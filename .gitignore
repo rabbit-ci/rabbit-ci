@@ -1,1 +1,4 @@
+deps/
+tmp/
+erl_crash.dump
 _build/
