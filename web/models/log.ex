@@ -1,7 +1,8 @@
 defmodule Rabbitci.Log do
   use Ecto.Model
 
-  schema "Logs" do
+  schema "logs" do
     field :stdio, :string
+    timestamps
   end
 end
