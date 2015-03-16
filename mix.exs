@@ -25,6 +25,9 @@ defmodule Rabbitci.Mixfile do
     [{:phoenix, "~> 0.10.0"},
      {:phoenix_ecto, "~> 0.1"},
      {:postgrex, ">= 0.0.0"},
-     {:cowboy, "~> 1.0"}]
+     {:cowboy, "~> 1.0"},
+     {:postgrex, "~> 0.8"},
+     {:ecto, "~> 0.9"}
+    ]
   end
 end
