@@ -3,6 +3,9 @@ defmodule Rabbitci.Log do
 
   schema "logs" do
     field :stdio, :string
+
+    belongs_to :script, Rabbitci.Script
+
     timestamps
   end
 

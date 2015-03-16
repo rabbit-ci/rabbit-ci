@@ -5,6 +5,7 @@ defmodule Rabbitci.Script do
     field :status, :string
     has_one :log, Rabbitci.Log
     # TODO: artifacts
+    belongs_to :build, Rabbitci.Log
     timestamps
   end
 

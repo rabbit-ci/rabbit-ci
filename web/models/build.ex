@@ -3,9 +3,11 @@ defmodule Rabbitci.Build do
 
   schema "builds" do
     field :build_number, :integer
-    field :branch_id, :integer
     field :start_time, Ecto.DateTime
     field :finish_time, Ecto.DateTime
+
+    belongs_to :branch, Rabbitci.Branch
+    has_many :scripts, Rabbitci.Script
 
     timestamps
   end
