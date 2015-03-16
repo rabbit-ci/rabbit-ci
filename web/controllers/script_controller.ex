@@ -8,12 +8,12 @@ defmodule Rabbitci.ScriptController do
 
   def index(conn, _params) do
     scripts = Repo.all(Script)
-    render conn, "index.html", scripts: scripts
+    # TODO do something
   end
 
   def new(conn, _params) do
     changeset = Script.changeset(%Script{})
-    render conn, "new.html", changeset: changeset
+    # TODO do something
   end
 
   def create(conn, %{"script" => script_params}) do
@@ -21,24 +21,21 @@ defmodule Rabbitci.ScriptController do
 
     if changeset.valid? do
       Repo.insert(changeset)
-
-      conn
-      |> put_flash(:info, "Script created succesfully.")
-      |> redirect(to: script_path(conn, :index))
+      # TODO do something else
     else
-      render conn, "new.html", changeset: changeset
+      # TODO do something
     end
   end
 
   def show(conn, %{"id" => id}) do
     script = Repo.get(Script, id)
-    render conn, "show.html", script: script
+    # TODO do something
   end
 
   def edit(conn, %{"id" => id}) do
     script = Repo.get(Script, id)
     changeset = Script.changeset(script)
-    render conn, "edit.html", script: script, changeset: changeset
+    # TODO do someting
   end
 
   def update(conn, %{"id" => id, "script" => script_params}) do
@@ -47,21 +44,15 @@ defmodule Rabbitci.ScriptController do
 
     if changeset.valid? do
       Repo.update(changeset)
-
-      conn
-      |> put_flash(:info, "Script updated succesfully.")
-      |> redirect(to: script_path(conn, :index))
+      # TODO do something
     else
-      render conn, "edit.html", script: script, changeset: changeset
+      # TODO do something
     end
   end
 
   def delete(conn, %{"id" => id}) do
     script = Repo.get(Script, id)
     Repo.delete(script)
-
-    conn
-    |> put_flash(:info, "Script deleted succesfully.")
-    |> redirect(to: script_path(conn, :index))
+    # TODO do something
   end
 end

@@ -13,6 +13,6 @@ defmodule Rabbitci.Log do
   with no validation performed.
   """
   def changeset(model, params \\ nil) do
-    cast(model, params, ~w(status), ~w())
+    cast(model, params, ~w(stdio), ~w())
   end
 end
