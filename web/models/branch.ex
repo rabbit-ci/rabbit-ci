@@ -7,7 +7,7 @@ defmodule Rabbitci.Branch do
 
     has_many :builds, Rabbitci.Build
 
-    # belongs_to :project, Project
+    belongs_to :project, Project
     timestamps
   end
 
