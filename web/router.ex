@@ -13,9 +13,11 @@ defmodule Rabbitci.Router do
   end
 
   scope "/", Rabbitci do
-    pipe_through :browser # Use the default browser stack
+    pipe_through :api # Use the default browser stack
 
-    get "/", PageController, :index
+    # get "/", PageController, :index
+
+    resources "/builds", BuildController, except: [:new, :edit]
   end
 
   # Other scopes may use custom stacks.

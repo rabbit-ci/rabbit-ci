@@ -8,12 +8,10 @@ defmodule Rabbitci.BuildController do
 
   def index(conn, _params) do
     builds = Repo.all(Build)
-    # Do someting
-  end
-
-  def new(conn, _params) do
-    changeset = Build.changeset(%Build{})
-    # Do someting
+    conn
+    |> assign(:builds, builds)
+    |> render("index.json")
+    # This will probably need to be paginated.
   end
 
   def create(conn, %{"build" => build_params}) do
