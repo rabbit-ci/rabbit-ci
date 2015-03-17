@@ -28,7 +28,8 @@ defmodule Rabbitci.Mixfile do
      {:cowboy, "~> 1.0"},
      {:postgrex, "~> 0.8"},
      {:ecto, "~> 0.9"},
-     {:ashes, ">= 0.0.3"}
+     {:ashes, ">= 0.0.3"},
+     {:remodel, "~> 0.0.1"}
     ]
   end
 end
