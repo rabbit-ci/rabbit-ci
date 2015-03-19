@@ -27,7 +27,6 @@ defmodule Rabbitci.BuildController do
     json(conn, %{message: "Please provide an array of ids", status: "error"})
   end
 
-
   def create(conn, %{"build" => build_params}) do
     changeset = Build.changeset(%Build{}, build_params)
 
