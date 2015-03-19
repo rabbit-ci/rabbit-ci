@@ -21,9 +21,7 @@ defmodule Rabbitci.BuildControllerTest do
     end
 
     response = get "/builds", ids: Enum.to_list(ids)
-
     body = Poison.decode!(response.resp_body)
-
     assert List.last(body)["build_number"] == 100
   end
 end
