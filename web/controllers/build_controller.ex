@@ -12,8 +12,8 @@ defmodule Rabbitci.BuildController do
     page = String.to_integer(page)
     builds = Repo.all(from b in Build,
                       where: b.id in ^ids,
-                      limit: 100,
-                      offset: ^(page * 100))
+                      limit: 30,
+                      offset: ^(page * 30))
 
     conn
     |> assign(:builds, builds)
