@@ -7,7 +7,7 @@ config :rabbitci, Rabbitci.Endpoint,
   server: false
 
 # Print only warnings and errors during test
-config :logger, level: :warn
+config :logger, level: :debug
 
 # Configure your database
 config :rabbitci, Rabbitci.Repo,

@@ -8,23 +8,27 @@ defmodule Rabbitci.BuildController do
   plug :action
 
 
-  def index(conn, %{"ids" => ids, "page" => page}) do
+  def index(conn, %{"ids" => ids, "page" => %{"offset" => page}}) do
+    page = String.to_integer(page)
     builds = Repo.all(from b in Build,
                       where: b.id in ^ids,
                       limit: 100,
                       offset: ^(page * 100))
+
     conn
     |> assign(:builds, builds)
     |> render("index.json")
   end
 
   def index(conn, params = %{"ids" => _}) do
-    index(conn, Map.merge(params, %{"page" => 0}))
+    index(conn, Map.merge(params, %{"page" => %{"offset" => "0"}}))
   end
 
   def index(conn, params) do
     # I don't think this is standard. And where are the response codes?
-    json(conn, %{message: "Please provide an array of ids", status: "error"})
+    conn
+    |> put_status(:bad_request)
+    |> json(%{message: "Please provide an array of ids", status: "error"})
   end
 
   def create(conn, %{"build" => build_params}) do
