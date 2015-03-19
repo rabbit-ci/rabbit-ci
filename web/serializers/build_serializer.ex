@@ -1,16 +1,15 @@
 defmodule Rabbitci.BuildSerializer do
   use Remodel
 
+  require Rabbitci.SerializerHelpers
+  alias Rabbitci.SerializerHelpers
+
   attributes [:id, :build_number, :start_time, :finish_time, :script_ids,
-              :branch_id]
+              :branch_id] # We also need timestamps
 
-  def script_ids(record) do
-    Rabbitci.Build.script_ids(record)
-  end
+  def script_ids(record), do: Rabbitci.Build.script_ids(record)
 
-  def start_time(%Rabbitci.Build{start_time: nil}), do: nil
-  def start_time(r), do: Ecto.DateTime.to_string(r.start_time)
-  def finish_time(%Rabbitci.Build{finish_time: nil}), do: nil
-  def finish_time(r), do: Ecto.DateTime.to_string(r.finish_time)
+  SerializerHelpers.time(start_time, Rabbitci.Build)
+  SerializerHelpers.time(finish_time, Rabbitci.Build)
 
 end
