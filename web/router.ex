@@ -18,6 +18,8 @@ defmodule Rabbitci.Router do
     # get "/", PageController, :index
 
     resources "/builds", BuildController, except: [:new, :edit]
+    resources "/projects", ProjectController, except: [:new, :edit]
+    resources "/branches", BranchController, expcet: [:new, :edit]
   end
 
   # Other scopes may use custom stacks.
