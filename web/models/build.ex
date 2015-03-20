@@ -23,9 +23,9 @@ defmodule Rabbitci.Build do
          ~w(start_time finish_time))
   end
 
-  def script_ids(model) do
+  def script_ids(record) do
     from(s in Rabbitci.Script,
-         where: s.build_id == ^model.id,
+         where: s.build_id == ^record.id,
          select: s.id)
     |> Rabbitci.Repo.all
   end
