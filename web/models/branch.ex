@@ -20,4 +20,12 @@ defmodule Rabbitci.Branch do
   def changeset(model, params \\ nil) do
     cast(model, params, ~w(name, exists_in_git), ~w())
   end
+
+  def build_ids(record) do
+    from(b in Rabbitci.Build,
+         where: b.branch_id == ^record.id,
+         select: b.id)
+    |> Rabbitci.Repo.all
+  end
+
 end
