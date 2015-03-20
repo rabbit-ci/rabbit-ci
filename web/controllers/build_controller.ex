@@ -4,9 +4,7 @@ defmodule Rabbitci.BuildController do
   import Ecto.Query
   alias Rabbitci.Build
 
-  plug :scrub_params, "build" when action in [:create, :update]
   plug :action
-
 
   def index(conn, %{"ids" => ids, "page" => %{"offset" => page}}) do
     page = String.to_integer(page)
