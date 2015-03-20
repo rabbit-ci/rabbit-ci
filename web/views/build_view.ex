@@ -5,4 +5,8 @@ defmodule Rabbitci.BuildView do
     Rabbitci.BuildSerializer.to_map(builds)
   end
 
+  def render("show.json", %{build: build}) do
+    Rabbitci.BuildSerializer.to_map(build)
+  end
+
 end

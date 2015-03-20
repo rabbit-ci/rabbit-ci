@@ -10,7 +10,10 @@ defmodule Rabbitci.ProjectSerializer do
               :updated_at]
 
   # Conn is scope
-  def branch_url(_, conn), do: Rabbitci.Router.Helpers.branch_path(conn, :index)
+  def branch_url(m, conn) do
+    Rabbitci.Router.Helpers.branch_path(conn, :index, m.id)
+  end
+
   def branch_ids(record), do: Rabbitci.Project.branch_ids(record)
 
   SerializerHelpers.time(inserted_at, Rabbitci.Project)

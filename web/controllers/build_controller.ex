@@ -6,10 +6,11 @@ defmodule Rabbitci.BuildController do
 
   plug :action
 
-  def index(conn, %{"ids" => ids, "page" => %{"offset" => page}}) do
+  def index(conn, %{"branch_id" => branch_id,
+                    "page" => %{"offset" => page}}) do
     page = String.to_integer(page)
     builds = Repo.all(from b in Build,
-                      where: b.id in ^ids,
+                      where: b.branch_id == ^branch_id,
                       limit: 30,
                       offset: ^(page * 30))
 
@@ -18,15 +19,8 @@ defmodule Rabbitci.BuildController do
     |> render("index.json")
   end
 
-  def index(conn, params = %{"ids" => _}) do
-    index(conn, Map.merge(params, %{"page" => %{"offset" => "0"}}))
-  end
-
   def index(conn, params) do
-    # I don't think this is standard. And where are the response codes?
-    conn
-    |> put_status(:bad_request)
-    |> json(%{message: "Please provide an array of ids", status: "error"})
+    index(conn, Map.merge(params, %{"page" => %{"offset" => "0"}}))
   end
 
   def create(conn, %{"build" => build_params}) do
@@ -40,9 +34,14 @@ defmodule Rabbitci.BuildController do
     end
   end
 
-  def show(conn, %{"id" => id}) do
-    build = Repo.get(Build, id)
-    # Do someting
+  def show(conn, %{"branch_id" => branch_id, "build_number" => build_number}) do
+    build = Repo.all(from b in Build,
+                     where: b.build_number == ^build_number and
+                     b.branch_id == ^branch_id)
+
+    conn
+    |> assign(:build, build)
+    |> render("show.json")
   end
 
   def edit(conn, %{"id" => id}) do
