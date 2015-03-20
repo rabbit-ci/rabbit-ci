@@ -5,10 +5,12 @@ defmodule Rabbitci.BranchSerializer do
   require Rabbitci.SerializerHelpers
   alias Rabbitci.SerializerHelpers
 
-  attributes [:id, :updated_at, :inserted_at, :name, :build_ids] # TODO: build_url
+  attributes [:id, :updated_at, :inserted_at, :name, :build_ids, :build_url]
 
-  def builds_ids(record), do: Rabbitci.Branch.builds_ids(record)
-    # def build_url(_, conn),
+  def build_ids(record), do: Rabbitci.Branch.build_ids(record)
+  def build_url(m, conn) do
+    Rabbitci.Router.Helpers.build_path(conn, :index, m.project_id, m.id)
+  end
 
   SerializerHelpers.time(updated_at, Rabbitci.Branch)
   SerializerHelpers.time(inserted_at, Rabbitci.Branch)

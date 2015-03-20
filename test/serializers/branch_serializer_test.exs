@@ -1,18 +1,21 @@
 defmodule Rabbitci.BranchSerializerTest do
-  use Rabbitci.TestHelper
   use Rabbitci.Integration.Case
+  use Rabbitci.TestHelper
 
   test "Correct attributes should exist" do
-    b = Rabbitci.Repo.insert(%Rabbitci.Branch{name: "thing"})
-    map = Rabbitci.BranchSerializer.to_list(b)
+    p = Rabbitci.Repo.insert(%Rabbitci.Project{name: "Project", repo: "things"})
+    b = Rabbitci.Repo.insert(%Rabbitci.Branch{name: "thing", project_id: p.id})
+    map = Rabbitci.BranchSerializer.to_map(b)
 
     assert map.id != nil
     assert is_binary(map.updated_at)
     assert is_binary(map.inserted_at)
-    assert name != nil
-    assert is_list(map.builds_ids)
+    assert map.name != nil
+    assert is_list(map.build_ids)
+    assert map.build_url != nil
 
     assert Enum.sort(Map.keys(map)) == Enum.sort([:id, :updated_at, :name,
-                                                  :build_ids])
+                                                  :build_ids, :build_url,
+                                                  :inserted_at])
   end
 end

@@ -1,6 +1,6 @@
 defmodule Rabbitci.ProjectSerializerTest do
-  use Rabbitci.TestHelper
   use Rabbitci.Integration.Case
+  use Rabbitci.TestHelper
 
   test "Correct attributes should exist" do
     p = Rabbitci.Repo.insert(%Rabbitci.Project{name: "Project", repo: "things"})

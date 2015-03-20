@@ -11,7 +11,7 @@ defmodule Rabbitci.TestHelper do
     end
   end
 
-  def post(url, params \\ []), do: conn(:post, url, params)
+  def post(url, params \\ []), do: _conn(:post, url, params)
   def get(url, params \\ []), do: _conn(:get, url, params)
 
   defp _conn(type, url, params) do
