@@ -1,6 +1,5 @@
 defmodule Rabbitci.Branch do
-  use Ecto.Model
-  import Rabbitci.ModelHelpers
+  use Rabbitci.Web, :model
 
   schema "branches" do
     field :name, :string

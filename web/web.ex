@@ -39,6 +39,7 @@ defmodule Rabbitci.Web do
   def model do
     quote do
       use Ecto.Model
+      import Rabbitci.ModelHelpers
     end
   end
 
