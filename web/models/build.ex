@@ -21,6 +21,7 @@ defmodule Rabbitci.Build do
   def changeset(model, params \\ nil) do
     cast(model, params, ~w(build_number branch_id),
          ~w(start_time finish_time))
+    |> validate_unique_with_scope(:build_number, [scope: :branch_id])
   end
 
   def script_ids(record) do
