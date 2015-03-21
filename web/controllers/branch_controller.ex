@@ -13,4 +13,9 @@ defmodule Rabbitci.BranchController do
     |> assign(:branches, branches)
     |> render("index.json")
   end
+
+  def show(conn, %{"id" => id}) do
+    branch = Repo.one(from b in Rabbitci.Branch, where: b.id == ^id)
+    conn |> assign(:branches, [branch]) |> render("index.json")
+  end
 end
