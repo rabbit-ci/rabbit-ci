@@ -1,5 +1,6 @@
 defmodule Rabbitci.Branch do
   use Ecto.Model
+  import Rabbitci.ModelHelpers
 
   schema "branches" do
     field :name, :string
@@ -18,7 +19,8 @@ defmodule Rabbitci.Branch do
   with no validation performed.
   """
   def changeset(model, params \\ nil) do
-    cast(model, params, ~w(name, exists_in_git), ~w())
+    cast(model, params, ~w(name exists_in_git), ~w())
+    |> validate_unique_with_scope(:name, [scope: :project_id])
   end
 
   def build_ids(record) do
