@@ -17,8 +17,8 @@ defmodule Rabbitci.ProjectController do
     |> render("index.json")
   end
 
-  def show(conn, %{"id" => id}) do
-    project = Repo.one(from p in Project, where: p.id == ^id)
+  def show(conn, %{"id" => name}) do
+    project = Repo.one(from p in Project, where: p.name == ^name)
     conn |> assign(:projects, [project]) |> render("index.json")
   end
 

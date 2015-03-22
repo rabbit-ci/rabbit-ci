@@ -20,12 +20,12 @@ defmodule Rabbitci.Router do
 
     resources "/projects", ProjectController, except: [:new, :edit]
 
-    get "/projects/:project_id/branches", BranchController, :index
-    get "/projects/:project_id/branches/:id", BranchController, :show
+    get "/projects/:project_name/branches", BranchController, :index
+    get "/projects/:project_name/branches/:name", BranchController, :show
 
-    get "/projects/:project_id/branches/:branch_id/builds",
+    get "/projects/:project_name/branches/:branch_name/builds",
     BuildController, :index
-    get "/projects/:project_id/branches/:branch_id/builds/:build_number",
+    get "/projects/:project_name/branches/:branch_name/builds/:build_number",
     BuildController, :show
 
     #resources "/branches", BranchController, except: [:new, :edit]

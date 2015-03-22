@@ -3,11 +3,21 @@ defmodule Rabbitci.BuildController do
 
   import Ecto.Query
   alias Rabbitci.Build
+  alias Rabbitci.Branch
+  alias Rabbitci.Project
 
   plug :action
 
-  def index(conn, %{"branch_id" => branch_id,
-                    "page" => %{"offset" => page}}) do
+  defp get_ids(%{"project_name" => project_name, "branch_name" => branch_name}) do
+    project_id = Repo.one(from p in Project, where: p.name == ^project_name).id
+    branch_id = Repo.one(from b in Branch,
+                         where: b.name == ^branch_name and
+                         b.project_id == ^project_id).id
+    {project_id, branch_id}
+  end
+
+  def index(conn, params = %{"page" => %{"offset" => page}}) do
+    {project_id, branch_id} = get_ids(params)
     page = String.to_integer(page)
     builds = Repo.all(from b in Build,
                       where: b.branch_id == ^branch_id,
@@ -34,7 +44,8 @@ defmodule Rabbitci.BuildController do
     end
   end
 
-  def show(conn, %{"branch_id" => branch_id, "build_number" => build_number}) do
+  def show(conn, params = %{"build_number" => build_number}) do
+    {project_id, branch_id} = get_ids(params)
     build = Repo.all(from b in Build,
                      where: b.build_number == ^build_number and
                      b.branch_id == ^branch_id)

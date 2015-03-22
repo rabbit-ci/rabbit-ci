@@ -6,7 +6,7 @@ defmodule Rabbitci.ProjectSerializer do
   require Rabbitci.SerializerHelpers
   alias Rabbitci.SerializerHelpers
 
-  attributes [:id, :name, :repo, :branch_ids, :branch_url, :inserted_at,
+  attributes [:id, :name, :repo, :branch_names, :branch_url, :inserted_at,
               :updated_at]
 
   # Conn is scope
@@ -14,7 +14,7 @@ defmodule Rabbitci.ProjectSerializer do
     Rabbitci.Router.Helpers.branch_path(conn, :index, m.id)
   end
 
-  def branch_ids(record), do: Rabbitci.Project.branch_ids(record)
+  def branch_names(record), do: Rabbitci.Project.branch_names(record)
 
   SerializerHelpers.time(inserted_at, Rabbitci.Project)
   SerializerHelpers.time(updated_at, Rabbitci.Project)
