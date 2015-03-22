@@ -10,10 +10,11 @@ defmodule Rabbitci.Router do
 
   pipeline :api do
     plug :accepts, ["json"]
+    plug :allow_origin
   end
 
   scope "/", Rabbitci do
-    pipe_through :api # Use the default browser stack
+    pipe_through :api
 
     # get "/", PageController, :index
 
@@ -35,4 +36,15 @@ defmodule Rabbitci.Router do
   # scope "/api", Rabbitci do
   #   pipe_through :api
   # end
+
+  defp allow_origin(conn, _opts) do
+    headers = get_req_header(conn, "access-control-request-headers")
+    |> Enum.join(", ")
+
+    conn
+    |> put_resp_header("access-control-allow-origin", "*")
+    |> put_resp_header("access-control-allow-headers", headers)
+    |> put_resp_header("access-control-allow-methods", "get, post, options")
+    |> put_resp_header("access-control-max-age", "3600")
+  end
 end

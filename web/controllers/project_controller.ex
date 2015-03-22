@@ -22,4 +22,7 @@ defmodule Rabbitci.ProjectController do
     conn |> assign(:projects, [project]) |> render("index.json")
   end
 
+  def create(conn, params = %{}) do
+  end
+
 end
