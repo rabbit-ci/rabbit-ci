@@ -28,6 +28,8 @@ defmodule Rabbitci.Router do
     get "/projects/:project_name/branches/:branch_name/builds/:build_number",
     BuildController, :show
 
+    post "/config_extraction", ConfigExtractionController, :create
+
     #resources "/branches", BranchController, except: [:new, :edit]
     #resources "/builds", BuildController, except: [:new, :edit]
   end
