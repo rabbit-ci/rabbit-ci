@@ -1,5 +1,5 @@
 defmodule Rabbitci.Log do
-  use Ecto.Model
+  use Rabbitci.Web, :model
 
   schema "logs" do
     field :stdio, :string

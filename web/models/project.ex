@@ -1,5 +1,5 @@
 defmodule Rabbitci.Project do
-  use Ecto.Model
+  use Rabbitci.Web, :model
 
   schema "projects" do
     field :name, :string
