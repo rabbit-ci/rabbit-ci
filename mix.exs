@@ -15,7 +15,7 @@ defmodule Rabbitci.Mixfile do
   # Type `mix help compile.app` for more information
   def application do
     [mod: {Rabbitci, []},
-     applications: [:phoenix, :cowboy, :logger, :ecto, :postgrex]]
+     applications: [:phoenix, :cowboy, :logger, :ecto, :postgrex, :exq]]
   end
 
   # Specifies your project dependencies
@@ -29,7 +29,9 @@ defmodule Rabbitci.Mixfile do
      {:postgrex, "~> 0.8"},
      {:ecto, "~> 0.9"},
      {:ashes, ">= 0.0.3"},
-     {:remodel, "~> 0.0.1"}
+     {:remodel, "~> 0.0.1"},
+     {:exq, github: "akira/exq"},
+     {:eredis, github: 'wooga/eredis', tag: 'v1.0.5'}
     ]
   end
 end
