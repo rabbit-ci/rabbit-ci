@@ -10,6 +10,7 @@ config :rabbitci, Rabbitci.Endpoint,
   url: [host: "localhost"],
   secret_key_base: "MOd1xikwYz0y3kr5GlBxA4pDUf5catrgRfANogH5PaCp4QcaJXKpnvorZLq6j6DH",
   debug_errors: false,
+  root: Path.expand("..", __DIR__),
   pubsub: [name: Rabbitci.PubSub,
            adapter: Phoenix.PubSub.PG2]
 

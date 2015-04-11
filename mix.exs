@@ -5,8 +5,10 @@ defmodule Rabbitci.Mixfile do
     [app: :rabbitci,
      version: "0.0.1",
      elixir: "~> 1.0",
-     elixirc_paths: ["lib", "web"],
+     elixirc_paths: elixirc_paths(Mix.env),
      compilers: [:phoenix] ++ Mix.compilers,
+     build_embedded: Mix.env == :prod,
+     start_permanent: Mix.env == :prod,
      deps: deps]
   end
 
@@ -34,4 +36,8 @@ defmodule Rabbitci.Mixfile do
      {:eredis, github: 'wooga/eredis', tag: 'v1.0.5'}
     ]
   end
+
+  # Specifies which paths to compile per environment
+  defp elixirc_paths(:test), do: ["lib", "web", "test/support"]
+  defp elixirc_paths(_),     do: ["lib", "web"]
 end

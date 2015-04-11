@@ -18,9 +18,6 @@ defmodule Rabbitci.Web do
 
       # Import URL helpers from the router
       import Rabbitci.Router.Helpers
-
-      # Import all HTML functions (forms, tags, etc)
-      use Phoenix.HTML
     end
   end
 
