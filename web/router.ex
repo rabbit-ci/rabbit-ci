@@ -18,6 +18,8 @@ defmodule Rabbitci.Router do
 
     # get "/", PageController, :index
 
+    get "/queue", QueueController, :index
+
     resources "/projects", ProjectController, except: [:new, :edit]
 
     get "/projects/:project_name/branches", BranchController, :index
