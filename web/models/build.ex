@@ -3,8 +3,10 @@ defmodule Rabbitci.Build do
 
   schema "builds" do
     field :build_number, :integer
+
     field :start_time, Ecto.DateTime
     field :finish_time, Ecto.DateTime
+    field :commit, :string
 
     belongs_to :branch, Rabbitci.Branch
     has_many :scripts, Rabbitci.Script
@@ -20,9 +22,13 @@ defmodule Rabbitci.Build do
   with no validation performed.
   """
   def changeset(model, params \\ nil) do
-    cast(model, params, ~w(build_number branch_id),
+    cast(model, params, ~w(build_number branch_id commit),
          ~w(start_time finish_time))
     |> validate_unique_with_scope(:build_number, [scope: :branch_id])
+
+    # Build numbers are scoped on the branch. IE each branch counts
+    # builds separately. This is to prevent the confusion of Branch A
+    # having builds 1, 2, and 4 because Branch B took build 3.
   end
 
   def script_ids(record) do
@@ -32,5 +38,16 @@ defmodule Rabbitci.Build do
     |> Rabbitci.Repo.all
   end
 
+  def latest_build_number(branch = %Rabbitci.Branch{}) do
+    query = (from b in Rabbitci.Build,
+             where: b.branch_id == ^branch.id,
+             select: b.build_number,
+             limit: 1,
+             order_by: [desc: b.build_number])
+
+    Rabbitci.Repo.one(query)
+  end
+
+  # TODO: latest_build_number when given a build
 
 end

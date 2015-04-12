@@ -28,6 +28,7 @@ defmodule Rabbitci.Web do
       # Alias the data repository as a convenience
       alias Rabbitci.Repo
 
+      import Rabbitci.ControllerHelpers
       # Import URL helpers from the router
       import Rabbitci.Router.Helpers
     end
