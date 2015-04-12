@@ -8,10 +8,10 @@ defmodule Rabbitci.QueueController do
   alias Rabbitci.Branch
   alias Rabbitci.Project
 
-  # TODO: Should this be a POST?
   # TODO: More detailed information about which parameter is missing.
   # TODO: This explodes when you attempt to provide the same branch and commit twice.
-  def index(conn, %{"repo" => repo, "commit" => commit, "branch" => branch_name}) do
+  #       Solve by giving the extractor a build id?
+  def create(conn, %{"repo" => repo, "commit" => commit, "branch" => branch_name}) do
     case get_project_from_repo(repo) do
       nil ->
         conn |> send_resp(404, "Could not find project")
@@ -33,7 +33,7 @@ defmodule Rabbitci.QueueController do
     end
   end
 
-  def index(conn, _) do
+  def create(conn, _) do
     conn |> send_resp(400, '"repo", "branch", or "commit" URL parameter missing.')
   end
 
