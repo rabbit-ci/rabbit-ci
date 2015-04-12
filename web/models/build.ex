@@ -8,6 +8,7 @@ defmodule Rabbitci.Build do
 
     belongs_to :branch, Rabbitci.Branch
     has_many :scripts, Rabbitci.Script
+    has_one :config_file, Rabbitci.ConfigFile
 
     timestamps
   end
