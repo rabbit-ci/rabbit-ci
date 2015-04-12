@@ -5,8 +5,15 @@ defmodule Rabbitci.ConfigExtractionController do
 
   def create(conn, params) do
     {:ok, body, _} = read_body(conn)
-    # config = %Rabbitci.Config{body: body, build_id: _}
-    conn |> json(%{message: "received"})
+    case decoded = Poison.decode(body) do
+      {:ok, content} ->
+        {:ok, json} = Poison.encode(content) # This removes formatting nonsense.
+        # TODO: put JSON in DB.
+        json(conn, %{message: "received"})
+      {:error, _} ->
+        # TODO: Now we need to record that the JSON is invalid.
+        conn |> put_status(400) |> json(%{message: "JSON is invalid."})
+    end
   end
 
 end
