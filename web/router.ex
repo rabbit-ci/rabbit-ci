@@ -16,9 +16,10 @@ defmodule Rabbitci.Router do
   scope "/", Rabbitci do
     pipe_through :api
 
-    # get "/", PageController, :index
+    get "/", PageController, :index
 
-    get "/queue", QueueController, :index
+    post "/queue", QueueController, :create
+    post "/config_extraction", ConfigExtractionController, :create
 
     resources "/projects", ProjectController, except: [:new, :edit]
 
@@ -29,18 +30,10 @@ defmodule Rabbitci.Router do
     BuildController, :index
     get "/projects/:project_name/branches/:branch_name/builds/:build_number",
     BuildController, :show
-
-    post "/config_extraction", ConfigExtractionController, :create
-
-    #resources "/branches", BranchController, except: [:new, :edit]
-    #resources "/builds", BuildController, except: [:new, :edit]
   end
 
-  # Other scopes may use custom stacks.
-  # scope "/api", Rabbitci do
-  #   pipe_through :api
-  # end
-
+  # This should be changed in production and must be based off of the server's
+  # configuration.
   defp allow_origin(conn, _opts) do
     headers = get_req_header(conn, "access-control-request-headers")
     |> Enum.join(", ")

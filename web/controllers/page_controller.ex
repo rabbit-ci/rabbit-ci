@@ -4,6 +4,6 @@ defmodule Rabbitci.PageController do
   plug :action
 
   def index(conn, _params) do
-    render conn, "index.html"
+    send_resp(conn, 200, "Server is running.")
   end
 end
