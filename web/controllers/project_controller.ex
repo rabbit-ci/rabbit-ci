@@ -19,7 +19,10 @@ defmodule Rabbitci.ProjectController do
 
   def show(conn, %{"id" => name}) do
     project = Repo.one(from p in Project, where: p.name == ^name)
-    conn |> assign(:project, project) |> render("show.json")
+    case project do
+      nil -> conn |> send_resp(404, "Project not found.")
+      _ -> conn |> assign(:project, project) |> render("show.json")
+    end
   end
 
   def create(conn, params = %{}) do

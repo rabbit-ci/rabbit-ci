@@ -1,11 +1,6 @@
 defmodule Rabbitci.Endpoint do
   use Phoenix.Endpoint, otp_app: :rabbitci
 
-  # Serve at "/" the given assets from "priv/static" directory
-  plug Plug.Static,
-    at: "/", from: :rabbitci,
-    only: ~w(css images js favicon.ico robots.txt)
-
   plug Plug.Logger
 
   if code_reloading? do
