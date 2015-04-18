@@ -22,5 +22,5 @@ config :exq,
   host: '127.0.0.1',
   port: 6379,
   namespace: "resque",
-  queues: [""] # We put an empty string for the queue so that it does not attempt to run anything.
+  queues: ["nothing"] # We need a queue which will never be written to so that it does not timeout.
                # We can add things to the queue just fine.
