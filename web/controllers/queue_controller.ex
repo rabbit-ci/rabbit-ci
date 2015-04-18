@@ -8,6 +8,7 @@ defmodule Rabbitci.QueueController do
   alias Rabbitci.Branch
   alias Rabbitci.Project
 
+  # TODO: This will not create new branches.
   # TODO: More detailed information about which parameter is missing.
   # TODO: This explodes when you attempt to provide the same branch and commit twice.
   #       Solve by giving the extractor a build id?
@@ -25,7 +26,8 @@ defmodule Rabbitci.QueueController do
         case build.valid? do
           true ->
             b2 = Repo.insert(build)
-            Exq.enqueue(:exq, "workers", "ConfigExtractor", [repo, commit, branch_name])
+            Exq.enqueue(:exq, "workers", "ConfigExtractor", [repo, commit, branch_name,
+                                                             build_number])
             conn |> send_resp(200, "Queued")
           false ->
             conn |> send_resp(500, "Error! #{build.errors}")

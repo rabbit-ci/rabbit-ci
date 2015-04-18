@@ -8,19 +8,28 @@ defmodule Rabbitci.BuildController do
 
   plug :action
 
-  defp get_ids(%{"project_name" => project_name, "branch_name" => branch_name}) do
-    project_id = Repo.one(from p in Project, where: p.name == ^project_name).id
-    branch_id = Repo.one(from b in Branch,
+  # TODO: clean this up
+  defp get_parents(%{"project_name" => project_name, "branch_name" => branch_name}) do
+    project = Repo.one(from p in Project, where: p.name == ^project_name)
+    branch = Repo.one(from b in Branch,
                          where: b.name == ^branch_name and
-                         b.project_id == ^project_id).id
-    {project_id, branch_id}
+                         b.project_id == ^project.id)
+    {project, branch}
+  end
+
+  def config_file(conn, params = %{"build_number" => build_number}) do
+    {project, branch} = get_parents(params)
+    build = Rabbitci.Repo.preload(get_build(branch, build_number), :config_file)
+    conn
+    |> put_resp_content_type("application/json")
+    |> send_resp(200, build.config_file.raw_body)
   end
 
   def index(conn, params = %{"page" => %{"offset" => page}}) do
-    {project_id, branch_id} = get_ids(params)
+    {_, branch} = get_parents(params)
     page = String.to_integer(page)
     builds = Repo.all(from b in Build,
-                      where: b.branch_id == ^branch_id,
+                      where: b.branch_id == ^branch.id,
                       limit: 30,
                       offset: ^(page * 30))
 
@@ -45,10 +54,8 @@ defmodule Rabbitci.BuildController do
   end
 
   def show(conn, params = %{"build_number" => build_number}) do
-    {project_id, branch_id} = get_ids(params)
-    build = Repo.all(from b in Build,
-                     where: b.build_number == ^build_number and
-                     b.branch_id == ^branch_id)
+    {_, branch} = get_parents(params)
+    build = get_build(branch, build_number)
 
     conn
     |> assign(:build, build)

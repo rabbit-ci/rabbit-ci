@@ -9,4 +9,8 @@ defmodule Rabbitci.BuildView do
     Rabbitci.BuildSerializer.to_map(build)
   end
 
+  def render("config_file.json", %{config_file: config_file}) do
+    Rabbitci.ConfigFileSerializer.to_map(config_file)
+  end
+
 end

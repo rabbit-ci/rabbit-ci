@@ -9,20 +9,22 @@ defmodule Rabbitci.ConfigExtractionController do
 
   import Ecto.Query
 
-  def create(conn, %{"commit" => commit, "repo" => repo, "branch" => branch_name}) do
+  def create(conn, %{"repo" => repo, "commit" => commit, "branch" => branch_name,
+                     "build_number" => build_number}) do
     {:ok, body, _} = read_body(conn)
     case decoded = Poison.decode(body) do
       {:ok, content} ->
         {:ok, json} = Poison.encode(content) # This removes formatting nonsense.
-        build = (get_project_from_repo(repo)
-                 |> get_branch(branch_name)
-                 |> get_build(commit))
+        project = get_project_from_repo(repo)
+        branch = get_branch(project, branch_name)
+        build = get_build(branch, build_number)
 
-        # TODO: Am I using changesets right?
         config = ConfigFile.changeset(%ConfigFile{}, %{build_id: build.id, raw_body: json})
         case config.valid? do
           true ->
             Repo.insert(config)
+            Exq.enqueue(:exq, "workers", "BuildRunner", [project.name, branch.name,
+                                                         build.build_number])
             json(conn, %{message: "received"})
           false ->
             conn
@@ -33,12 +35,6 @@ defmodule Rabbitci.ConfigExtractionController do
         # TODO: Now we need to record that the JSON is invalid.
         conn |> put_status(400) |> json(%{message: "JSON is invalid."})
     end
-  end
-
-  defp get_build(branch, commit) do
-    query = (from b in Build,
-             where: b.branch_id == ^branch.id and b.commit == ^commit)
-    Repo.one(query)
   end
 
 end
