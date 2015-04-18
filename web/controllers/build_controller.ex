@@ -17,12 +17,22 @@ defmodule Rabbitci.BuildController do
     {project, branch}
   end
 
-  def config_file(conn, params = %{"build_number" => build_number}) do
+  # def config(conn, params = %{"build_number" => build_number, "raw" => true}) do
+  #   {project, branch} = get_parents(params)
+  #   build = Rabbitci.Repo.preload(get_build(branch, build_number), :config_file)
+  #   conn
+  #   |> put_resp_content_type("application/json")
+  #   |> send_resp(200, build.config_file.raw_body)
+  # end
+
+  def config(conn, params = %{"build_number" => build_number}) do
     {project, branch} = get_parents(params)
     build = Rabbitci.Repo.preload(get_build(branch, build_number), :config_file)
     conn
-    |> put_resp_content_type("application/json")
-    |> send_resp(200, build.config_file.raw_body)
+    |> assign(:build, build)
+    |> assign(:branch, branch)
+    |> assign(:project, project)
+    |> render("config.json")
   end
 
   def index(conn, params = %{"page" => %{"offset" => page}}) do
