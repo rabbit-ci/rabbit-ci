@@ -5,9 +5,10 @@ defmodule Rabbitci.BranchSerializer do
   require Rabbitci.SerializerHelpers
   alias Rabbitci.SerializerHelpers
 
-  attributes [:id, :updated_at, :inserted_at, :name, :build_ids]
+  attributes [:id, :updated_at, :inserted_at, :name]
 
-  def build_ids(record), do: Rabbitci.Branch.build_ids(record)
+  def id(record), do: record.name
+  # def build_ids(record), do: Rabbitci.Branch.build_ids(record)
 
   # TODO: Fix this.
   # def build_url(m, conn) do
