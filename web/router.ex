@@ -30,6 +30,10 @@ defmodule Rabbitci.Router do
     BuildController, :index
     get "/projects/:project_name/branches/:branch_name/builds/:build_number",
     BuildController, :show
+    put "/projects/:project_name/branches/:branch_name/builds/:build_number/log",
+    BuildController, :log_put
+    get "/projects/:project_name/branches/:branch_name/builds/:build_number/log",
+    BuildController, :log_get
     get "/projects/:project_name/branches/:branch_name/builds/:build_number/config",
     BuildController, :config
   end

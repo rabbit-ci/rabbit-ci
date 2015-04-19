@@ -3,6 +3,7 @@ defmodule Rabbitci.Script do
 
   schema "scripts" do
     field :status, :string
+    field :name, :string
     has_one :log, Rabbitci.Log
     # TODO: artifacts
     belongs_to :build, Rabbitci.Log

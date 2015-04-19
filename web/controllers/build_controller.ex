@@ -5,6 +5,8 @@ defmodule Rabbitci.BuildController do
   alias Rabbitci.Build
   alias Rabbitci.Branch
   alias Rabbitci.Project
+  alias Rabbitci.Script
+  alias Rabbitci.Log
 
   plug :action
 
@@ -17,17 +19,39 @@ defmodule Rabbitci.BuildController do
     {project, branch}
   end
 
-  # def config(conn, params = %{"build_number" => build_number, "raw" => true}) do
-  #   {project, branch} = get_parents(params)
-  #   build = Rabbitci.Repo.preload(get_build(branch, build_number), :config_file)
-  #   conn
-  #   |> put_resp_content_type("application/json")
-  #   |> send_resp(200, build.config_file.raw_body)
-  # end
+  def log_put(conn, params = %{"build_number" => build_number,
+                               "script" => script_name}) do
+    {:ok, body, _} = read_body(conn)
+    {_, branch} = get_parents(params)
+    build = Repo.preload(get_build(branch, build_number), :scripts)
+    case Enum.find(build.scripts, fn(script) -> script.name == script_name end) do
+      nil ->
+        script = Repo.insert(%Script{name: script_name, status: "running", build_id: build.id})
+        Repo.insert(%Log{stdio: body, script_id: script.id})
+      script ->
+        log = Repo.preload(script, :log).log
+        Repo.update(%{log | stdio: log.stdio <> body})
+    end
+
+    conn |> send_resp(200, "Hopefully this worked.")
+  end
+
+  def log_get(conn, params = %{"build_number" => build_number}) do
+    {_, branch} = get_parents(params)
+    build = Repo.preload(get_build(branch, build_number), scripts: [:log])
+
+    log_str = Enum.map(build.scripts, fn(script) ->
+      "--> Begin #{script.name} log\n"
+      <> script.log.stdio
+      <> "--> End #{script.name} log\n\n"
+    end) |> Enum.join
+
+    conn |> send_resp(200, log_str)
+  end
 
   def config(conn, params = %{"build_number" => build_number}) do
     {project, branch} = get_parents(params)
-    build = Rabbitci.Repo.preload(get_build(branch, build_number), :config_file)
+    build = Repo.preload(get_build(branch, build_number), :config_file)
     conn
     |> assign(:build, build)
     |> assign(:branch, branch)
