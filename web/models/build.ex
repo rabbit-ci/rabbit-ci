@@ -38,16 +38,13 @@ defmodule Rabbitci.Build do
     |> Rabbitci.Repo.all
   end
 
-  def latest_build_number(branch = %Rabbitci.Branch{}) do
+  def latest_build_on_branch(branch = %Rabbitci.Branch{}) do
     query = (from b in Rabbitci.Build,
              where: b.branch_id == ^branch.id,
-             select: b.build_number,
+             # select: b.build_number,
              limit: 1,
              order_by: [desc: b.build_number])
 
     Rabbitci.Repo.one(query)
   end
-
-  # TODO: latest_build_number when given a build
-
 end

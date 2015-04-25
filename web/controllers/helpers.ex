@@ -18,6 +18,10 @@ defmodule Rabbitci.ControllerHelpers do
     Repo.one(query)
   end
 
+  def get_build(branch, "latest") do
+    Build.latest_build_on_branch(branch)
+  end
+
   def get_build(branch, build_number) do
     query = (from b in Build,
              where: b.branch_id == ^branch.id

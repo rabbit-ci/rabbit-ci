@@ -18,7 +18,7 @@ defmodule Rabbitci.QueueController do
         conn |> send_resp(404, "Could not find project")
       project ->
         branch = get_branch(project, branch_name)
-        latest_build_number = Build.latest_build_number(branch)
+        latest_build_number = Build.latest_build_on_branch(branch).build_number
         build_number = (latest_build_number || 0) + 1 # (nil || 0) + 1 #=> 1
         build = Build.changeset(%Build{}, %{build_number: build_number, branch_id: branch.id,
                                             commit: commit})
