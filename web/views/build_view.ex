@@ -12,13 +12,14 @@ defmodule Rabbitci.BuildView do
 
   def render("config.json", %{build: build, project: project, branch: branch}) do
     config = Poison.decode!(build.config_file.raw_body)
-    env = %{"BRANCH" => branch.name, "COMMIT" => build.commit, "PROJECT_NAME" => project.name,
-            "BUILD_NUMBER" => build.build_number, "REPO" => project.repo}
+    env = %{"BRANCH" => branch.name, "COMMIT" => build.commit,
+            "PROJECT_NAME" => project.name, "BUILD_NUMBER" => build.build_number,
+            "REPO" => project.repo}
+
     env = Map.merge(config["ENV"], expand_env_vars(env))
     Map.put(config, "ENV", env)
     |> merge_script_envs
   end
-
 
   defp expand_env_vars(env_vars) do
     Enum.map(env_vars, fn({key, value}) ->
