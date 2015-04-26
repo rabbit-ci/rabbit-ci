@@ -35,6 +35,4 @@ defmodule Rabbitci.BuildView do
     Map.put(config, "scripts", new_scripts)
     |> Map.delete("ENV")
   end
-
-
 end
