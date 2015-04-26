@@ -25,4 +25,9 @@ defmodule Rabibtci.HelpersTest do
     assert ControllerHelpers.get_build(branch2, 1) == build2
     assert ControllerHelpers.get_build(branch2, "latest") == build3
   end
+
+  test "get_project_from_repo" do
+    project = Repo.insert(%Project{name: "blah", repo: "lala"})
+    assert ControllerHelpers.get_project_from_repo(project.repo) == project
+  end
 end
