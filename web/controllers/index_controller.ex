@@ -1,4 +1,4 @@
-defmodule Rabbitci.PageController do
+defmodule Rabbitci.IndexController do
   use Rabbitci.Web, :controller
 
   plug :action

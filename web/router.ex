@@ -16,7 +16,7 @@ defmodule Rabbitci.Router do
   scope "/", Rabbitci do
     pipe_through :api
 
-    get "/", PageController, :index
+    get "/", IndexController, :index
 
     post "/queue", QueueController, :create
     post "/config_extraction", ConfigExtractionController, :create
