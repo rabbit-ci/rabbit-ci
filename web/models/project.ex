@@ -9,12 +9,4 @@ defmodule Rabbitci.Project do
 
     timestamps
   end
-
-  def branch_names(record) do
-    from(b in Rabbitci.Branch,
-         where: b.project_id == ^record.id,
-         select: b.name)
-    |> Rabbitci.Repo.all
-  end
-
 end
