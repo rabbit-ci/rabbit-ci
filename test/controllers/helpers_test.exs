@@ -30,4 +30,10 @@ defmodule Rabibtci.HelpersTest do
     project = Repo.insert(%Project{name: "blah", repo: "lala"})
     assert ControllerHelpers.get_project_from_repo(project.repo) == project
   end
+
+  test "get_branch" do
+    project = Repo.insert(%Project{name: "blah", repo: "lala"})
+    branch = Repo.insert(%Branch{project_id: project.id, name: "branch1"})
+    assert ControllerHelpers.get_branch(project, branch.name) == branch
+  end
 end
