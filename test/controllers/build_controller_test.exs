@@ -27,7 +27,7 @@ defmodule Rabbitci.BuildControllerTest do
     url = "/projects/#{project_name}/branches/#{branch_name}/builds"
     response = get url
     body = Poison.decode!(response.resp_body)
-    assert List.last(body["builds"])["build_number"] == 30
+    assert hd(body["builds"])["build_number"] == 40
   end
 
   test "page offset should work" do
@@ -35,7 +35,7 @@ defmodule Rabbitci.BuildControllerTest do
     url = "/projects/#{project_name}/branches/#{branch_name}/builds"
     response = get url, [page: %{offset: "1"}]
     body = Poison.decode!(response.resp_body)
-    assert List.last(body["builds"])["build_number"] == 40
+    assert hd(body["builds"])["build_number"] == 10
   end
 
   test "show a single build" do
@@ -43,6 +43,6 @@ defmodule Rabbitci.BuildControllerTest do
     url = "/projects/#{project_name}/branches/#{branch_name}/builds/1"
     response = get url
     body = Poison.decode!(response.resp_body)
-    assert Dict.size(body["builds"]) == 1
+    assert is_map(body)
   end
 end

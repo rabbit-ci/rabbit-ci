@@ -15,7 +15,8 @@ defmodule Rabbitci.TestHelper do
   def get(url, params \\ []), do: _conn(:get, url, params)
 
   defp _conn(type, url, params) do
-    conn(type, url, params, headers: [{"content-type", "application/json"}])
+    conn(type, url, params)
+    |> Plug.Conn.put_resp_content_type("application/json")
     |> Rabbitci.Router.call(Rabbitci.Router.init([]))
   end
 end

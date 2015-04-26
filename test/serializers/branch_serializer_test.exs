@@ -11,11 +11,8 @@ defmodule Rabbitci.BranchSerializerTest do
     assert is_binary(map.updated_at)
     assert is_binary(map.inserted_at)
     assert map.name != nil
-    assert is_list(map.build_ids)
-    assert map.build_url != nil
 
     assert Enum.sort(Map.keys(map)) == Enum.sort([:id, :updated_at, :name,
-                                                  :build_ids, :build_url,
                                                   :inserted_at])
   end
 end

@@ -5,6 +5,7 @@ defmodule Rabbitci.BuildView do
     Rabbitci.BuildSerializer.to_map(builds)
   end
 
+  # TODO: This is not consistent
   def render("show.json", %{build: build}) do
     Rabbitci.BuildSerializer.to_map(build)
   end
