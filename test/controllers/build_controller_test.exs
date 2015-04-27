@@ -13,10 +13,10 @@ defmodule Rabbitci.BuildControllerTest do
     time = Ecto.DateTime.utc()
     builds = for n <- 1..amount do
       %Rabbitci.Build{build_number: n,
-                          start_time: time,
-                          finish_time: time,
-                          branch_id: branch.id,
-                          commit: "eccee02ec18a36bcb2615b8c86d401b0618738c2"}
+                      start_time: time,
+                      finish_time: time,
+                      branch_id: branch.id,
+                      commit: "eccee02ec18a36bcb2615b8c86d401b0618738c2"}
       |> Rabbitci.Repo.insert
     end
 
