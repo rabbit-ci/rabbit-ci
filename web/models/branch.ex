@@ -18,7 +18,7 @@ defmodule Rabbitci.Branch do
   with no validation performed.
   """
   def changeset(model, params \\ nil) do
-    cast(model, params, ~w(name exists_in_git), ~w())
+    cast(model, params, ~w(name exists_in_git project_id), ~w())
     |> validate_unique_with_scope(:name, [scope: :project_id])
   end
 

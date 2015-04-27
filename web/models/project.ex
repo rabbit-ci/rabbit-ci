@@ -9,4 +9,9 @@ defmodule Rabbitci.Project do
 
     timestamps
   end
+
+  def changeset(model, params \\ nil) do
+    cast(model, params, ~w(name repo), ~w())
+  end
+
 end
