@@ -14,8 +14,8 @@ defmodule Rabbitci.BuildController do
   defp get_parents(%{"project_name" => project_name, "branch_name" => branch_name}) do
     project = Repo.one(from p in Project, where: p.name == ^project_name)
     branch = Repo.one(from b in Branch,
-                         where: b.name == ^branch_name and
-                         b.project_id == ^project.id)
+                      where: b.name == ^branch_name and
+                      b.project_id == ^project.id)
     {project, branch}
   end
 
@@ -84,22 +84,4 @@ defmodule Rabbitci.BuildController do
     |> assign(:build, build)
     |> render("show.json")
   end
-
-  # def update(conn, %{"id" => id, "build" => build_params}) do
-  #   build = Repo.get(Build, id)
-  #   changeset = Build.changeset(build, build_params)
-
-  #   if changeset.valid? do
-  #     Repo.update(changeset)
-  #     # Do someting
-  #   else
-  #     # Do someting
-  #   end
-  # end
-
-  # def delete(conn, %{"id" => id}) do
-  #   build = Repo.get(Build, id)
-  #   Repo.delete(build)
-  #   # Do someting
-  # end
 end
