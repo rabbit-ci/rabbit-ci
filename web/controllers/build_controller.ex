@@ -20,8 +20,8 @@ defmodule Rabbitci.BuildController do
   end
 
   def log_put(conn, params = %{"build_number" => build_number,
-                               "script" => script_name}) do
-    {:ok, body, _} = read_body(conn)
+                               "script" => script_name,
+                               "log_string" => body}) do
     {_, branch} = get_parents(params)
     build = Repo.preload(get_build(branch, build_number), :scripts)
     case Enum.find(build.scripts, fn(script) -> script.name == script_name end) do
