@@ -30,6 +30,7 @@ defmodule Rabbitci.BuildControllerTest do
     url = "/projects/#{project.name}/branches/#{branch.name}/builds"
     response = get(url)
     body = Poison.decode!(response.resp_body)
+    assert hd(body["builds"])["build_number"] == 40
     assert List.last(body["builds"])["build_number"] == 11
   end
 
@@ -39,6 +40,7 @@ defmodule Rabbitci.BuildControllerTest do
     response = get(url, [page: %{offset: "1"}])
     body = Poison.decode!(response.resp_body)
     assert hd(body["builds"])["build_number"] == 10
+    assert List.last(body["builds"])["build_number"] == 1
   end
 
   test "show a single build" do

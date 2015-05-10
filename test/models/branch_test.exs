@@ -1,6 +1,6 @@
 defmodule Rabbitci.BranchTest do
-  use Rabbitci.TestHelper
   use Rabbitci.Integration.Case
+  use Rabbitci.TestHelper
 
   alias Rabbitci.Repo
   alias Rabbitci.Project

@@ -65,7 +65,8 @@ defmodule Rabbitci.BuildController do
     builds = Repo.all(from b in Build,
                       where: b.branch_id == ^branch.id,
                       limit: 30,
-                      offset: ^(page * 30))
+                      offset: ^(page * 30),
+                      order_by: [desc: b.build_number])
 
     conn
     |> assign(:builds, builds)
