@@ -19,22 +19,24 @@ defmodule Rabbitci.ConfigExtractionController do
     if build == nil do
       conn |> put_status(400) |> json(%{message: "Build not found"})
     else
-      config = ConfigFile.changeset(%ConfigFile{}, %{build_id: build.id, raw_body: body})
+      config = ConfigFile.changeset(%ConfigFile{}, %{build_id: build.id,
+                                                     raw_body: body})
       case config.valid? do
         true ->
           {:ok, content} = Poison.decode(body)
           Repo.insert(config)
 
           for %{"name" => script_name} <- content["scripts"] do
-            Exq.enqueue(:exq, "workers", "BuildRunner", [project.name, branch.name,
-                                                         build.build_number, script_name])
+            Exq.enqueue(:exq, "workers", "BuildRunner",
+                        [project.name, branch.name,
+                         build.build_number, script_name])
           end
 
           json(conn, %{message: "received"})
         false ->
           conn
           |> put_status(400)
-          |> json(%{message: "Config has these errors: #{inspect config.errors}"})
+          |> json(%{message: "Config has errors: #{inspect config.errors}"})
       end
     end
   end
