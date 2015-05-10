@@ -33,6 +33,7 @@ defmodule Rabbitci.Mixfile do
      {:ecto, "~> 0.9"},
      {:ashes, ">= 0.0.3"},
      {:remodel, "~> 0.0.1"},
+     {:mock, "~> 0.1.1"},
      {:exq, github: "akira/exq"},
      {:excoveralls, "~> 0.3", only: [:dev, :test]},
      {:eredis, github: 'wooga/eredis', tag: 'v1.0.5'}

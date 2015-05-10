@@ -21,5 +21,16 @@ defmodule Rabbitci.ConfigFile do
   def changeset(model, params \\ nil) do
     model
     |> cast(params, @required_fields, @optional_fields)
+    |> validate_change :raw_body, fn
+      :raw_body, body ->
+        case Poison.decode(body) do
+          {:ok, %{"scripts" => [_ | _]}} ->
+            []
+          {:ok, _} ->
+            [{:raw_body, :missing_fields}]
+          _ ->
+            [{:raw_body, :json_invalid}]
+        end
+    end
   end
 end

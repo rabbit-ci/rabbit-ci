@@ -17,10 +17,3 @@ config :rabbitci, Rabbitci.Repo,
   database: "rabbitci_test",
   size: 1,
   max_overflow: false
-
-config :exq,
-  host: '127.0.0.1',
-  port: 6379,
-  namespace: "resque",
-  queues: ["nothing"] # We need a queue which will never be written to so that it does not timeout.
-               # We can add things to the queue just fine.

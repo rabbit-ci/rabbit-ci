@@ -10,6 +10,8 @@
   "hackney": {:hex, :hackney, "1.1.0"},
   "idna": {:hex, :idna, "1.0.2"},
   "jsx": {:hex, :jsx, "2.4.0"},
+  "meck": {:hex, :meck, "0.8.2"},
+  "mock": {:hex, :mock, "0.1.1"},
   "phoenix": {:hex, :phoenix, "0.11.0"},
   "phoenix_ecto": {:hex, :phoenix_ecto, "0.1.0"},
   "plug": {:hex, :plug, "0.11.3"},
