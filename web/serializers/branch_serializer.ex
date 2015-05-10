@@ -8,7 +8,6 @@ defmodule Rabbitci.BranchSerializer do
   attributes [:id, :updated_at, :inserted_at, :name]
 
   def id(record), do: record.name
-  # def build_ids(record), do: Rabbitci.Branch.build_ids(record)
 
   # TODO: Fix this.
   # def build_url(m, conn) do

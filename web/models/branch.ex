@@ -21,12 +21,4 @@ defmodule Rabbitci.Branch do
     cast(model, params, ~w(name exists_in_git project_id), ~w())
     |> validate_unique_with_scope(:name, [scope: :project_id])
   end
-
-  def build_ids(record) do
-    from(b in Rabbitci.Build,
-         where: b.branch_id == ^record.id,
-         select: b.id)
-    |> Rabbitci.Repo.all
-  end
-
 end
