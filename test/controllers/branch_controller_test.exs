@@ -19,6 +19,7 @@ defmodule Rabbitci.BranchControllerTest do
     assert length(response["branches"]) == 5
     assert Enum.sort(Map.keys(hd(response["branches"]))) ==
       Enum.sort(["id", "name", "inserted_at", "updated_at"])
+    assert response.status == 200
   end
 
   test "get a single branch" do
@@ -30,7 +31,15 @@ defmodule Rabbitci.BranchControllerTest do
     {:ok, response} =
       get("/projects/#{project.name}/branches/#{branch.name}").resp_body |>
       Poison.decode
+    assert response.status == 200
     assert length(response["branches"]) == 1
     assert hd(response["branches"])["name"] == branch.name
+  end
+
+  test "branch does not exist" do
+    project = Repo.insert %Project{name: "project1",
+                                   repo: "git@example.com:user/project"}
+    response = get("/projects/#{project.name}/branches/fakebranch")
+    assert response.status == 404
   end
 end

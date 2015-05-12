@@ -24,6 +24,9 @@ defmodule Rabbitci.BranchController do
     branch = Repo.one(from b in Rabbitci.Branch,
                       where: b.name == ^name and
                       b.project_id == ^get_project_id(params))
-    conn |> assign(:branches, [branch]) |> render("index.json")
+    case branch do
+      nil -> conn |> send_resp(404, "Branch not found.")
+      _ -> conn |> assign(:branches, [branch]) |> render("index.json")
+    end
   end
 end
