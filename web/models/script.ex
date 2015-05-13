@@ -17,6 +17,6 @@ defmodule Rabbitci.Script do
   with no validation performed.
   """
   def changeset(model, params \\ nil) do
-    cast(model, params, ~w(status), ~w())
+    cast(model, params, ~w(build_id name status), ~w())
   end
 end
