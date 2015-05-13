@@ -31,9 +31,9 @@ defmodule Rabbitci.ProjectControllerTest do
   test "show page for real project" do
     Repo.insert %Project{name: "project1",
                          repo: "git@example.com:user/project1"}
-    response = get("projects")
+    response = get("/projects/project1")
     body = Poison.decode!(response.resp_body)
     assert response.status == 200
-    assert length(body["projects"]) == 1
+    assert body["project"] != nil
   end
 end
