@@ -70,7 +70,6 @@ defmodule Rabbitci.ConfigExtractionControllerTest do
 
   test "config is nil", context do
     %{project: project, branch: branch, build: build} = context
-    build_number = build.build_number
     Repo.delete(build)
     with_mock Exq, [enqueue: fn(_, _, _, _) -> nil end] do
       response = post("/config_extraction",
