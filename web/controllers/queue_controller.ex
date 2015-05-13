@@ -18,15 +18,25 @@ defmodule Rabbitci.QueueController do
         conn |> send_resp(404, "Could not find project")
       project ->
         branch = get_branch(project, branch_name)
-        latest_build_number = Build.latest_build_on_branch(branch).build_number
-        build_number = (latest_build_number || 0) + 1 # (nil || 0) + 1 #=> 1
-        build = Build.changeset(%Build{}, %{build_number: build_number, branch_id: branch.id,
-                                            commit: commit})
 
+        if branch == nil do
+          branch = Branch.changeset(%Branch{}, %{name: branch_name,
+                                       project_id: project.id,
+                                       exists_in_git: true})
+          |> Repo.insert
+        end
+
+        latest_build = Build.latest_build_on_branch(branch)
+        build_number = ((latest_build && latest_build.build_number) || 0) + 1
+        # (nil || 0) + 1 #=> 1
+        build = Build.changeset(%Build{}, %{build_number: build_number,
+                                            branch_id: branch.id,
+                                            commit: commit})
         case build.valid? do
           true ->
-            b2 = Repo.insert(build)
-            Exq.enqueue(:exq, "workers", "ConfigExtractor", [repo, commit, branch_name,
+            Repo.insert(build)
+            Exq.enqueue(:exq, "workers", "ConfigExtractor", [repo, commit,
+                                                             branch_name,
                                                              build_number])
             conn |> send_resp(200, "Queued")
           false ->
