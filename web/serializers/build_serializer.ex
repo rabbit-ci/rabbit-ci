@@ -6,7 +6,7 @@ defmodule Rabbitci.BuildSerializer do
   alias Rabbitci.SerializerHelpers
 
   attributes [:id, :build_number, :start_time, :finish_time, :script_ids,
-              :branch_id, :updated_at, :inserted_at] # need script path
+              :branch_id, :updated_at, :inserted_at, :commit] # need script path
 
   def script_ids(record), do: Rabbitci.Build.script_ids(record)
 

@@ -5,9 +5,25 @@ defmodule Rabbitci.BranchSerializer do
   require Rabbitci.SerializerHelpers
   alias Rabbitci.SerializerHelpers
 
-  attributes [:id, :updated_at, :inserted_at, :name]
+  attributes [:id, :updated_at, :inserted_at, :name, :latest_build, :builds]
 
   def id(record), do: record.name
+
+  def latest_build(record) do
+    latest = Rabbitci.Branch.latest(record)
+    if latest != nil do
+      latest.id
+    else
+      nil
+    end
+  end
+
+  def builds(record) do
+    case [latest_build(record)] do
+      a = [nil] -> []
+      a = _ -> a
+    end
+  end
 
   # TODO: Fix this.
   # def build_url(m, conn) do

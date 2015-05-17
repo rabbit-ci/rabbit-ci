@@ -18,5 +18,6 @@ defmodule Rabbitci.Script do
   """
   def changeset(model, params \\ nil) do
     cast(model, params, ~w(build_id name status), ~w())
+    # |> validate_inclusion(:status, []) # Need to validate status
   end
 end
