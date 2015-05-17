@@ -5,6 +5,7 @@ defmodule Rabbitci.BranchControllerTest do
   alias Rabbitci.Repo
   alias Rabbitci.Project
   alias Rabbitci.Branch
+  alias Rabbitci.Build
 
   test "Get all branches for project" do
     project = Repo.insert %Project{name: "project1",
@@ -27,6 +28,8 @@ defmodule Rabbitci.BranchControllerTest do
                                    repo: "git@example.com:user/project"}
     branch = Repo.insert %Branch{name: "branch1", exists_in_git: false,
                                  project_id: project.id}
+    build = Repo.insert %Build{build_number: 1, branch_id: branch.id,
+                               commit: "xyz"}
 
     response = get("/projects/#{project.name}/branches/#{branch.name}")
     {:ok, body} =
@@ -35,6 +38,8 @@ defmodule Rabbitci.BranchControllerTest do
     assert response.status == 200
     assert length(body["branches"]) == 1
     assert hd(body["branches"])["name"] == branch.name
+    assert hd(body["branches"])["latest_build"] == build.id
+    assert hd(body["builds"])["id"] == build.id
   end
 
   test "branch does not exist" do
