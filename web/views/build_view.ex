@@ -1,13 +1,13 @@
 defmodule Rabbitci.BuildView do
   use Rabbitci.Web, :view
 
-  def render("index.json", %{builds: builds}) do
-    Rabbitci.BuildSerializer.to_map(builds)
+  def render("index.json", %{conn: conn, builds: builds}) do
+    Rabbitci.BuildSerializer.as_json(builds, conn, %{})
   end
 
   # TODO: This is not consistent
-  def render("show.json", %{build: build}) do
-    Rabbitci.BuildSerializer.to_map(build)
+  def render("show.json", %{conn: conn, build: build}) do
+    Rabbitci.BuildSerializer.as_json(build, conn, %{})
   end
 
   def render("config.json", %{build: build, project: project, branch: branch}) do

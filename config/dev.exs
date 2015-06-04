@@ -34,3 +34,6 @@ config :exq,
   namespace: "resque",
   queues: ["nothing"] # Empty queue so that we do not timeout.
                # We can add things to the queue just fine.
+
+config :relax,
+  root_url: "http://localhost:4000"

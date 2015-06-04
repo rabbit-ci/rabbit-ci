@@ -34,6 +34,13 @@ defmodule Rabbitci.ProjectControllerTest do
     response = get("/projects/project1")
     body = Poison.decode!(response.resp_body)
     assert response.status == 200
-    assert body["project"] != nil
+    assert is_map(body["projects"])
+
+    project = body["projects"]
+    assert project["id"] != nil
+    assert project["name"] != nil
+    assert project["repo"] != nil
+    assert is_binary(project["insertedAt"])
+    assert is_binary(project["updatedAt"])
   end
 end

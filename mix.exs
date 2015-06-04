@@ -18,7 +18,7 @@ defmodule Rabbitci.Mixfile do
   # Type `mix help compile.app` for more information
   def application do
     [mod: {Rabbitci, []},
-     applications: [:phoenix, :cowboy, :logger, :ecto, :postgrex, :exq]]
+     applications: [:phoenix, :cowboy, :logger, :ecto, :postgrex, :exq, :phoenix_ecto]]
   end
 
   # Specifies your project dependencies
@@ -26,13 +26,13 @@ defmodule Rabbitci.Mixfile do
   # Type `mix help deps` for examples and options
   defp deps do
     [{:phoenix, "~> 0.11.0"},
-     {:phoenix_ecto, "~> 0.1"},
+     {:phoenix_ecto, "~> 0.3"},
      {:postgrex, ">= 0.0.0"},
      {:cowboy, "~> 1.0"},
      {:postgrex, "~> 0.8"},
-     {:ecto, "~> 0.9"},
+     {:ecto, "~> 0.11"},
      {:ashes, ">= 0.0.3"},
-     {:remodel, "~> 0.0.1"},
+     {:relax, "~> 0.0.3"},
      {:mock, "~> 0.1.1"},
      {:exq, github: "akira/exq"},
      {:excoveralls, "~> 0.3", only: [:dev, :test]},

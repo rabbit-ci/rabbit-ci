@@ -21,7 +21,7 @@ defmodule Rabbitci.Branch do
   """
   def changeset(model, params \\ nil) do
     cast(model, params, ~w(name exists_in_git project_id), ~w())
-    |> validate_unique_with_scope(:name, [scope: :project_id])
+    |> validate_unique(:name, scope: [:project_id], on: Repo)
   end
 
   def latest(record) do

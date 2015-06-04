@@ -26,7 +26,7 @@ defmodule Rabbitci.BranchController do
                       b.project_id == ^get_project_id(params))
     case branch do
       nil -> conn |> send_resp(404, "Branch not found.")
-      _ -> conn |> assign(:branches, [branch]) |> render("index.json")
+      _ -> conn |> assign(:branch, branch) |> render("show.json")
     end
   end
 end

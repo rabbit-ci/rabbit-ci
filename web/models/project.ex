@@ -32,6 +32,4 @@ defmodule Rabbitci.Project do
       nil
     end
   end
-
-
 end

@@ -1,18 +1,16 @@
 defmodule Rabbitci.BuildSerializer do
-  use Remodel
-
-  @array_root :builds
   require Rabbitci.SerializerHelpers
   alias Rabbitci.SerializerHelpers
 
-  attributes [:id, :build_number, :start_time, :finish_time, :script_ids,
-              :branch_id, :updated_at, :inserted_at, :commit] # need script path
+  use Relax.Serializer
 
-  def script_ids(record), do: Rabbitci.Build.script_ids(record)
+  serialize "builds" do
+    attributes [:id, :build_number, :start_time, :finish_time,
+                :updated_at, :inserted_at, :commit, :status]
+    # has_many :scripts, ids: true
+    has_one  :branch,  field: :branch_id
+  end
 
-  SerializerHelpers.time(start_time, Rabbitci.Build)
-  SerializerHelpers.time(finish_time, Rabbitci.Build)
-  SerializerHelpers.time(inserted_at, Rabbitci.Build)
-  SerializerHelpers.time(updated_at, Rabbitci.Build)
-
+  # def scripts(build, _conn), do: Rabbitci.Build.script_ids(build)
+  def status(record), do: Rabbitci.Build.status(record)
 end

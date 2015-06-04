@@ -29,4 +29,14 @@ defmodule Rabbitci.BuildTest do
                                        branch_id: b2.id,
                                        commit: "xyz"}).valid?
   end
+
+  test "status" do
+    assert Build.status(["queued", "queued", "queued"]) == "queued"
+    assert Build.status(["running", "queued", "error"]) == "error"
+    assert Build.status(["running", "running", "failed"]) == "failed"
+    assert Build.status(["queued", "queued", "finished"]) == "running"
+    assert Build.status(["queued", "queued", "running"]) == "running"
+    assert Build.status(["finished", "finished", "finished"]) == "finished"
+    assert Build.status([]) == "queued"
+  end
 end

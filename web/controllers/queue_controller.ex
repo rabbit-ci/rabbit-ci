@@ -8,7 +8,6 @@ defmodule Rabbitci.QueueController do
   alias Rabbitci.Branch
   alias Rabbitci.Project
 
-  # TODO: This will not create new branches.
   # TODO: More detailed information about which parameter is missing.
   # TODO: This explodes when you attempt to provide the same branch and commit twice.
   #       Solve by giving the extractor a build id?
@@ -21,8 +20,8 @@ defmodule Rabbitci.QueueController do
 
         if branch == nil do
           branch = Branch.changeset(%Branch{}, %{name: branch_name,
-                                       project_id: project.id,
-                                       exists_in_git: true})
+                                                 project_id: project.id,
+                                                 exists_in_git: true})
           |> Repo.insert
         end
 

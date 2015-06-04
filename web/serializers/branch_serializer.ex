@@ -1,37 +1,26 @@
 defmodule Rabbitci.BranchSerializer do
-  use Remodel
+  # use Remodel
+  use Relax.Serializer
 
-  @array_root :branches
+  # @array_root :branches
   require Rabbitci.SerializerHelpers
   alias Rabbitci.SerializerHelpers
 
-  attributes [:id, :updated_at, :inserted_at, :name, :latest_build, :builds]
-
-  def id(record), do: record.name
-
-  def latest_build(record) do
-    latest = Rabbitci.Branch.latest(record)
-    if latest != nil do
-      latest.id
-    else
-      nil
-    end
+  serialize "branches" do
+    attributes [:id, :updated_at, :inserted_at, :name]
+    has_one :project, field: :project_id
+    # has_one :latest_build
+    has_many :builds, serializer: Rabbitci.BuildSerializer
   end
 
   def builds(record) do
-    case [latest_build(record)] do
-      a = [nil] -> []
-      a = _ -> a
-    end
+    (Rabbitci.Branch.latest(record) || []) |> List.wrap
   end
 
-  # TODO: Fix this.
-  # def build_url(m, conn) do
-  #   IO.inspect conn
-  #   Rabbitci.Router.Helpers.build_path(conn, :index, m.project_id, m.id)
+  # def builds(record) do
+  #   case Rabbitci.Branch.latest(record) do
+  #     nil -> []
+  #     a -> a
+  #   end
   # end
-
-  SerializerHelpers.time(updated_at, Rabbitci.Branch)
-  SerializerHelpers.time(inserted_at, Rabbitci.Branch)
-
 end
