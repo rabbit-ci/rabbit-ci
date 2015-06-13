@@ -19,7 +19,7 @@ defmodule Rabbitci.ControllerHelpers do
   end
 
   def get_build(branch, "latest") do
-    Build.latest_build_on_branch(branch)
+    Branch.latest_build(branch)
   end
 
   def get_build(branch, build_number) do

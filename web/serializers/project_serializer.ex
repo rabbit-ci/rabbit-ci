@@ -11,7 +11,6 @@ defmodule Rabbitci.ProjectSerializer do
   end
 
   def branches(record) do
-    build = Rabbitci.Project.latest_build(record)
     case Rabbitci.Project.latest_build(record) do
       nil -> []
       build ->

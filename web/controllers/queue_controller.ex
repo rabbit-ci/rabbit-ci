@@ -25,7 +25,7 @@ defmodule Rabbitci.QueueController do
           |> Repo.insert
         end
 
-        latest_build = Build.latest_build_on_branch(branch)
+        latest_build = Branch.latest_build(branch)
         build_number = ((latest_build && latest_build.build_number) || 0) + 1
         # (nil || 0) + 1 #=> 1
         build = Build.changeset(%Build{}, %{build_number: build_number,

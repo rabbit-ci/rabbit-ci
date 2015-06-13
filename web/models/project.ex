@@ -4,6 +4,7 @@ defmodule Rabbitci.Project do
   alias Rabbitci.Repo
   alias Rabbitci.Branch
   alias Rabbitci.Build
+  alias Rabbitci.Project
 
   schema "projects" do
     field :name, :string
@@ -19,17 +20,13 @@ defmodule Rabbitci.Project do
   end
 
   def latest_build(project) do
-    branch_ids = Repo.all(from b in Branch,
-                           where: b.project_id == ^project.id,
-                           select: b.id)
-    build = Repo.one(from b in Build,
-                     where: b.branch_id in ^branch_ids,
-                     order_by: [desc: b.inserted_at],
-                     limit: 1)
-    if build != nil do
-      Repo.preload(build, :branch)
-    else
-      nil
-    end
+   (from b in Build,
+    join:     g in Branch,
+    on:       b.branch_id == g.id,
+    join:     p in Project,
+    on:       g.project_id == ^project.id,
+    order_by: [desc: b.inserted_at],
+    limit:    1,
+    preload:  [branch: g]) |> Repo.one
   end
 end

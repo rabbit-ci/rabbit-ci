@@ -33,13 +33,6 @@ defmodule Rabbitci.Build do
     # having builds 1, 2, and 4 because Branch B took build 3.
   end
 
-  def script_ids(record) do
-    from(s in Rabbitci.Script,
-         where: s.build_id == ^record.id,
-         select: s.id)
-    |> Rabbitci.Repo.all
-  end
-
   def status(statuses) when is_list(statuses) do
     cond do
       Enum.any?(statuses, fn(status) -> status == "failed" end) -> "failed"
@@ -56,14 +49,5 @@ defmodule Rabbitci.Build do
   def status(build) do
     build = Repo.preload(build, :scripts)
     Enum.map(build.scripts, &(&1.status)) |> status
-  end
-
-  def latest_build_on_branch(branch = %Rabbitci.Branch{}) do
-    query = (from b in Rabbitci.Build,
-             where: b.branch_id == ^branch.id,
-             limit: 1,
-             order_by: [desc: b.build_number])
-
-    Rabbitci.Repo.one(query)
   end
 end

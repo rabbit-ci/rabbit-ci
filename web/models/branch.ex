@@ -24,20 +24,12 @@ defmodule Rabbitci.Branch do
     |> validate_unique(:name, scope: [:project_id], on: Repo)
   end
 
-  def latest(record) do
-    query = from(b in Build,
-                 where: b.branch_id == ^record.id,
-                 order_by: [desc: b.inserted_at],
-                 limit: 1)
-    Repo.one(query)
+  def latest_build(branch = %Rabbitci.Branch{}) do
+    query = (from b in Rabbitci.Build,
+             where: b.branch_id == ^branch.id,
+             limit: 1,
+             order_by: [desc: b.build_number])
+
+    Rabbitci.Repo.one(query)
   end
-
-  # def latest_success(record) do
-  #   query = from(b in Build,
-  #                where: b.branch_id == ^record.id and status,
-  #                order_by: [desc: b.created_at],
-  #                limit: 1)
-  #   Repo.one(query)
-  # end
-
 end
