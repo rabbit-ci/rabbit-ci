@@ -30,13 +30,12 @@ defmodule Rabbitci.QueueController do
 
   defp _create(conn, args = %{branch_name: branch_name, project: project,
                               branch: nil}) do
-    branch = Branch.changeset(%Branch{}, %{name: branch_name,
-                                           project_id: project.id,
-                                           exists_in_git: true})
-    |> Repo.insert
+    branch =
+      Branch.changeset(%Branch{}, %{name: branch_name, project_id: project.id,
+                                    exists_in_git: true})
+      |> Repo.insert
     _create(conn, Map.merge(args, %{branch: branch}))
   end
-
 
   defp _create(conn, %{repo: repo, branch_name: branch_name, build: build,
                        valid: true}) do
@@ -51,14 +50,12 @@ defmodule Rabbitci.QueueController do
     conn |> send_resp(500, "Error! #{build.errors}")
   end
 
-  defp _create(conn, args = %{commit: commit,
-                              branch: branch = %Branch{}}) do
+  defp _create(conn, args = %{commit: commit, branch: branch = %Branch{}}) do
     latest_build = Branch.latest_build(branch)
     build_number = ((latest_build && latest_build.build_number) || 0) + 1
     # (nil || 0) + 1 #=> 1
     build = Build.changeset(%Build{}, %{build_number: build_number,
-                                        branch_id: branch.id,
-                                        commit: commit})
+                                        branch_id: branch.id, commit: commit})
     _create(conn, Map.merge(args, %{build: build, valid: build.valid?}))
   end
 
