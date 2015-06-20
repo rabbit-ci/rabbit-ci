@@ -9,9 +9,6 @@ defmodule Rabbitci.QueueController do
   alias Rabbitci.Project
 
   # TODO: More detailed information about which parameter is missing.
-  # TODO: This explodes when you attempt to provide the same branch
-  # and commit twice.  Solve by giving the extractor a build id?
-  # ^ not sure if this is valid
   def create(conn, %{"repo" => repo, "commit" => commit,
                      "branch" => branch_name}) do
     _create(conn, %{project: get_project_from_repo(repo),

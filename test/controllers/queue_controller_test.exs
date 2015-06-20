@@ -43,4 +43,22 @@ defmodule Rabbitci.QueueControllerTest do
       assert Repo.one(query) != nil
     end
   end
+
+  test "queue a commit again" do
+    with_mock Exq, [enqueue: fn(_, _, _ , _) -> nil end] do
+      p = Repo.insert %Project{name: "project1", repo: "xyz"}
+      b = Repo.insert %Branch{name: "branch1", exists_in_git: false,
+                              project_id: p.id}
+      for _ <- 0..1 do
+        response = post("/queue", %{repo: "xyz", commit: "xyz",
+                                    branch: "branch1"})
+        assert response.status == 200
+      end
+
+      query = (from b in Build,
+               where: b.branch_id == ^b.id and b.commit == "xyz")
+      assert length(Repo.all(query)) == 2
+    end
+  end
+
 end
