@@ -11,7 +11,6 @@
   "idna": {:hex, :idna, "1.0.2"},
   "inflex": {:hex, :inflex, "0.2.9"},
   "ja_serializer": {:git, "git://github.com/AgilionApps/ja_serializers.git", "372d3e0d036c2fe04e0b7ef678d1d292299f22c7", []},
-  "ja_serializers": {:git, "git://github.com/AgilionApps/ja_serializers.git", "3bdbb70c670e2d35a75748e0b04d7b3293548407", []},
   "jsx": {:hex, :jsx, "2.4.0"},
   "meck": {:hex, :meck, "0.8.2"},
   "mock": {:hex, :mock, "0.1.1"},
