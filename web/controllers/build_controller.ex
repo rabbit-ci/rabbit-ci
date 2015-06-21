@@ -69,7 +69,7 @@ defmodule Rabbitci.BuildController do
                       order_by: [desc: b.build_number])
 
     conn
-    |> assign(:builds, builds)
+    |> assign(:builds, Rabbitci.Repo.preload(builds, [branch: [:project]]))
     |> render("index.json")
   end
 
@@ -82,7 +82,7 @@ defmodule Rabbitci.BuildController do
     build = get_build(branch, build_number)
 
     conn
-    |> assign(:build, build)
+    |> assign(:build, Rabbitci.Repo.preload(build, [branch: [:project]]))
     |> render("show.json")
   end
 end

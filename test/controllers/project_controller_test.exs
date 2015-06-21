@@ -8,7 +8,7 @@ defmodule Rabbitci.ProjectControllerTest do
   test "index page with no projects" do
     response = get("/projects")
     body = Poison.decode!(response.resp_body)
-    assert length(body["projects"]) == 0
+    assert length(body["data"]) == 0
     assert response.status == 200
   end
 
@@ -19,7 +19,7 @@ defmodule Rabbitci.ProjectControllerTest do
                          repo: "git@example.com:user/project2"}
     response = get("/projects")
     body = Poison.decode!(response.resp_body)
-    assert length(body["projects"]) == 2
+    assert length(body["data"]) == 2
     assert response.status == 200
   end
 
@@ -34,13 +34,13 @@ defmodule Rabbitci.ProjectControllerTest do
     response = get("/projects/project1")
     body = Poison.decode!(response.resp_body)
     assert response.status == 200
-    assert is_map(body["projects"])
+    assert is_map(body["data"])
 
-    project = body["projects"]
+    project = body["data"]
     assert project["id"] != nil
-    assert project["name"] != nil
-    assert project["repo"] != nil
-    assert is_binary(project["insertedAt"])
-    assert is_binary(project["updatedAt"])
+    assert project["attributes"]["name"] != nil
+    assert project["attributes"]["repo"] != nil
+    assert is_binary(project["attributes"]["inserted-at"])
+    assert is_binary(project["attributes"]["updated-at"])
   end
 end

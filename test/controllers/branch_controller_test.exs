@@ -18,9 +18,9 @@ defmodule Rabbitci.BranchControllerTest do
     response = get("/projects/#{project.name}/branches")
     {:ok, body} = response.resp_body |> Poison.decode
     assert response.status == 200
-    assert length(body["branches"]) == 5
-    assert Enum.sort(Map.keys(hd(body["branches"]))) ==
-      Enum.sort(["id", "name", "insertedAt", "updatedAt", "links"])
+    assert length(body["data"]) == 5
+    assert Enum.sort(Map.keys(hd(body["data"])["attributes"])) ==
+      Enum.sort(["name", "inserted-at", "updated-at"])
   end
 
   test "get a single branch" do
@@ -36,10 +36,10 @@ defmodule Rabbitci.BranchControllerTest do
       response.resp_body |> Poison.decode
 
     assert response.status == 200
-    assert is_map(body["branches"])
-    assert body["branches"]["name"] == branch.name
-    assert body["branches"]["links"]["builds"] == [build.id]
-    assert hd(body["linked"]["builds"])["id"] == build.id
+    assert is_map(body["data"])
+    assert body["data"]["attributes"]["name"] == branch.name
+    assert hd(body["data"]["relationships"]["builds"]["data"])["id"] == to_string(build.id)
+    assert hd(body["included"])["id"] == to_string(build.id)
   end
 
   test "branch does not exist" do

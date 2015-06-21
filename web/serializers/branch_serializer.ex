@@ -1,13 +1,18 @@
 defmodule Rabbitci.BranchSerializer do
-  use Relax.Serializer
+  use JaSerializer
 
   require Rabbitci.SerializerHelpers
   alias Rabbitci.SerializerHelpers
 
   serialize "branches" do
-    attributes [:id, :updated_at, :inserted_at, :name]
-    has_one :project, field: :project_id
-    has_many :builds, serializer: Rabbitci.BuildSerializer
+    attributes [:updated_at, :inserted_at, :name]
+    has_one :project, link: ":project_link"
+    has_many :builds, include: Rabbitci.BuildSerializer
+  end
+
+  def project_link(record, conn) do
+    project = Rabbitci.Repo.preload(record, [:project]).project
+    Rabbitci.Router.Helpers.project_path(conn, :show, project)
   end
 
   def builds(record) do

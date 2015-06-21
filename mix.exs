@@ -32,9 +32,9 @@ defmodule Rabbitci.Mixfile do
      {:postgrex, "~> 0.8"},
      {:ecto, "~> 0.11"},
      {:ashes, ">= 0.0.3"},
-     {:relax, "~> 0.0.3"},
      {:mock, "~> 0.1.1"},
      {:exq, github: "akira/exq"},
+     {:ja_serializer, github: "AgilionApps/ja_serializers"},
      {:excoveralls, "~> 0.3", only: [:dev, :test]},
      {:eredis, github: 'wooga/eredis', tag: 'v1.0.5'}
     ]

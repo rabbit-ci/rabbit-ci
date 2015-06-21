@@ -1,13 +1,13 @@
 defmodule Rabbitci.ProjectSerializer do
-  use Relax.Serializer
+  use JaSerializer
 
   require Rabbitci.SerializerHelpers
   alias Rabbitci.SerializerHelpers
 
   serialize "projects" do
-    attributes [:id, :name, :repo, :inserted_at,
+    attributes [:name, :repo, :inserted_at,
                 :updated_at]
-    has_many :branches, serializer: Rabbitci.BranchSerializer
+    has_many :branches, include: Rabbitci.BranchSerializer
   end
 
   def branches(record) do

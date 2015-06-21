@@ -2,6 +2,7 @@ defmodule Rabbitci.Branch do
   use Rabbitci.Web, :model
   alias Rabbitci.Build
   alias Rabbitci.Repo
+  alias Rabbitci.Project
 
   schema "branches" do
     field :name, :string
