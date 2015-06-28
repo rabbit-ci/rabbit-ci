@@ -21,7 +21,7 @@ defmodule Rabbitci.QueueControllerTest do
   end
 
   test "branch does not exist" do
-    project = Repo.insert %Project{name: "project1", repo: "xyz"}
+    project = Repo.insert! %Project{name: "project1", repo: "xyz"}
     response = post("/queue", %{repo: "xyz", commit: "xyz", branch: "xyz"})
     assert response.status == 200
     query = (from b in Branch,
@@ -31,8 +31,8 @@ defmodule Rabbitci.QueueControllerTest do
 
   test "successful queue" do
     with_mock Exq, [enqueue: fn(_, _, _ , _) -> nil end] do
-      p = Repo.insert %Project{name: "project1", repo: "xyz"}
-      b = Repo.insert %Branch{name: "branch1", exists_in_git: false,
+      p = Repo.insert! %Project{name: "project1", repo: "xyz"}
+      b = Repo.insert! %Branch{name: "branch1", exists_in_git: false,
                               project_id: p.id}
       response = post("/queue", %{repo: "xyz", commit: "xyz",
                                   branch: "branch1"})
@@ -46,8 +46,8 @@ defmodule Rabbitci.QueueControllerTest do
 
   test "queue a commit again" do
     with_mock Exq, [enqueue: fn(_, _, _ , _) -> nil end] do
-      p = Repo.insert %Project{name: "project1", repo: "xyz"}
-      b = Repo.insert %Branch{name: "branch1", exists_in_git: false,
+      p = Repo.insert! %Project{name: "project1", repo: "xyz"}
+      b = Repo.insert! %Branch{name: "branch1", exists_in_git: false,
                               project_id: p.id}
       for _ <- 0..1 do
         response = post("/queue", %{repo: "xyz", commit: "xyz",

@@ -10,8 +10,8 @@ defmodule Rabbitci.BuildControllerTest do
   alias Rabbitci.Log
   # TODO: Test bad params
   def generate_records(builds: amount) do
-    project = Repo.insert(%Project{name: "blah", repo: "lala"})
-    branch = Repo.insert(%Branch{name: "branch1", project_id: project.id})
+    project = Repo.insert!(%Project{name: "blah", repo: "lala"})
+    branch = Repo.insert!(%Branch{name: "branch1", project_id: project.id})
     time = Ecto.DateTime.utc()
     builds = for n <- 1..amount do
       %Rabbitci.Build{build_number: n,
@@ -19,7 +19,7 @@ defmodule Rabbitci.BuildControllerTest do
                       finish_time: time,
                       branch_id: branch.id,
                       commit: "eccee02ec18a36bcb2615b8c86d401b0618738c2"}
-      |> Rabbitci.Repo.insert
+      |> Rabbitci.Repo.insert!
     end
 
     {project, branch, builds}
@@ -76,7 +76,7 @@ defmodule Rabbitci.BuildControllerTest do
 
     {project, branch, builds} = generate_records(builds: 1)
     build = hd(builds)
-    Repo.insert(%ConfigFile{build_id: build.id, raw_body: config})
+    Repo.insert!(%ConfigFile{build_id: build.id, raw_body: config})
     url = ("/projects/#{project.name}/branches/#{branch.name}/builds/" <>
       "#{build.build_number}/config")
     response = get(url)
@@ -92,9 +92,9 @@ defmodule Rabbitci.BuildControllerTest do
     logs = [{"main", "This is log 'main'"},
             {"secondary", "This is log 'secondary'"}]
     for {name, log} <- logs do
-      script = Repo.insert %Script{name: name, status: "running",
+      script = Repo.insert! %Script{name: name, status: "running",
                                    build_id: build.id}
-      Repo.insert(%Log{stdio: log, script_id: script.id})
+      Repo.insert!(%Log{stdio: log, script_id: script.id})
     end
 
     response = get(url)

@@ -30,13 +30,13 @@ defmodule Rabbitci.QueueController do
     branch =
       Branch.changeset(%Branch{}, %{name: branch_name, project_id: project.id,
                                     exists_in_git: true})
-      |> Repo.insert
+      |> Repo.insert!
     _create(conn, Map.merge(args, %{branch: branch}))
   end
 
   defp _create(conn, %{repo: repo, branch_name: branch_name, build: build,
                        valid: true}) do
-    build = Repo.insert(build)
+    build = Repo.insert!(build)
     Exq.enqueue(:exq, "workers", "ConfigExtractor", [repo, build.commit,
                                                      branch_name,
                                                      build.build_number])

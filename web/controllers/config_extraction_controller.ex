@@ -24,7 +24,7 @@ defmodule Rabbitci.ConfigExtractionController do
       case config.valid? do
         true ->
           {:ok, content} = Poison.decode(body)
-          Repo.insert(config)
+          Repo.insert!(config)
 
           for %{"name" => script_name} <- content["scripts"] do
             Exq.enqueue(:exq, "workers", "BuildRunner",

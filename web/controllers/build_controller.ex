@@ -26,11 +26,11 @@ defmodule Rabbitci.BuildController do
     build = Repo.preload(get_build(branch, build_number), :scripts)
     case Enum.find(build.scripts, fn(script) -> script.name == script_name end) do
       nil ->
-        script = Repo.insert(%Script{name: script_name, status: "running", build_id: build.id})
-        Repo.insert(%Log{stdio: body, script_id: script.id})
+        script = Repo.insert!(%Script{name: script_name, status: "running", build_id: build.id})
+        Repo.insert!(%Log{stdio: body, script_id: script.id})
       script ->
         log = Repo.preload(script, :log).log
-        Repo.update(%{log | stdio: log.stdio <> body})
+        Repo.update!(%{log | stdio: log.stdio <> body})
     end
 
     conn |> send_resp(200, "Hopefully this worked.")

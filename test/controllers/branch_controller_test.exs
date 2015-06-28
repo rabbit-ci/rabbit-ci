@@ -8,10 +8,10 @@ defmodule Rabbitci.BranchControllerTest do
   alias Rabbitci.Build
 
   test "Get all branches for project" do
-    project = Repo.insert %Project{name: "project1",
+    project = Repo.insert! %Project{name: "project1",
                                    repo: "git@example.com:user/project"}
     for n <- 1..5 do
-      Repo.insert %Branch{name: "branch#{n}", exists_in_git: false,
+      Repo.insert! %Branch{name: "branch#{n}", exists_in_git: false,
                           project_id: project.id}
     end
 
@@ -24,11 +24,11 @@ defmodule Rabbitci.BranchControllerTest do
   end
 
   test "get a single branch" do
-    project = Repo.insert %Project{name: "project1",
+    project = Repo.insert! %Project{name: "project1",
                                    repo: "git@example.com:user/project"}
-    branch = Repo.insert %Branch{name: "branch1", exists_in_git: false,
+    branch = Repo.insert! %Branch{name: "branch1", exists_in_git: false,
                                  project_id: project.id}
-    build = Repo.insert %Build{build_number: 1, branch_id: branch.id,
+    build = Repo.insert! %Build{build_number: 1, branch_id: branch.id,
                                commit: "xyz"}
 
     response = get("/projects/#{project.name}/branches/#{branch.name}")
@@ -43,7 +43,7 @@ defmodule Rabbitci.BranchControllerTest do
   end
 
   test "branch does not exist" do
-    project = Repo.insert %Project{name: "project1",
+    project = Repo.insert! %Project{name: "project1",
                                    repo: "git@example.com:user/project"}
     response = get("/projects/#{project.name}/branches/fakebranch")
     assert response.status == 404

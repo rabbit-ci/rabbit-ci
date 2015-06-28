@@ -34,13 +34,13 @@ defmodule Rabbitci.Router do
   # This should be changed in production and must be based off of the server's
   # configuration.
   defp allow_origin(conn, _opts) do
-    headers = get_req_header(conn, "Access-Control-Request-Headers")
+    headers = get_req_header(conn, "access-control-request-headers")
     |> Enum.join(", ")
 
     conn
-    |> put_resp_header("Access-Control-Allow-Origin", "*")
-    |> put_resp_header("Access-Control-Allow-Headers", headers)
-    |> put_resp_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
-    |> put_resp_header("Access-Control-Max-Age", "3600")
+    |> put_resp_header("access-control-allow-origin", "*")
+    |> put_resp_header("access-control-allow-headers", headers)
+    |> put_resp_header("access-control-allow-methods", "GET, POST, OPTIONS")
+    |> put_resp_header("access-control-max-age", "3600")
   end
 end

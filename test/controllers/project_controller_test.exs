@@ -13,9 +13,9 @@ defmodule Rabbitci.ProjectControllerTest do
   end
 
   test "index page with projects" do
-    Repo.insert %Project{name: "project1",
+    Repo.insert! %Project{name: "project1",
                          repo: "git@example.com:user/project1"}
-    Repo.insert %Project{name: "project2",
+    Repo.insert! %Project{name: "project2",
                          repo: "git@example.com:user/project2"}
     response = get("/projects")
     body = Poison.decode!(response.resp_body)
@@ -29,7 +29,7 @@ defmodule Rabbitci.ProjectControllerTest do
   end
 
   test "show page for real project" do
-    Repo.insert %Project{name: "project1",
+    Repo.insert! %Project{name: "project1",
                          repo: "git@example.com:user/project1"}
     response = get("/projects/project1")
     body = Poison.decode!(response.resp_body)

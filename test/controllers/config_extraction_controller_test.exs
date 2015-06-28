@@ -11,12 +11,12 @@ defmodule Rabbitci.ConfigExtractionControllerTest do
   alias Rabbitci.Build
 
   setup do
-    project = Repo.insert %Project{name: "project",
+    project = Repo.insert! %Project{name: "project",
                                    repo: "git@example.com:user/project.git"}
-    branch = Repo.insert %Branch{name: "master",
+    branch = Repo.insert! %Branch{name: "master",
                                  project_id: project.id,
                                  exists_in_git: false}
-    build = Repo.insert %Build{build_number: 1, commit: "xyz",
+    build = Repo.insert! %Build{build_number: 1, commit: "xyz",
                                branch_id: branch.id}
     {:ok, project: project, branch: branch, build: build}
   end
@@ -49,7 +49,7 @@ defmodule Rabbitci.ConfigExtractionControllerTest do
 
   test "build does not exist", context do
     %{project: project, branch: branch, build: build} = context
-    Repo.delete(build)
+    Repo.delete!(build)
     with_mock Exq, [enqueue: fn(_, _, _, _) -> nil end] do
       response = post("/config_extraction",
                       %{"repo" => project.repo,
@@ -70,7 +70,7 @@ defmodule Rabbitci.ConfigExtractionControllerTest do
 
   test "config is nil", context do
     %{project: project, branch: branch, build: build} = context
-    Repo.delete(build)
+    Repo.delete!(build)
     with_mock Exq, [enqueue: fn(_, _, _, _) -> nil end] do
       response = post("/config_extraction",
                       %{"repo" => project.repo,
