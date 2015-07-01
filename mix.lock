@@ -9,7 +9,6 @@
   "exq": {:git, "git://github.com/akira/exq.git", "4fe65d7de524fc7720ee1962fa4de75c33fc7210", []},
   "hackney": {:hex, :hackney, "1.1.0"},
   "idna": {:hex, :idna, "1.0.2"},
-  "inflex": {:hex, :inflex, "0.2.9"},
   "ja_serializer": {:git, "git://github.com/AgilionApps/ja_serializers.git", "372d3e0d036c2fe04e0b7ef678d1d292299f22c7", []},
   "jsx": {:hex, :jsx, "2.4.0"},
   "meck": {:hex, :meck, "0.8.2"},
@@ -21,8 +20,6 @@
   "poolboy": {:hex, :poolboy, "1.5.1"},
   "postgrex": {:hex, :postgrex, "0.8.4"},
   "ranch": {:hex, :ranch, "1.0.0"},
-  "relax": {:hex, :relax, "0.0.3"},
-  "remodel": {:hex, :remodel, "0.0.1"},
   "ssl_verify_hostname": {:hex, :ssl_verify_hostname, "1.0.5"},
   "timex": {:hex, :timex, "0.13.4"},
   "uuid": {:hex, :uuid, "1.0.1"}}
