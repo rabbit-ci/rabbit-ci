@@ -1,8 +1,6 @@
 defmodule RabbitCICore.QueueController do
   use RabbitCICore.Web, :controller
 
-  plug :action
-
   alias RabbitCICore.Repo
   alias RabbitCICore.Build
   alias RabbitCICore.Branch

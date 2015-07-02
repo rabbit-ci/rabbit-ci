@@ -4,8 +4,6 @@ defmodule RabbitCICore.BranchController do
   import Ecto.Query
   alias RabbitCICore.Project
 
-  plug :action
-
   defp get_project_id(%{"project_name" => project_name}) do
     Repo.one(from p in Project, where: p.name == ^project_name).id
   end

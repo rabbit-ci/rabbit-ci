@@ -8,8 +8,6 @@ defmodule RabbitCICore.BuildController do
   alias RabbitCICore.Script
   alias RabbitCICore.Log
 
-  plug :action
-
   # TODO: clean this up
   defp get_parents(%{"project_name" => project_name, "branch_name" => branch_name}) do
     project = Repo.one(from p in Project, where: p.name == ^project_name)

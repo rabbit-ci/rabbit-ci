@@ -7,8 +7,6 @@ defmodule RabbitCICore.ConfigExtractionController do
   alias RabbitCICore.ConfigFile
   alias RabbitCICore.Build
 
-  import Ecto.Query
-
   def create(conn, %{"repo" => repo, "commit" => commit,
                      "branch" => branch_name, "build_number" => build_number,
                      "config_string" => body}) when body != nil do

@@ -8,8 +8,6 @@ defmodule RabbitCICore.ProjectController do
   alias RabbitCICore.Project
   alias RabbitCICore.Repo
 
-  plug :action
-
   def index(conn, params) do # This will be paginated later
     projects = Repo.all(Project)
     conn
