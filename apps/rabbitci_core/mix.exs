@@ -28,12 +28,12 @@ defmodule RabbitCICore.Mixfile do
   #
   # Type `mix help deps` for examples and options
   defp deps do
-    [{:phoenix, "~> 0.13.0"},
+    [{:phoenix, "~> 0.14.0"},
      {:phoenix_ecto, "~> 0.5.0"},
      {:postgrex, "~> 0.8.0"},
      {:cowboy, "~> 1.0"},
      {:postgrex, "~> 0.8.0"},
-     {:ecto, "~> 0.12.0"},
+     {:ecto, "~> 0.13.0"},
      {:ashes, ">= 0.0.3"},
      {:mock, "~> 0.1.1"},
      {:exq, github: "akira/exq"},

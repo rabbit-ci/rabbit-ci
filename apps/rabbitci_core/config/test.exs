@@ -15,5 +15,5 @@ config :rabbitci_core, RabbitCICore.Repo,
   username: "postgres",
   password: "postgres",
   database: "rabbitci_test",
-  size: 1,
-  max_overflow: false
+  pool: Ecto.Adapters.SQL.Sandbox,
+  size: 1

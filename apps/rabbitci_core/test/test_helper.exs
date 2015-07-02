@@ -1,4 +1,7 @@
 ExUnit.start
+IO.puts "Creating DB and running migrations"
+Mix.Task.run "ecto.create", ["-r", "RabbitCICore.Repo"]
+Mix.Task.run "ecto.migrate", ["-r", "RabbitCICore.Repo"]
 
 defmodule RabbitCICore.TestHelper do
   import Plug.Test
@@ -27,7 +30,8 @@ defmodule RabbitCICore.Integration.Case do
 
   setup_all do
     Ecto.Adapters.SQL.begin_test_transaction(RabbitCICore.Repo, [])
-    on_exit fn -> Ecto.Adapters.SQL.rollback_test_transaction(RabbitCICore.Repo, []) end
+    on_exit fn -> Ecto.Adapters.SQL.rollback_test_transaction(RabbitCICore.Repo,
+                                                              []) end
     :ok
   end
 
