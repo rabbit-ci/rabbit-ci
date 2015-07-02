@@ -1,4 +1,4 @@
-defmodule Rabbitci.Repo.Migrations.RenameLogToLogs do
+defmodule RabbitCICore.Repo.Migrations.RenameLogToLogs do
   use Ecto.Migration
 
   def up do

@@ -1,10 +1,10 @@
-defmodule Rabbitci.ControllerHelpers do
+defmodule RabbitCICore.ControllerHelpers do
   import Ecto.Query
 
-  alias Rabbitci.Repo
-  alias Rabbitci.Branch
-  alias Rabbitci.Project
-  alias Rabbitci.Build
+  alias RabbitCICore.Repo
+  alias RabbitCICore.Branch
+  alias RabbitCICore.Project
+  alias RabbitCICore.Build
 
   def get_branch(project, branch_name) do
     query = (from b in Branch,

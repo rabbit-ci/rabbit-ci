@@ -1,11 +1,11 @@
-defmodule Rabbitci.ConfigExtractionController do
-  use Rabbitci.Web, :controller
+defmodule RabbitCICore.ConfigExtractionController do
+  use RabbitCICore.Web, :controller
 
   plug :action
 
-  alias Rabbitci.Repo
-  alias Rabbitci.ConfigFile
-  alias Rabbitci.Build
+  alias RabbitCICore.Repo
+  alias RabbitCICore.ConfigFile
+  alias RabbitCICore.Build
 
   import Ecto.Query
 

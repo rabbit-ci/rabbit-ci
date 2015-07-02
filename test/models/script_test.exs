@@ -1,8 +1,8 @@
-defmodule Rabbitci.ScriptTest do
-  use Rabbitci.Integration.Case
-  use Rabbitci.TestHelper
+defmodule RabbitCICore.ScriptTest do
+  use RabbitCICore.Integration.Case
+  use RabbitCICore.TestHelper
 
-  alias Rabbitci.Script
+  alias RabbitCICore.Script
 
   test "required fields" do
     assert !Script.changeset(%Script{}, %{name: "xyz"}).valid?

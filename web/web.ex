@@ -1,12 +1,12 @@
-defmodule Rabbitci.Web do
+defmodule RabbitCICore.Web do
   @moduledoc """
   A module that keeps using definitions for controllers,
   views and so on.
 
   This can be used in your application as:
 
-      use Rabbitci.Web, :controller
-      use Rabbitci.Web, :view
+      use RabbitCICore.Web, :controller
+      use RabbitCICore.Web, :view
 
   Keep the definitions in this module short and clean,
   mostly focused on imports, uses and aliases.
@@ -17,7 +17,7 @@ defmodule Rabbitci.Web do
       use Phoenix.View, root: "web/templates"
 
       # Import URL helpers from the router
-      import Rabbitci.Router.Helpers
+      import RabbitCICore.Router.Helpers
     end
   end
 
@@ -26,18 +26,18 @@ defmodule Rabbitci.Web do
       use Phoenix.Controller
 
       # Alias the data repository as a convenience
-      alias Rabbitci.Repo
+      alias RabbitCICore.Repo
 
-      import Rabbitci.ControllerHelpers
+      import RabbitCICore.ControllerHelpers
       # Import URL helpers from the router
-      import Rabbitci.Router.Helpers
+      import RabbitCICore.Router.Helpers
     end
   end
 
   def model do
     quote do
       use Ecto.Model
-      import Rabbitci.ModelHelpers
+      import RabbitCICore.ModelHelpers
     end
   end
 

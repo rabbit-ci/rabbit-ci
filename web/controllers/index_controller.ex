@@ -1,5 +1,5 @@
-defmodule Rabbitci.IndexController do
-  use Rabbitci.Web, :controller
+defmodule RabbitCICore.IndexController do
+  use RabbitCICore.Web, :controller
 
   plug :action
 

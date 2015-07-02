@@ -1,4 +1,4 @@
-defmodule Rabbitci.Repo.Migrations.CreateConfigModel do
+defmodule RabbitCICore.Repo.Migrations.CreateConfigModel do
   use Ecto.Migration
 
   def change do

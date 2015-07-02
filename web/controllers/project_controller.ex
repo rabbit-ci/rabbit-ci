@@ -1,12 +1,12 @@
-defmodule Rabbitci.ProjectController do
-  use Rabbitci.Web, :controller
+defmodule RabbitCICore.ProjectController do
+  use RabbitCICore.Web, :controller
 
   import Ecto.Query
 
-  alias Rabbitci.Build
-  alias Rabbitci.Branch
-  alias Rabbitci.Project
-  alias Rabbitci.Repo
+  alias RabbitCICore.Build
+  alias RabbitCICore.Branch
+  alias RabbitCICore.Project
+  alias RabbitCICore.Repo
 
   plug :action
 

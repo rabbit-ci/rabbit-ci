@@ -1,11 +1,11 @@
 ExUnit.start
 
-defmodule Rabbitci.TestHelper do
+defmodule RabbitCICore.TestHelper do
   import Plug.Test
 
   defmacro __using__(_) do
     quote do
-      import Rabbitci.TestHelper
+      import RabbitCICore.TestHelper
       use Plug.Test
       use ExUnit.Case, async: true
     end
@@ -18,21 +18,21 @@ defmodule Rabbitci.TestHelper do
   defp _conn(type, url, params) do
     conn(type, url, params)
     |> Plug.Conn.put_resp_content_type("application/json")
-    |> Rabbitci.Router.call(Rabbitci.Router.init([]))
+    |> RabbitCICore.Router.call(RabbitCICore.Router.init([]))
   end
 end
 
-defmodule Rabbitci.Integration.Case do
+defmodule RabbitCICore.Integration.Case do
   use ExUnit.CaseTemplate
 
   setup_all do
-    Ecto.Adapters.SQL.begin_test_transaction(Rabbitci.Repo, [])
-    on_exit fn -> Ecto.Adapters.SQL.rollback_test_transaction(Rabbitci.Repo, []) end
+    Ecto.Adapters.SQL.begin_test_transaction(RabbitCICore.Repo, [])
+    on_exit fn -> Ecto.Adapters.SQL.rollback_test_transaction(RabbitCICore.Repo, []) end
     :ok
   end
 
   setup do
-    Ecto.Adapters.SQL.restart_test_transaction(Rabbitci.Repo, [])
+    Ecto.Adapters.SQL.restart_test_transaction(RabbitCICore.Repo, [])
     :ok
   end
 end

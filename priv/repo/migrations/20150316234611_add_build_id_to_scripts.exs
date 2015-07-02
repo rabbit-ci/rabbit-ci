@@ -1,4 +1,4 @@
-defmodule Rabbitci.Repo.Migrations.AddBuildIdToScripts do
+defmodule RabbitCICore.Repo.Migrations.AddBuildIdToScripts do
   use Ecto.Migration
 
   def change do

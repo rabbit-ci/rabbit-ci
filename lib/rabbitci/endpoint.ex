@@ -1,5 +1,5 @@
-defmodule Rabbitci.Endpoint do
-  use Phoenix.Endpoint, otp_app: :rabbitci
+defmodule RabbitCICore.Endpoint do
+  use Phoenix.Endpoint, otp_app: :rabbitci_core
 
   plug Plug.Logger
 
@@ -17,9 +17,9 @@ defmodule Rabbitci.Endpoint do
 
   plug Plug.Session,
     store: :cookie,
-    key: "_rabbitci_key",
+    key: "_rabbitci_core_key",
     signing_salt: "5yrWD+HO",
     encryption_salt: "frlrKqup"
 
-  plug :router, Rabbitci.Router
+  plug :router, RabbitCICore.Router
 end

@@ -1,12 +1,12 @@
-defmodule Rabbitci.BuildController do
-  use Rabbitci.Web, :controller
+defmodule RabbitCICore.BuildController do
+  use RabbitCICore.Web, :controller
 
   import Ecto.Query
-  alias Rabbitci.Build
-  alias Rabbitci.Branch
-  alias Rabbitci.Project
-  alias Rabbitci.Script
-  alias Rabbitci.Log
+  alias RabbitCICore.Build
+  alias RabbitCICore.Branch
+  alias RabbitCICore.Project
+  alias RabbitCICore.Script
+  alias RabbitCICore.Log
 
   plug :action
 
@@ -69,7 +69,7 @@ defmodule Rabbitci.BuildController do
                       order_by: [desc: b.build_number])
 
     conn
-    |> assign(:builds, Rabbitci.Repo.preload(builds, [branch: [:project]]))
+    |> assign(:builds, RabbitCICore.Repo.preload(builds, [branch: [:project]]))
     |> render("index.json")
   end
 
@@ -82,7 +82,7 @@ defmodule Rabbitci.BuildController do
     build = get_build(branch, build_number)
 
     conn
-    |> assign(:build, Rabbitci.Repo.preload(build, [branch: [:project]]))
+    |> assign(:build, RabbitCICore.Repo.preload(build, [branch: [:project]]))
     |> render("show.json")
   end
 end

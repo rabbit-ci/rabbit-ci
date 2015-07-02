@@ -1,4 +1,4 @@
-defmodule Rabbitci.Repo.Migrations.AddIndexes do
+defmodule RabbitCICore.Repo.Migrations.AddIndexes do
   use Ecto.Migration
 
   def change do

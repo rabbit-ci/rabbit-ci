@@ -1,14 +1,14 @@
-defmodule Rabbitci.Branch do
-  use Rabbitci.Web, :model
-  alias Rabbitci.Build
-  alias Rabbitci.Repo
-  alias Rabbitci.Project
+defmodule RabbitCICore.Branch do
+  use RabbitCICore.Web, :model
+  alias RabbitCICore.Build
+  alias RabbitCICore.Repo
+  alias RabbitCICore.Project
 
   schema "branches" do
     field :name, :string
     field :exists_in_git, :boolean
 
-    has_many :builds, Rabbitci.Build
+    has_many :builds, RabbitCICore.Build
 
     belongs_to :project, Project
     timestamps
@@ -25,12 +25,12 @@ defmodule Rabbitci.Branch do
     |> validate_unique(:name, scope: [:project_id], on: Repo)
   end
 
-  def latest_build(branch = %Rabbitci.Branch{}) do
-    query = (from b in Rabbitci.Build,
+  def latest_build(branch = %RabbitCICore.Branch{}) do
+    query = (from b in RabbitCICore.Build,
              where: b.branch_id == ^branch.id,
              limit: 1,
              order_by: [desc: b.build_number])
 
-    Rabbitci.Repo.one(query)
+    RabbitCICore.Repo.one(query)
   end
 end

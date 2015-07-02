@@ -1,8 +1,8 @@
-defmodule Rabbitci.LogTest do
-  use Rabbitci.Integration.Case
-  use Rabbitci.TestHelper
+defmodule RabbitCICore.LogTest do
+  use RabbitCICore.Integration.Case
+  use RabbitCICore.TestHelper
 
-  alias Rabbitci.Log
+  alias RabbitCICore.Log
 
   test "required fields" do
     assert !Log.changeset(%Log{}, %{}).valid?

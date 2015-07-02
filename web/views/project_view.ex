@@ -1,11 +1,11 @@
-defmodule Rabbitci.ProjectView do
-  use Rabbitci.Web, :view
+defmodule RabbitCICore.ProjectView do
+  use RabbitCICore.Web, :view
 
   def render("index.json", %{conn: conn, projects: projects}) do
-    Rabbitci.ProjectSerializer.format(projects, conn, %{})
+    RabbitCICore.ProjectSerializer.format(projects, conn, %{})
   end
 
   def render("show.json", %{conn: conn, project: project}) do
-    Rabbitci.ProjectSerializer.format(project, conn, %{})
+    RabbitCICore.ProjectSerializer.format(project, conn, %{})
   end
 end

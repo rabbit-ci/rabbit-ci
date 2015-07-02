@@ -1,4 +1,4 @@
-defmodule Rabbitci.Repo.Migrations.AddTimestampsToProjects do
+defmodule RabbitCICore.Repo.Migrations.AddTimestampsToProjects do
   use Ecto.Migration
 
   def change do

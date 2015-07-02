@@ -1,4 +1,4 @@
-defmodule Rabbitci.Router do
+defmodule RabbitCICore.Router do
   use Phoenix.Router
   require IEx
   pipeline :api do
@@ -6,7 +6,7 @@ defmodule Rabbitci.Router do
     plug :accepts, ["json", "json-api"]
   end
 
-  scope "/", Rabbitci do
+  scope "/", RabbitCICore do
     pipe_through :api
 
     get "/", IndexController, :index

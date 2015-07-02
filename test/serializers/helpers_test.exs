@@ -1,3 +1,3 @@
-defmodule Rabbitci.HelpersTest do
-  use Rabbitci.TestHelper
+defmodule RabbitCICore.HelpersTest do
+  use RabbitCICore.TestHelper
 end

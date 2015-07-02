@@ -1,12 +1,12 @@
-defmodule Rabbitci.QueueController do
-  use Rabbitci.Web, :controller
+defmodule RabbitCICore.QueueController do
+  use RabbitCICore.Web, :controller
 
   plug :action
 
-  alias Rabbitci.Repo
-  alias Rabbitci.Build
-  alias Rabbitci.Branch
-  alias Rabbitci.Project
+  alias RabbitCICore.Repo
+  alias RabbitCICore.Build
+  alias RabbitCICore.Branch
+  alias RabbitCICore.Project
 
   # TODO: More detailed information about which parameter is missing.
   def create(conn, %{"repo" => repo, "commit" => commit,

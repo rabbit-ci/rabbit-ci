@@ -1,4 +1,4 @@
-defmodule Rabbitci.Repo.Migrations.DeleteLogId do
+defmodule RabbitCICore.Repo.Migrations.DeleteLogId do
   use Ecto.Migration
 
   def change do

@@ -1,9 +1,9 @@
-defmodule Rabbitci.ProjectControllerTest do
-  use Rabbitci.Integration.Case
-  use Rabbitci.TestHelper
+defmodule RabbitCICore.ProjectControllerTest do
+  use RabbitCICore.Integration.Case
+  use RabbitCICore.TestHelper
 
-  alias Rabbitci.Repo
-  alias Rabbitci.Project
+  alias RabbitCICore.Repo
+  alias RabbitCICore.Project
 
   test "index page with no projects" do
     response = get("/projects")

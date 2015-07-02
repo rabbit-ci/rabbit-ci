@@ -1,6 +1,6 @@
-defmodule Rabbitci.IndexControllerTest do
-  use Rabbitci.Integration.Case
-  use Rabbitci.TestHelper
+defmodule RabbitCICore.IndexControllerTest do
+  use RabbitCICore.Integration.Case
+  use RabbitCICore.TestHelper
 
   test "/ should be 200" do
     assert get("/").status == 200

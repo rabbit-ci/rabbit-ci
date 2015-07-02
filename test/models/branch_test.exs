@@ -1,10 +1,10 @@
-defmodule Rabbitci.BranchTest do
-  use Rabbitci.Integration.Case
-  use Rabbitci.TestHelper
+defmodule RabbitCICore.BranchTest do
+  use RabbitCICore.Integration.Case
+  use RabbitCICore.TestHelper
 
-  alias Rabbitci.Repo
-  alias Rabbitci.Project
-  alias Rabbitci.Branch
+  alias RabbitCICore.Repo
+  alias RabbitCICore.Project
+  alias RabbitCICore.Branch
 
   test "name must be unique in the scope of project" do
     p1 = Project.changeset(%Project{}, %{name: "project1", repo: "repo123"})

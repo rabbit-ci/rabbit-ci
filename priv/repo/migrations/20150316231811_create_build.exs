@@ -1,4 +1,4 @@
-defmodule Rabbitci.Repo.Migrations.CreateBuild do
+defmodule RabbitCICore.Repo.Migrations.CreateBuild do
   use Ecto.Migration
 
   def change do

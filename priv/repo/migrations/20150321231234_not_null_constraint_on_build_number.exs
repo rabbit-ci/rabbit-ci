@@ -1,4 +1,4 @@
-defmodule Rabbitci.Repo.Migrations.NotNullConstraintOnBuildNumber do
+defmodule RabbitCICore.Repo.Migrations.NotNullConstraintOnBuildNumber do
   use Ecto.Migration
 
   def up do

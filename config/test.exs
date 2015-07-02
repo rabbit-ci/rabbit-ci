@@ -2,7 +2,7 @@ use Mix.Config
 
 # We don't run a server during test. If one is required,
 # you can enable the server option below.
-config :rabbitci, Rabbitci.Endpoint,
+config :rabbitci_core, RabbitCICore.Endpoint,
   http: [port: 4001],
   server: false
 
@@ -10,7 +10,7 @@ config :rabbitci, Rabbitci.Endpoint,
 config :logger, level: :warn
 
 # Configure your database
-config :rabbitci, Rabbitci.Repo,
+config :rabbitci_core, RabbitCICore.Repo,
   adapter: Ecto.Adapters.Postgres,
   username: "postgres",
   password: "postgres",

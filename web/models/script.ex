@@ -1,12 +1,12 @@
-defmodule Rabbitci.Script do
-  use Rabbitci.Web, :model
+defmodule RabbitCICore.Script do
+  use RabbitCICore.Web, :model
 
   schema "scripts" do
     field :status, :string
     field :name, :string
-    has_one :log, Rabbitci.Log
+    has_one :log, RabbitCICore.Log
     # TODO: artifacts
-    belongs_to :build, Rabbitci.Log
+    belongs_to :build, RabbitCICore.Log
     timestamps
   end
 

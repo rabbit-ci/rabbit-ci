@@ -1,4 +1,4 @@
-defmodule Rabbitci.Repo.Migrations.CreateLog do
+defmodule RabbitCICore.Repo.Migrations.CreateLog do
   use Ecto.Migration
 
   def change do

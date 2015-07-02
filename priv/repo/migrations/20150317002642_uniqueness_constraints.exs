@@ -1,4 +1,4 @@
-defmodule Rabbitci.Repo.Migrations.UniquenessConstraints do
+defmodule RabbitCICore.Repo.Migrations.UniquenessConstraints do
   use Ecto.Migration
 
   def change do

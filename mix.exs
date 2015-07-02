@@ -1,8 +1,8 @@
-defmodule Rabbitci.Mixfile do
+defmodule RabbitCICore.Mixfile do
   use Mix.Project
 
   def project do
-    [app: :rabbitci,
+    [app: :rabbitci_core,
      version: "0.0.1",
      elixir: "~> 1.0",
      elixirc_paths: elixirc_paths(Mix.env),
@@ -17,7 +17,7 @@ defmodule Rabbitci.Mixfile do
   #
   # Type `mix help compile.app` for more information
   def application do
-    [mod: {Rabbitci, []},
+    [mod: {RabbitCICore, []},
      applications: [:phoenix, :cowboy, :logger, :ecto, :postgrex, :exq, :phoenix_ecto]]
   end
 

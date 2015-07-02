@@ -1,25 +1,25 @@
-defmodule Rabbitci.BuildControllerTest do
-  use Rabbitci.Integration.Case
-  use Rabbitci.TestHelper
+defmodule RabbitCICore.BuildControllerTest do
+  use RabbitCICore.Integration.Case
+  use RabbitCICore.TestHelper
 
-  alias Rabbitci.Project
-  alias Rabbitci.Branch
-  alias Rabbitci.Repo
-  alias Rabbitci.ConfigFile
-  alias Rabbitci.Script
-  alias Rabbitci.Log
+  alias RabbitCICore.Project
+  alias RabbitCICore.Branch
+  alias RabbitCICore.Repo
+  alias RabbitCICore.ConfigFile
+  alias RabbitCICore.Script
+  alias RabbitCICore.Log
   # TODO: Test bad params
   def generate_records(builds: amount) do
     project = Repo.insert!(%Project{name: "blah", repo: "lala"})
     branch = Repo.insert!(%Branch{name: "branch1", project_id: project.id})
     time = Ecto.DateTime.utc()
     builds = for n <- 1..amount do
-      %Rabbitci.Build{build_number: n,
+      %RabbitCICore.Build{build_number: n,
                       start_time: time,
                       finish_time: time,
                       branch_id: branch.id,
                       commit: "eccee02ec18a36bcb2615b8c86d401b0618738c2"}
-      |> Rabbitci.Repo.insert!
+      |> RabbitCICore.Repo.insert!
     end
 
     {project, branch, builds}

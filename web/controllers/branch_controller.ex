@@ -1,8 +1,8 @@
-defmodule Rabbitci.BranchController do
-  use Rabbitci.Web, :controller
+defmodule RabbitCICore.BranchController do
+  use RabbitCICore.Web, :controller
 
   import Ecto.Query
-  alias Rabbitci.Project
+  alias RabbitCICore.Project
 
   plug :action
 
@@ -11,9 +11,9 @@ defmodule Rabbitci.BranchController do
   end
 
   def index(conn, params) do
-    query = from(b in Rabbitci.Branch,
+    query = from(b in RabbitCICore.Branch,
                  where: b.project_id == ^get_project_id(params))
-    branches = Rabbitci.Repo.all(query)
+    branches = RabbitCICore.Repo.all(query)
 
     conn
     |> assign(:branches, branches)
@@ -21,7 +21,7 @@ defmodule Rabbitci.BranchController do
   end
 
   def show(conn, params = %{"name" => name}) do
-    branch = Repo.one(from b in Rabbitci.Branch,
+    branch = Repo.one(from b in RabbitCICore.Branch,
                       where: b.name == ^name and
                       b.project_id == ^get_project_id(params))
     case branch do

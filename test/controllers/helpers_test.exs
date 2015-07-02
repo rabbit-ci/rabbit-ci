@@ -1,12 +1,12 @@
 defmodule Rabibtci.HelpersTest do
-  use Rabbitci.Integration.Case
-  use Rabbitci.TestHelper
+  use RabbitCICore.Integration.Case
+  use RabbitCICore.TestHelper
 
-  alias Rabbitci.Repo
-  alias Rabbitci.Project
-  alias Rabbitci.Branch
-  alias Rabbitci.Build
-  alias Rabbitci.ControllerHelpers
+  alias RabbitCICore.Repo
+  alias RabbitCICore.Project
+  alias RabbitCICore.Branch
+  alias RabbitCICore.Build
+  alias RabbitCICore.ControllerHelpers
 
   test "get_build should provide correct build" do
     time = Ecto.DateTime.utc()

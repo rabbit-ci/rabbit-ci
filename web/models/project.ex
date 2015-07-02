@@ -1,16 +1,16 @@
-defmodule Rabbitci.Project do
-  use Rabbitci.Web, :model
+defmodule RabbitCICore.Project do
+  use RabbitCICore.Web, :model
 
-  alias Rabbitci.Repo
-  alias Rabbitci.Branch
-  alias Rabbitci.Build
-  alias Rabbitci.Project
+  alias RabbitCICore.Repo
+  alias RabbitCICore.Branch
+  alias RabbitCICore.Build
+  alias RabbitCICore.Project
 
   schema "projects" do
     field :name, :string
     field :repo, :string
 
-    has_many :branches, Rabbitci.Branch
+    has_many :branches, RabbitCICore.Branch
 
     timestamps
   end

@@ -1,6 +1,6 @@
-defmodule Rabbitci.BuildSerializer do
-  require Rabbitci.SerializerHelpers
-  alias Rabbitci.SerializerHelpers
+defmodule RabbitCICore.BuildSerializer do
+  require RabbitCICore.SerializerHelpers
+  alias RabbitCICore.SerializerHelpers
 
   use JaSerializer
 
@@ -11,9 +11,9 @@ defmodule Rabbitci.BuildSerializer do
   end
 
   def branch_link(record, conn) do
-    branch = Rabbitci.Repo.preload(record, [branch: [:project]]).branch
-    Rabbitci.Router.Helpers.branch_path(conn, :show, branch.project.name, branch.name)
+    branch = RabbitCICore.Repo.preload(record, [branch: [:project]]).branch
+    RabbitCICore.Router.Helpers.branch_path(conn, :show, branch.project.name, branch.name)
   end
 
-  def status(record), do: Rabbitci.Build.status(record)
+  def status(record), do: RabbitCICore.Build.status(record)
 end

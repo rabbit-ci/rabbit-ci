@@ -1,11 +1,11 @@
-defmodule Rabbitci.BuildTest do
-  use Rabbitci.Integration.Case
-  use Rabbitci.TestHelper
+defmodule RabbitCICore.BuildTest do
+  use RabbitCICore.Integration.Case
+  use RabbitCICore.TestHelper
 
-  alias Rabbitci.Repo
-  alias Rabbitci.Project
-  alias Rabbitci.Branch
-  alias Rabbitci.Build
+  alias RabbitCICore.Repo
+  alias RabbitCICore.Project
+  alias RabbitCICore.Branch
+  alias RabbitCICore.Build
 
   test "build_number must be unique in the scope of branch" do
     p1 = Project.changeset(%Project{}, %{name: "project1", repo: "repo123"})

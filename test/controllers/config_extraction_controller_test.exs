@@ -1,14 +1,14 @@
-defmodule Rabbitci.ConfigExtractionControllerTest do
-  use Rabbitci.Integration.Case
-  use Rabbitci.TestHelper
+defmodule RabbitCICore.ConfigExtractionControllerTest do
+  use RabbitCICore.Integration.Case
+  use RabbitCICore.TestHelper
   use ExUnit.Case, async: false
 
   import Mock
 
-  alias Rabbitci.Repo
-  alias Rabbitci.Project
-  alias Rabbitci.Branch
-  alias Rabbitci.Build
+  alias RabbitCICore.Repo
+  alias RabbitCICore.Project
+  alias RabbitCICore.Branch
+  alias RabbitCICore.Build
 
   setup do
     project = Repo.insert! %Project{name: "project",

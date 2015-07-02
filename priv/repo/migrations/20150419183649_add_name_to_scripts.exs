@@ -1,4 +1,4 @@
-defmodule Rabbitci.Repo.Migrations.AddNameToScripts do
+defmodule RabbitCICore.Repo.Migrations.AddNameToScripts do
   use Ecto.Migration
 
   def change do

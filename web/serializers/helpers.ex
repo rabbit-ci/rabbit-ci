@@ -1,2 +1,2 @@
-defmodule Rabbitci.SerializerHelpers do
+defmodule RabbitCICore.SerializerHelpers do
 end

@@ -1,11 +1,11 @@
-defmodule Rabbitci.BranchControllerTest do
-  use Rabbitci.Integration.Case
-  use Rabbitci.TestHelper
+defmodule RabbitCICore.BranchControllerTest do
+  use RabbitCICore.Integration.Case
+  use RabbitCICore.TestHelper
 
-  alias Rabbitci.Repo
-  alias Rabbitci.Project
-  alias Rabbitci.Branch
-  alias Rabbitci.Build
+  alias RabbitCICore.Repo
+  alias RabbitCICore.Project
+  alias RabbitCICore.Branch
+  alias RabbitCICore.Build
 
   test "Get all branches for project" do
     project = Repo.insert! %Project{name: "project1",

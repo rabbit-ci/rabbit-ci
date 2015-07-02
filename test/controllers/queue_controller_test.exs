@@ -1,14 +1,14 @@
-defmodule Rabbitci.QueueControllerTest do
-  use Rabbitci.Integration.Case
-  use Rabbitci.TestHelper
+defmodule RabbitCICore.QueueControllerTest do
+  use RabbitCICore.Integration.Case
+  use RabbitCICore.TestHelper
 
   import Mock
   import Ecto.Query
 
-  alias Rabbitci.Repo
-  alias Rabbitci.Project
-  alias Rabbitci.Branch
-  alias Rabbitci.Build
+  alias RabbitCICore.Repo
+  alias RabbitCICore.Project
+  alias RabbitCICore.Branch
+  alias RabbitCICore.Build
 
   test "missing params" do
     response = post("/queue")
