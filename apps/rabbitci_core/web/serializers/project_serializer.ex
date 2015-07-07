@@ -7,7 +7,7 @@ defmodule RabbitCICore.ProjectSerializer do
   serialize "projects" do
     attributes [:name, :repo, :inserted_at,
                 :updated_at]
-    has_many :branches, include: RabbitCICore.BranchSerializer, link: ":branches_link"
+    has_many :branches, include: RabbitCICore.BranchSerializer, link: :branches_link
   end
 
   def branches_link(record, conn) do
