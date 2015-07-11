@@ -1,8 +1,15 @@
-# Rabbitci
+# RabbitCI Backend
 
-To start your new Phoenix application:
+This is (most of) the backend for RabbitCI. See
+http://github.com/rabbitci/rabbitci to learn what RabbitCI is.
 
-1. Install dependencies with `mix deps.get`
-2. Start Phoenix endpoint with `mix phoenix.server`
+## Dependencies
+The backend depends on:
 
-Now you can visit `localhost:4000` from your browser.
+- Elixir
+- Erlang
+- Postgres (username: postgres, password: postgres, databases:
+  rabbitci_test, rabbitci_dev)
+
+All other dependencies should be installed by running `mix cmd mix
+deps.get, compile` in the project root.
