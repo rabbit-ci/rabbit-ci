@@ -1,7 +1,7 @@
 # RabbitCI Backend
 
 This is (most of) the backend for RabbitCI. See
-http://github.com/rabbitci/rabbitci to learn what RabbitCI is.
+http://github.com/rabbit-ci/rabbit-ci to learn what RabbitCI is.
 
 ## Dependencies
 The backend depends on:
