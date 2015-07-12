@@ -7,12 +7,9 @@ defmodule BuildMan do
     import Supervisor.Spec, warn: false
 
     children = [
-      # Define workers and child supervisors to be supervised
-      # worker(BuildMan.Worker, [arg1, arg2, arg3])
+      supervisor(BuildSup, []),
     ]
 
-    # See http://elixir-lang.org/docs/stable/elixir/Supervisor.html
-    # for other strategies and supported options
     opts = [strategy: :one_for_one, name: BuildMan.Supervisor]
     Supervisor.start_link(children, opts)
   end
