@@ -3,8 +3,8 @@ defmodule BuildSup do
   use GenServer
   use AMQP
 
-  def start_link(option) do
-    GenServer.start_link(__MODULE__, option, [])
+  def start_link do
+    GenServer.start_link(__MODULE__, [], [])
   end
 
   @exchange "rabbitci_build_exchange"
