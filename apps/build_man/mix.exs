@@ -36,6 +36,7 @@ defmodule BuildMan.Mixfile do
   # Type `mix help deps` for more examples and options
   defp deps do
     [{:excoveralls, "~> 0.3.0", only: [:dev, :test]},
-     {:amqp, "0.1.1"}]
+     {:amqp, "0.1.1"},
+     {:exec, github: "saleyn/erlexec"}]
   end
 end

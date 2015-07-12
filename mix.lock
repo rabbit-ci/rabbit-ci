@@ -7,6 +7,7 @@
   "ecto": {:hex, :ecto, "0.13.1"},
   "eredis": {:git, "git://github.com/wooga/eredis.git", "a2273335de773209fd3ab30542fd1b670ca5c957", [tag: 'v1.0.5']},
   "excoveralls": {:hex, :excoveralls, "0.3.10"},
+  "exec": {:git, "git://github.com/saleyn/erlexec.git", "b3548d6973a1529bfada3cab9bbf602d43fb5e46", []},
   "exjsx": {:hex, :exjsx, "3.1.0"},
   "exq": {:git, "git://github.com/akira/exq.git", "704052fc72c6a6a7a2fe7a08d75f9c6d4110fcd0", []},
   "hackney": {:hex, :hackney, "1.1.0"},
