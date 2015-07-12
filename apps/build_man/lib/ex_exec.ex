@@ -39,6 +39,11 @@ defmodule ExExec do
   end
 
   def run(command, options) do
-    :exec.run(command, options)
+    :exec.run(command, Enum.map(options, &fix_option/1))
   end
+
+  defp fix_option({key, value}) when is_binary(value) do
+    {key, to_char_list(value)}
+  end
+  defp fix_option(a), do: a
 end
