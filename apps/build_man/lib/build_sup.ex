@@ -48,7 +48,25 @@ defmodule BuildSup do
   end
 
   defp consume(channel, tag, redelivered, payload) do
-    IO.puts "Payload: #{payload}"
+    Logger.debug "Extracting config. Payload: #{payload}"
+
+    {:ok, path} = unique_folder("rabbits")
+    git = System.find_executable("git")
+    ExExec.run([git, "clone", "git@github.com:octocat/Spoon-Knife.git", path],
+               [:sync, :stdout, :stderr])
+    {:ok, contents} = File.read("#{path}/README.md")
+    File.rm_rf!(path)
     Basic.ack(channel, tag)
+    Logger.debug "Finished Extracting config. Payload: #{payload}"
+  end
+
+  defp unique_folder(prefix \\ "") do # TODO: Extract to shared module
+    system_tmp = System.tmp_dir
+    unique_hash = :erlang.phash2(make_ref)
+    tmp_path = "#{system_tmp}RabbitCI/#{prefix}#{unique_hash}"
+    case File.mkdir_p(tmp_path) do
+      :ok -> {:ok, tmp_path}
+      a = {:error, _} -> a
+    end
   end
 end
