@@ -7,7 +7,7 @@ defmodule BuildMan do
     import Supervisor.Spec, warn: false
 
     children = [
-      supervisor(BuildSup, []),
+      supervisor(BuildMan.BuildSup, []),
     ]
 
     opts = [strategy: :one_for_one, name: BuildMan.Supervisor]
