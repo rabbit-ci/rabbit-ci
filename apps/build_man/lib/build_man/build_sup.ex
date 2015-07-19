@@ -1,7 +1,3 @@
-defmodule BuildMan.Build do
-  defstruct build_id: nil, cancelled: false, repo: nil, commit: nil, pr: nil
-end
-
 defmodule BuildMan.BuildSup do
   require Logger
   import BuildMan.FileHelpers, only: [unique_folder: 1]
@@ -67,23 +63,30 @@ defmodule BuildMan.BuildSup do
   defp consume(channel, tag, _redelivered, packed_payload) do
     payload = :erlang.binary_to_term(packed_payload)
     Logger.debug "Extracting config. Payload: #{inspect payload}"
-
     {:ok, path} = unique_folder("rabbits")
-    clone_repo(path, payload)
-    {:ok, contents} = File.read("#{path}/README.md")
-    File.rm_rf!(path)
-    Basic.ack(channel, tag) # We need to nack if it explodes.
-    Logger.debug "Finished Extracting config. Payload: #{inspect payload}"
+
+    try do
+      clone_repo(path, payload)
+      {:ok, contents} = File.read("#{path}/README.md")
+      BuildMan.FileExtraction.reply("README.md", contents)
+    after
+      File.rm_rf!(path)
+    end
+
+    Basic.ack(channel, tag)
+    BuildMan.FileExtraction.finish
   end
 end
 
+defmodule BuildMan.FileExtraction do
+  require Logger
 
-defmodule TBC do
-  def run do
-    term = :erlang.term_to_binary(%{"repo" => "git@github.com:rabbit-ci/backend.git",
-                                    "commit" => "cbc19a1c910ce86716ebbc7434b627d305733ef1"})
-    {:ok, conn} = AMQP.Connection.open("amqp://guest:guest@localhost")
-    {:ok, chan} = AMQP.Channel.open(conn)
-    AMQP.Basic.publish(chan, "rabbitci_build_exchange", "", term) # persistent?
+  def reply(name, contents) when is_binary(name) and is_binary(contents) do
+    contents = String.split(contents, "\n") |> Enum.join("\n    ")
+    Logger.debug "Got file #{name}, contents:\n\n    #{contents}"
+  end
+
+  def finish do
+    Logger.debug "Finished Extracting config"
   end
 end

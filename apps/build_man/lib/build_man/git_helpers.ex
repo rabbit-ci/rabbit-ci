@@ -3,14 +3,14 @@ defmodule BuildMan.GitHelpers do
   def clone_repo(path, %{"repo" => repo, "commit" => commit}) do
     git(["clone", repo, path])
     git(["checkout", "-qf", commit], path: path)
-    IO.inspect git(["rev-parse", "HEAD"], path: path)
+    git(["rev-parse", "HEAD"], path: path)
   end
 
   def clone_repo(path, %{"repo" => repo, "pr" => pr}) do
     git(["clone", repo, path])
     git(["fetch", "origin", "+refs/pull/#{pr}/merge:pr/#{pr}"], path: path)
     git(["checkout", "-qf", "pr/#{pr}"], path: path)
-    IO.inspect git(["rev-parse", "HEAD"], path: path)
+    git(["rev-parse", "HEAD"], path: path)
   end
 
   def git(args, [path: path]) when is_list(args) do
