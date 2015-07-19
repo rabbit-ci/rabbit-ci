@@ -1,4 +1,5 @@
 defmodule BuildMan.GitHelpers do
+  require Logger
   def clone_repo(path, %{"repo" => repo, "commit" => commit}) do
     git(["clone", repo, path])
     git(["checkout", "-qf", commit], path: path)
@@ -22,6 +23,13 @@ defmodule BuildMan.GitHelpers do
     case ExExec.run([git_cmd | args], [{:stderr, :stdout}, :sync, :stdout]) do
       {:ok, [stdout: out]} -> out
       {:ok, []} -> []
+      {:error, [stdout: out, stderr: err]} ->
+        Logger.error(out)
+        Logger.error(err)
+        raise "Git errored!"
+      a ->
+        Logger.error(inspect a)
+        raise "Git errored!"
     end
   end
 end
