@@ -11,6 +11,7 @@ The backend depends on:
 - Postgres (username: postgres, password: postgres, databases:
   rabbitci_test, rabbitci_dev)
 - RabbitMQ
+- Redis
 
 All other dependencies should be installed by running `mix cmd mix
 deps.get, compile` in the project root.
