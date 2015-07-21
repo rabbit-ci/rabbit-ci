@@ -26,7 +26,7 @@ defmodule BuildMan.BuildHelpersTest do
 
     GitHelpers.clone_repo(
       path,
-      %{"repo" => repo, "commit" => "eccee02ec18a36bcb2615b8c86d401b0618738c2"}
+      %{repo: repo, commit: "eccee02ec18a36bcb2615b8c86d401b0618738c2"}
     )
 
     rev = hd(GitHelpers.git(["rev-parse", "HEAD"], path: path))
@@ -42,7 +42,7 @@ defmodule BuildMan.BuildHelpersTest do
 
     GitHelpers.clone_repo(
       path,
-      %{"repo" => repo, "pr" => "1"}
+      %{repo: repo, pr: 1}
     )
 
     rev = hd(GitHelpers.git(["rev-parse", "HEAD"], path: path))

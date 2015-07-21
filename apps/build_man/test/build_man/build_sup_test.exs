@@ -5,8 +5,8 @@ defmodule BuildMan.BuildSupTest do
   test "Extracting a file" do
     path = Path.join(__DIR__, "../fixtures/test_repos/example-project.bundle")
     |> Path.expand
-    term = :erlang.term_to_binary(%{"repo" => path,
-                                    "pr" => 1})
+    term = :erlang.term_to_binary(%{repo: path,
+                                    pr: 1})
     {:ok, conn} = AMQP.Connection.open("amqp://guest:guest@localhost")
     {:ok, chan} = AMQP.Channel.open(conn)
 
