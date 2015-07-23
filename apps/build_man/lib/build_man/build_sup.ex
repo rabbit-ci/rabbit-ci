@@ -69,10 +69,10 @@ defmodule BuildMan.BuildSup do
       clone_repo(path, payload)
 
       contents =
-        Path.join([path, "README.md"])
+        Path.join([path, payload.file])
       |> File.read!
 
-      BuildMan.FileExtraction.reply("README.md", contents)
+      BuildMan.FileExtraction.reply(payload.file, contents)
     after
       File.rm_rf!(path)
     end
