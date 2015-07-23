@@ -1,0 +1,1 @@
+# Rabbit CI Configuration format
