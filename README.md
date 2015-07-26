@@ -12,6 +12,7 @@ The backend depends on:
   rabbitci_test, rabbitci_dev)
 - RabbitMQ
 - Redis
+- Vagrant
 
 All other dependencies should be installed by running `mix cmd mix
 deps.get, compile` in the project root.
