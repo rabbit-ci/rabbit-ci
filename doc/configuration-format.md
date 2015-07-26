@@ -6,7 +6,8 @@ spec-version: 0.0.1
 
 This document specifies the requirements for a Rabbit CI project
 configuration. A project configuration describes how a project should
-be built on Rabbit CI.
+be built on Rabbit CI. An example can be seen in
+(configuration-format.yaml)[configuration-format.yaml].
 
 ***
 
