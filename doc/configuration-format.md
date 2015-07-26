@@ -9,6 +9,10 @@ configuration. A project configuration describes how a project should
 be built on Rabbit CI. An example can be seen in
 [configuration-format.yaml](configuration-format.yaml).
 
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+"SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+document are to be interpreted as described in RFC 2119.
+
 ***
 
 The configuration consists of a unix style line ending (LF), UTF-8
