@@ -1,5 +1,5 @@
+---
 spec-version: 0.0.1
-
 ---
 
 # Rabbit CI Project Configuration
