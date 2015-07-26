@@ -1,12 +1,14 @@
 defmodule RabbitCICore.BuildView do
   use RabbitCICore.Web, :view
 
+  alias RabbitCICore.BuildSerializer
+
   def render("index.json", %{conn: conn, builds: builds}) do
-    RabbitCICore.BuildSerializer.format(builds, conn, %{})
+    BuildSerializer.format(builds, conn, %{})
   end
 
   def render("show.json", %{conn: conn, build: build}) do
-    RabbitCICore.BuildSerializer.format(build, conn, %{})
+    BuildSerializer.format(build, conn, %{})
   end
 
   def render("config.json", %{build: build, project: project, branch: branch}) do

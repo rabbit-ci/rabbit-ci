@@ -3,8 +3,6 @@ defmodule RabbitCICore.ProjectController do
 
   import Ecto.Query
 
-  alias RabbitCICore.Build
-  alias RabbitCICore.Branch
   alias RabbitCICore.Project
   alias RabbitCICore.Repo
 

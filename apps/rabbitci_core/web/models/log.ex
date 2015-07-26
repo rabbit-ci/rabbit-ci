@@ -1,10 +1,12 @@
 defmodule RabbitCICore.Log do
   use RabbitCICore.Web, :model
 
+  alias RabbitCICore.Script
+
   schema "logs" do
     field :stdio, :string
 
-    belongs_to :script, RabbitCICore.Script
+    belongs_to :script, Script
 
     timestamps
   end

@@ -1,8 +1,11 @@
 defmodule RabbitCICore.BuildSerializer do
-  require RabbitCICore.SerializerHelpers
-  alias RabbitCICore.SerializerHelpers
-
   use JaSerializer
+
+  require RabbitCICore.SerializerHelpers
+
+  alias RabbitCICore.SerializerHelpers
+  alias RabbitCICore.Repo
+  alias RabbitCICore.Build
 
   serialize "builds" do
     attributes [:build_number, :start_time, :finish_time,
@@ -11,9 +14,9 @@ defmodule RabbitCICore.BuildSerializer do
   end
 
   def branch_link(record, conn) do
-    branch = RabbitCICore.Repo.preload(record, [branch: [:project]]).branch
+    branch = Repo.preload(record, [branch: [:project]]).branch
     RabbitCICore.Router.Helpers.branch_path(conn, :show, branch.project.name, branch.name)
   end
 
-  def status(record), do: RabbitCICore.Build.status(record)
+  def status(record), do: Build.status(record)
 end

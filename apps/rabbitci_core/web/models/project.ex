@@ -10,7 +10,7 @@ defmodule RabbitCICore.Project do
     field :name, :string
     field :repo, :string
 
-    has_many :branches, RabbitCICore.Branch
+    has_many :branches, Branch
 
     timestamps
   end
