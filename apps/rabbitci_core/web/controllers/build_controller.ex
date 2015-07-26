@@ -7,6 +7,7 @@ defmodule RabbitCICore.BuildController do
   alias RabbitCICore.Project
   alias RabbitCICore.Script
   alias RabbitCICore.Log
+  alias RabbitCICore.Repo
 
   # TODO: clean this up
   defp get_parents(%{"project_name" => project_name, "branch_name" => branch_name}) do
@@ -67,7 +68,7 @@ defmodule RabbitCICore.BuildController do
                       order_by: [desc: b.build_number])
 
     conn
-    |> assign(:builds, RabbitCICore.Repo.preload(builds, [branch: [:project]]))
+    |> assign(:builds, Repo.preload(builds, [branch: [:project]]))
     |> render("index.json")
   end
 
@@ -80,7 +81,7 @@ defmodule RabbitCICore.BuildController do
     build = get_build(branch, build_number)
 
     conn
-    |> assign(:build, RabbitCICore.Repo.preload(build, [branch: [:project]]))
+    |> assign(:build, Repo.preload(build, [branch: [:project]]))
     |> render("show.json")
   end
 end

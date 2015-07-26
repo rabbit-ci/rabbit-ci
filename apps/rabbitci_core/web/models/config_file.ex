@@ -1,10 +1,12 @@
 defmodule RabbitCICore.ConfigFile do
   use RabbitCICore.Web, :model
 
+  alias RabbitCICore.Build
+
   schema "config_files" do
     field :raw_body, :string
 
-    belongs_to :build, RabbitCICore.Build
+    belongs_to :build, Build
 
     timestamps
   end

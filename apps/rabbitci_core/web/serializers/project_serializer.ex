@@ -2,12 +2,15 @@ defmodule RabbitCICore.ProjectSerializer do
   use JaSerializer
 
   require RabbitCICore.SerializerHelpers
+
   alias RabbitCICore.SerializerHelpers
+  alias RabbitCICore.Project
+  alias RabbitCICore.BranchSerializer
 
   serialize "projects" do
     attributes [:name, :repo, :inserted_at,
                 :updated_at]
-    has_many :branches, include: RabbitCICore.BranchSerializer, link: :branches_link
+    has_many :branches, include: BranchSerializer, link: :branches_link
   end
 
   def branches_link(record, conn) do
@@ -15,7 +18,7 @@ defmodule RabbitCICore.ProjectSerializer do
   end
 
   def branches(record) do
-    case RabbitCICore.Project.latest_build(record) do
+    case Project.latest_build(record) do
       nil -> []
       build ->
         case build.branch do
