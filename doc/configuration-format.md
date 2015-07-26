@@ -11,7 +11,7 @@ be built on Rabbit CI.
 ***
 
 The configuration consists of a unix style line ending (LF), UTF-8
-encoded [YAML][http://yaml.org] document in the root directory of a
+encoded [YAML](http://yaml.org) document in the root directory of a
 project's Git repository, named: `.rabbitci.yaml`.
 
 The configuration MUST contain a `spec-version` field set to the
