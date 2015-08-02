@@ -8,6 +8,7 @@ defmodule BuildMan do
 
     children = [
       supervisor(BuildMan.BuildSup, []),
+      worker(BuildMan.ProjectConfig, []),
     ]
 
     opts = [strategy: :one_for_one, name: BuildMan.Supervisor]

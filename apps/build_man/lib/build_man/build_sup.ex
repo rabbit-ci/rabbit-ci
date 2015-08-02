@@ -9,8 +9,8 @@ defmodule BuildMan.BuildSup do
     GenServer.start_link(__MODULE__, :ok, [])
   end
 
-  @exchange "rabbitci_build_exchange"
-  @queue "rabbitci_build_queue"
+  @exchange "rabbitci_builds_file_extraction_exchange"
+  @queue "rabbitci_builds_file_extraction_queue"
 
   def init(:ok) do
     {:ok, conn} = Connection.open("amqp://guest:guest@localhost")
