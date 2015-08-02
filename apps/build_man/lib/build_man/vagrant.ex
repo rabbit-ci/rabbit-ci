@@ -12,9 +12,10 @@ defmodule BuildMan.Vagrant do
 
     command(["up"], path)
     script = ~s"""
-      git clone https://github.com/github/hub.git workdir
-      cd workdir
-      #{config.script}
+    set -x
+    git clone #{config.repo} workdir
+    cd workdir
+    #{config.script}
     """
     command(["ssh", "-c", "sh", "-c", script], path)
     command(["destroy", "-f"], path)
@@ -28,11 +29,22 @@ defmodule BuildMan.Vagrant do
   end
 
   defp handle_out(_, _, s) do
-    IO.write "stdout: #{s}"
+    str = remove_str_newline(s)
+    IO.puts str
+    # "stdout: #{s}"
   end
 
   defp handle_err(_, _, s) do
-    IO.write "stderr: #{s}"
+    str = remove_str_newline(s)
+    IO.puts "STDERR: #{str}"
+    # "stderr: #{s}"
+  end
+
+  defp remove_str_newline(str) do
+    case String.last(str) do
+      "\n" -> String.slice(str, 0..-2)
+      _ -> str
+    end
   end
 
   p = Path.join(["lib", "build_man", "templates", "Vagrantfile.eex"])
