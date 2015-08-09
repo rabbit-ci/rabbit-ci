@@ -105,7 +105,7 @@ defmodule BuildMan.LogStreamer do
   end
 
   defp shut_down(state) do
-    Logger.debug("Log streamer going down... #{self}")
+    Logger.debug("Log streamer going down... #{inspect self}")
     {:stop, :normal, state}
   end
 
