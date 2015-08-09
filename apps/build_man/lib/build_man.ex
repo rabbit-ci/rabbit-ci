@@ -7,8 +7,11 @@ defmodule BuildMan do
     import Supervisor.Spec, warn: false
 
     children = [
-      supervisor(BuildMan.BuildSup, []),
+      # RabbitMQ must be first so that the pool can be created before other
+      # GenServers attempt to use it.
       supervisor(BuildMan.RabbitMQ, []),
+
+      supervisor(BuildMan.BuildSup, []),
     ]
 
     opts = [strategy: :one_for_one, name: BuildMan.Supervisor]
