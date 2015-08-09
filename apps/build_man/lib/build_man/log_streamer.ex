@@ -15,13 +15,12 @@ defmodule BuildMan.LogStreamer do
 
   With the values being:
 
-  `pid`: The pid of the process that should be monitored. When
-  that process shuts down, the LogStreamer will finish processing the
-  messages in the queue and shut down as well. This should generally
-  be the return value of `self/1`.
+  `pid`: The pid of the process that should be monitored. When that process
+  shuts down, the LogStreamer will finish processing the messages in the queue
+  and shut down as well. This should generally be the return value of `self/1`.
 
-  `build_identifier`: A unique identifier for the build. This is use
-  to determine the routing key to bind the queue.
+  `build_identifier`: A unique identifier for the build. This is use to
+  determine the routing key to bind the queue.
   """
   def start(opts) do
     GenServer.start(__MODULE__, opts)
@@ -92,10 +91,9 @@ defmodule BuildMan.LogStreamer do
     # Do something
   end
 
-  # This is what is called when the process we were monitoring
-  # dies. If the queue is empty, we shut down. If not, we set the
-  # third value in the state tuple to true which will be picked up on
-  # the next processed message.
+  # This is what is called when the process we were monitoring dies. If the
+  # queue is empty, we shut down. If not, we set the third value in the state
+  # tuple to true which will be picked up on the next processed message.
   def handle_info({:DOWN, ref, :process, _pid, _reason},
                   {chan, ref2, _stop, queue}) do
     case Queue.message_count(chan, queue) do
