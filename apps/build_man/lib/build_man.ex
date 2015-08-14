@@ -7,6 +7,10 @@ defmodule BuildMan do
     import Supervisor.Spec, warn: false
 
     children = [
+      # RabbitMQ must be first so that the pool can be created before other
+      # GenServers attempt to use it.
+      supervisor(BuildMan.RabbitMQ, []),
+
       supervisor(BuildMan.BuildSup, []),
     ]
 

@@ -1,7 +1,8 @@
 defmodule BuildMan.BuildSup do
-  require Logger
+  alias BuildMan.RabbitMQ
   import BuildMan.FileHelpers, only: [unique_folder: 1]
   import BuildMan.GitHelpers
+  require Logger
   use GenServer
   use AMQP
 
@@ -13,16 +14,24 @@ defmodule BuildMan.BuildSup do
   @queue "rabbitci_build_queue"
 
   def init(:ok) do
-    {:ok, conn} = Connection.open("amqp://guest:guest@localhost")
-    {:ok, chan} = Channel.open(conn)
+    open_chan = RabbitMQ.with_conn fn conn ->
+      {:ok, chan} = Channel.open(conn)
 
-    Basic.qos(chan, prefetch_count: 1) # TODO: Config this per node.
-    Queue.declare(chan, @queue, durable: true)
-    Exchange.fanout(chan, @exchange, durable: true)
-    Queue.bind(chan, @queue, @exchange)
+      Basic.qos(chan, prefetch_count: 1) # TODO: Config this per node.
+      Queue.declare(chan, @queue, durable: true)
+      Exchange.fanout(chan, @exchange, durable: true)
+      Queue.bind(chan, @queue, @exchange)
 
-    {:ok, _consumer_tag} = Basic.consume(chan, @queue)
-    {:ok, chan}
+      {:ok, _consumer_tag} = Basic.consume(chan, @queue)
+      {:ok, chan}
+    end
+
+    case open_chan do
+      {:ok, chan} ->
+        {:ok, chan}
+      {:error, :disconnected} ->
+        {:stop, :disconnected}
+    end
   end
 
   # Confirmation sent by the broker after registering this process as a consumer
