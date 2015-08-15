@@ -2,6 +2,9 @@ defmodule RabbitCICore.Build do
   use RabbitCICore.Web, :model
 
   alias RabbitCICore.Repo
+  alias RabbitCICore.Branch
+  alias RabbitCICore.Script
+  alias RabbitCICore.ConfigFile
 
   schema "builds" do
     field :build_number, :integer
@@ -10,9 +13,9 @@ defmodule RabbitCICore.Build do
     field :finish_time, Ecto.DateTime
     field :commit, :string
 
-    belongs_to :branch, RabbitCICore.Branch
-    has_many :scripts, RabbitCICore.Script
-    has_one :config_file, RabbitCICore.ConfigFile
+    belongs_to :branch, Branch
+    has_many :scripts, Script
+    has_one :config_file, ConfigFile
 
     timestamps
   end
