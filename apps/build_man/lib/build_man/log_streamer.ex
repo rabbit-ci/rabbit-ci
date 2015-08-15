@@ -43,25 +43,15 @@ defmodule BuildMan.LogStreamer do
     {:ok, {chan, ref, false, queue}}
   end
 
-  # FIXME: Duplication.
-  def handle_info({:basic_consume_ok, %{consumer_tag: _consumer_tag}},
-                  state = {chan, ref, stop, queue}) do
+  # AMQP Stuff
+  def handle_info({:basic_consume_ok, _}, state) do
     {:ok, hostname} = :inet.gethostname
     Logger.info("BuildMan.LogStreamer started on #{hostname}")
     {:noreply, state}
   end
 
-  # FIXME: Duplication
-  def handle_info({:basic_cancel, %{consumer_tag: _consumer_tag}},
-                  state = {chan, ref, stop, queue}) do
-    {:stop, :normal, state}
-  end
-
-  # FIXME: Duplication
-  def handle_info({:basic_cancel_ok, %{consumer_tag: _consumer_tag}},
-                  state = {chan, ref, stop, queue}) do
-    {:noreply, state}
-  end
+  def handle_info({:basic_cancel, _}, state), do: {:stop, :normal, state}
+  def handle_info({:basic_cancel_ok, _}, state), do: {:noreply, state}
 
   def handle_info({:basic_deliver, payload,
                    %{delivery_tag: tag, routing_key: routing_key}},
@@ -71,22 +61,22 @@ defmodule BuildMan.LogStreamer do
     do_process(payload, count, stop, routing_key, state)
   end
 
-  defp do_process(payload, 0, true, routing_key, state) do
+  defp process_message(payload, 0, true, routing_key, state) do
     do_process(payload, routing_key)
     shut_down(state)
   end
 
-  defp do_process(payload, _, _, routing_key, state) do
+  defp process_message(payload, _, _, routing_key, state) do
     do_process(payload, routing_key)
     {:noreply, state}
   end
 
-  defp do_process(payload, "stderr." <> identifier) do
+  defp process(payload, "stderr." <> identifier) do
     Logger.debug "STDERR: #{payload}"
     # Do something
   end
 
-  defp do_process(payload, "stdout." <> identifier) do
+  defp process(payload, "stdout." <> identifier) do
     Logger.debug "STDOUT: #{payload}"
     # Do something
   end
