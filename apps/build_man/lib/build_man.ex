@@ -12,7 +12,6 @@ defmodule BuildMan do
       supervisor(BuildMan.RabbitMQ, []),
 
       supervisor(BuildMan.BuildSup, []),
-      worker(BuildMan.ProjectConfig, []),
     ]
 
     opts = [strategy: :one_for_one, name: BuildMan.Supervisor]

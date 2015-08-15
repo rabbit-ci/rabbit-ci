@@ -58,16 +58,16 @@ defmodule BuildMan.LogStreamer do
                   state = {chan, ref, stop, queue}) do
     Basic.ack(chan, tag)
     count = Queue.message_count(chan, queue)
-    do_process(payload, count, stop, routing_key, state)
+    process_message(payload, count, stop, routing_key, state)
   end
 
   defp process_message(payload, 0, true, routing_key, state) do
-    do_process(payload, routing_key)
+    process(payload, routing_key)
     shut_down(state)
   end
 
   defp process_message(payload, _, _, routing_key, state) do
-    do_process(payload, routing_key)
+    process(payload, routing_key)
     {:noreply, state}
   end
 
