@@ -44,8 +44,8 @@ defmodule BuildMan.BuildSupTest do
 
       # We're not using `assert called` here because we need to wait
       # on the process in case it hasn't finished.
-      assert_receive {:replied, ^content}, 500
-      assert_receive :finished, 500
+      assert_receive {:replied, ^content}, 1000
+      assert_receive :finished, 1000
     end
   end
 end
