@@ -10,8 +10,8 @@ defmodule BuildMan.BuildSup do
     GenServer.start_link(__MODULE__, :ok, [])
   end
 
-  @exchange "rabbitci_build_exchange"
-  @queue "rabbitci_build_queue"
+  @exchange "rabbitci_builds_file_extraction_exchange"
+  @queue "rabbitci_builds_file_extraction_queue"
 
   def init(:ok) do
     open_chan = RabbitMQ.with_conn fn conn ->
@@ -43,14 +43,10 @@ defmodule BuildMan.BuildSup do
 
   # Sent by the broker when the consumer is unexpectedly cancelled (such as
   # after a queue deletion)
-  def handle_info({:basic_cancel, %{consumer_tag: _consumer_tag}}, chan) do
-    {:stop, :normal, chan}
-  end
+  def handle_info({:basic_cancel, _}, state), do: {:stop, :normal, state}
 
   # Confirmation sent by the broker to the consumer process after a Basic.cancel
-  def handle_info({:basic_cancel_ok, %{consumer_tag: _consumer_tag}}, chan) do
-    {:noreply, chan}
-  end
+  def handle_info({:basic_cancel_ok, _}, state), do: {:noreply, state}
 
   def handle_info({:basic_deliver, payload,
                    %{delivery_tag: tag, redelivered: redelivered}}, chan) do
