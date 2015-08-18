@@ -1,11 +1,11 @@
-defmodule BuildMan.RabbitMQ do
+defmodule RabbitMQ.PoolSup do
   use Supervisor
   use AMQP
   require Logger
 
   @pool_size 5
-  @conn_pool_name Module.concat(__MODULE__, ConnPool)
-  @pub_pool_name Module.concat(__MODULE__, PubPool)
+  @conn_pool_name Module.concat(RabbitMQ, ConnPool)
+  @pub_pool_name Module.concat(RabbitMQ, PubPool)
 
   @moduledoc """
   This code was adapted from pma/phoenix_pubsub_rabbitmq which can be found on
@@ -17,11 +17,11 @@ defmodule BuildMan.RabbitMQ do
   end
 
   def init(opts) do
-    Logger.info("BuildMan.RabbitMQ started!")
+    Logger.info("RabbitMQ.PoolSup started!")
 
     conn_pool_opts = [
       name: {:local, @conn_pool_name},
-      worker_module: BuildMan.RabbitMQConn,
+      worker_module: RabbitMQ.Conn,
       size: opts[:pool_size] || @pool_size,
       strategy: :fifo,
       max_overflow: 0
@@ -29,7 +29,7 @@ defmodule BuildMan.RabbitMQ do
 
     pub_pool_opts = [
       name: {:local, @pub_pool_name},
-      worker_module: BuildMan.RabbitMQPub,
+      worker_module: RabbitMQ.Pub,
       size: opts[:pool_size] || @pool_size,
       max_overflow: 0
     ]

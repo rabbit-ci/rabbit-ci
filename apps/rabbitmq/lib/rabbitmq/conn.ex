@@ -1,4 +1,4 @@
-defmodule BuildMan.RabbitMQConn do
+defmodule RabbitMQ.Conn do
   use GenServer
   use AMQP
   require Logger

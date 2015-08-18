@@ -1,7 +1,6 @@
-defmodule BuildMan.RabbitMQPub do
+defmodule RabbitMQ.Pub do
   use GenServer
   use AMQP
-  alias BuildMan.RabbitMQ
 
   @reconnect_after_ms 5_000
 

@@ -1,5 +1,4 @@
 defmodule BuildMan.BuildSup do
-  alias BuildMan.RabbitMQ
   import BuildMan.FileHelpers, only: [unique_folder: 1]
   import BuildMan.GitHelpers
   require Logger

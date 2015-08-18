@@ -1,15 +1,14 @@
-defmodule BuildMan.Mixfile do
+defmodule Rabbitmq.Mixfile do
   use Mix.Project
 
   def project do
-    [app: :build_man,
+    [app: :rabbitmq,
      version: "0.0.1",
      deps_path: "../../deps",
      lockfile: "../../mix.lock",
      elixir: "~> 1.0",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
-     test_coverage: [tool: ExCoveralls],
      deps: deps]
   end
 
@@ -17,8 +16,8 @@ defmodule BuildMan.Mixfile do
   #
   # Type `mix help compile.app` for more information
   def application do
-    [applications: [:logger, :exec, :yaml_elixir, :rabbitmq],
-     mod: {BuildMan, []}]
+    [applications: [:logger, :amqp],
+     mod: {RabbitMQ, []}]
   end
 
   # Dependencies can be Hex packages:
@@ -35,12 +34,7 @@ defmodule BuildMan.Mixfile do
   #
   # Type `mix help deps` for more examples and options
   defp deps do
-    [{:excoveralls, "~> 0.3.0", only: [:dev, :test]},
-     {:rabbitmq, in_umbrella: true},
-     {:yamerl, github: "yakaz/yamerl"},
-     {:yaml_elixir, "~> 1.0.0"},
-     {:mock, "0.1.1", only: :test},
-     {:exec, github: "saleyn/erlexec"},
-     {:uuid, "~> 1.0.1"}]
+    [{:amqp, "0.1.1"},
+     {:poolboy, "~> 1.5.0"}]
   end
 end

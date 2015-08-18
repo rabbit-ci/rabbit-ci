@@ -4,7 +4,6 @@ defmodule BuildMan.BuildConsumer do
 
   use AMQP
   use GenServer
-  alias BuildMan.RabbitMQ
   alias BuildMan.Vagrant
   require Logger
 

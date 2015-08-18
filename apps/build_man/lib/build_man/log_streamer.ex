@@ -6,7 +6,6 @@ defmodule BuildMan.LogStreamer do
   require Logger
   use AMQP
   use GenServer
-  alias BuildMan.RabbitMQ
   alias BuildMan.LogProcessor
 
   # Client API
