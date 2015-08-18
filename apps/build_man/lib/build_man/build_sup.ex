@@ -89,10 +89,15 @@ end
 
 defmodule BuildMan.FileExtraction do
   require Logger
+  alias BuildMan.ProjectConfig
 
   def reply(name, contents) when is_binary(name) and is_binary(contents) do
-    contents = String.split(contents, "\n") |> Enum.join("\n    ")
-    Logger.debug "Got file #{name}, contents:\n\n    #{contents}"
+    pretty = String.split(contents, "\n") |> Enum.join("\n    ")
+    Logger.debug "Got file #{name}, contents:\n\n    #{pretty}"
+
+    contents
+    |> ProjectConfig.parse_from_yaml
+    |> ProjectConfig.queue_builds
   end
 
   def finish do

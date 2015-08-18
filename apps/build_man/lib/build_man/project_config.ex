@@ -14,7 +14,7 @@ defmodule BuildMan.ProjectConfig do
   end
 
   def parse_from_yaml(content) do
-    :yamerl_constr.string(content)
+    YamlElixir.read_from_string(content)
   end
 
   def queue_builds(%{"steps" => steps, "repo" => repo}) when is_list(steps) do

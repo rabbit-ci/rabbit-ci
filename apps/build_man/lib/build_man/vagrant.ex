@@ -16,8 +16,8 @@ defmodule BuildMan.Vagrant do
 
   # Client API
 
-  def start(opts) do
-    GenServer.start(__MODULE__, opts)
+  def start_link(opts) do
+    GenServer.start_link(__MODULE__, opts)
   end
 
   # Server callbacks
@@ -66,7 +66,7 @@ defmodule BuildMan.Vagrant do
         %{build: build, config: config, path: path}) do
     File.write(Path.join(path, "Vagrantfile"), vagrantfile(config))
 
-    {_, pid, _} = command(["up"], state)
+    {_, pid, _} = command(["up", "--provider", "virtualbox"], state)
     Process.monitor(pid)
     {:noreply, %{state | cmd: {:up, pid}}}
   end

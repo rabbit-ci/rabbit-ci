@@ -11,6 +11,7 @@ defmodule BuildMan do
       # GenServers attempt to use it.
       supervisor(BuildMan.RabbitMQ, []),
 
+      supervisor(BuildMan.BuildConsumer, []),
       supervisor(BuildMan.BuildSup, []),
     ]
 

@@ -130,12 +130,12 @@ defmodule BuildMan.LogProcessor do
   require Logger
 
   def process(payload, "stderr." <> identifier) do
-    Logger.debug "STDERR (#{identifier}): #{payload}"
+    Logger.debug "STDERR (#{identifier}): #{String.strip payload}"
     # Do something
   end
 
   def process(payload, "stdout." <> identifier) do
-    Logger.debug "STDOUT (#{identifier}): #{payload}"
+    Logger.debug "STDOUT (#{identifier}): #{String.strip payload}"
     # Do something
   end
 end
