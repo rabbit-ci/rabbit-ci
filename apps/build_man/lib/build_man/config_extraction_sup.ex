@@ -1,4 +1,4 @@
-defmodule BuildMan.BuildSup do
+defmodule BuildMan.ConfigExtractionSup do
   import BuildMan.FileHelpers, only: [unique_folder: 1]
   import BuildMan.GitHelpers
   require Logger
@@ -36,7 +36,7 @@ defmodule BuildMan.BuildSup do
   # Confirmation sent by the broker after registering this process as a consumer
   def handle_info({:basic_consume_ok, %{consumer_tag: _consumer_tag}}, chan) do
     {:ok, hostname} = :inet.gethostname
-    Logger.info("BuildMan.BuildSup started on #{hostname}")
+    Logger.info("BuildMan.ConfigExtractionSup started on #{hostname}")
     {:noreply, chan}
   end
 

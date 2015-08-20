@@ -1,4 +1,4 @@
-defmodule BuildMan.BuildSupTest do
+defmodule BuildMan.ConfigExtractionSupTest do
   use ExUnit.Case, async: false # Mocks are sync
   import Mock
 
