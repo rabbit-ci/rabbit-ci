@@ -30,9 +30,10 @@ defmodule BuildMan.LogStreamer do
 
   @exchange "rabbitci_builds_logs"
 
-  def log_string(str, type, build_identifier) do
+  def log_string(str, type, build_identifier, order) do
     # publish(exchange, routing_key, payload, options \\ [])
-    RabbitMQ.publish(@exchange, "#{type}.#{build_identifier}", str)
+    RabbitMQ.publish(@exchange, "#{type}.#{build_identifier}",
+                     :erlang.term_to_binary(%{text: str, order: order}))
   end
 
   # Server callbacks
@@ -47,11 +48,11 @@ defmodule BuildMan.LogStreamer do
       Queue.bind(chan, "", @exchange, routing_key: "#.#{build_identifier}")
 
       {:ok, _consumer_tag} = Basic.consume(chan, queue)
-      {:ok, {chan, ref, false, queue}}
+      {:ok, %{chan: chan, ref: ref, stop: false, queue: queue}}
     end
 
     case open_chan do
-      {:ok, state = {%{pid: pid}, _, _, _}} ->
+      {:ok, state = %{chan: %{pid: pid}}} ->
         Process.monitor(pid)
         {:ok, state}
       {:error, :disconnected} ->
@@ -69,22 +70,25 @@ defmodule BuildMan.LogStreamer do
   def handle_info({:basic_cancel, _}, state), do: {:stop, :normal, state}
   def handle_info({:basic_cancel_ok, _}, state), do: {:noreply, state}
 
-  def handle_info({:basic_deliver, payload,
+  def handle_info({:basic_deliver, raw_payload,
                    %{delivery_tag: tag, routing_key: routing_key}},
-                  state = {chan, ref, stop, queue}) do
-    Basic.ack(chan, tag)
+                  state = %{chan: chan, ref: ref, stop: stop, queue: queue})
+  do
     count = Queue.message_count(chan, queue)
-    process_message(payload, count, stop, routing_key, state)
-  end
 
-  defp process_message(payload, 0, true, routing_key, state) do
-    LogProcessor.process(payload, routing_key)
-    shut_down(state)
-  end
+    Task.start fn ->
+      try do
+        payload = :erlang.binary_to_term(raw_payload)
+        LogProcessor.process(payload, routing_key)
+      after
+        Basic.ack(chan, tag)
+      end
+    end
 
-  defp process_message(payload, _, _, routing_key, state) do
-    LogProcessor.process(payload, routing_key)
-    {:noreply, state}
+    case {count, stop} do
+      {0, true} -> shut_down(state)
+      _ -> {:noreply, state}
+    end
   end
 
   # This is what is called when the process we were monitoring dies. If the
@@ -116,7 +120,7 @@ defmodule BuildMan.LogStreamer do
     {:stop, :normal, state}
   end
 
-  def terminate(_reason, {chan, _, _, _}) do
+  def terminate(_reason, %{chan: chan}) do
     try do
       Channel.close(chan)
     catch
@@ -128,13 +132,39 @@ end
 defmodule BuildMan.LogProcessor do
   require Logger
 
-  def process(payload, "stderr." <> identifier) do
-    Logger.debug "STDERR (#{identifier}): #{String.strip payload}"
+  @exchange "rabbitci_builds_processed_logs"
+
+  def process(payload = %{text: text, order: order}, order, "stderr." <> identifier) do
+    do_process(payload, "STDERR", identifier)
+    Logger.debug "STDERR (#{identifier}:#{order}): #{String.strip text}"
     # Do something
   end
 
-  def process(payload, "stdout." <> identifier) do
-    Logger.debug "STDOUT (#{identifier}): #{String.strip payload}"
+  def process(payload = %{text: text, order: order}, "stdout." <> identifier) do
+    do_process(payload, "STDOUT", identifier)
+    Logger.debug "STDOUT (#{identifier}:#{order}): #{String.strip text}"
     # Do something
+  end
+
+  def process(payload, other) do
+    Logger.warn("Log with unknown identifier: #{other} #{inspect payload}")
+  end
+
+  defp remove_last_newline(string) do
+    case String.last(string) do
+      "\n" -> String.slice(string, 0..-2)
+      other -> string
+    end
+  end
+
+  defp do_process(%{text: text, order: order}, type, identifier) do
+    str =
+      text
+      |> remove_last_newline
+      |> String.split("\n")
+      |> Enum.join("\n#{type}: ")
+
+    payload = :erlang.term_to_binary(%{text: str, order: order})
+    RabbitMQ.publish(@exchange, "#{type}.#{identifier}", payload)
   end
 end

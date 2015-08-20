@@ -10,7 +10,7 @@ defmodule BuildMan.ProjectConfig do
   the config.
   """
   def queue_build(config) do
-    BuildMan.RabbitMQ.publish(@exchange, "", :erlang.term_to_binary(config))
+    RabbitMQ.publish(@exchange, "", :erlang.term_to_binary(config))
   end
 
   def parse_from_yaml(content) do

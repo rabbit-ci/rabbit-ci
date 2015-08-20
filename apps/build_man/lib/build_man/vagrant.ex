@@ -26,11 +26,13 @@ defmodule BuildMan.Vagrant do
     {:ok, pid} = LogStreamer.start({self, build_identifier})
     Process.monitor(pid)
 
+    {:ok, count_agent} = Agent.start(fn -> 0 end)
+
     send(self, :start_build)
 
     {:ok, path} = FileHelpers.unique_folder("builder")
     {:ok, %{path: path, log_streamer: pid, build: build_identifier,
-            config: config, cmd: nil}}
+            config: config, cmd: nil, counter: count_agent}}
   end
 
   # This is called when "vagrant up" is done.
@@ -94,14 +96,14 @@ defmodule BuildMan.Vagrant do
     end
   end
 
-  defp command(args, %{build: build, path: path}, opts \\ [])
+  defp command(args, %{build: build, path: path, counter: counter}, opts \\ [])
   when is_list(opts) do
     vagrant_cmd = System.find_executable("vagrant")
     ExExec.run(
       [vagrant_cmd | args],
       [
-        {:stdout, handle_log(build, :stdout)},
-        {:stderr, handle_log(build, :stderr)},
+        {:stdout, handle_log(build, counter, :stdout)},
+        {:stderr, handle_log(build, counter, :stderr)},
         # Vagrant will not terminate from a signal in the "importing
         # box" stage unless it is running in a PTY. Running commands in
         # a PTY also gives us colors!
@@ -123,9 +125,16 @@ defmodule BuildMan.Vagrant do
     end
   end
 
-  defp handle_log(build, type) do
+  defp handle_log(build, counter, type) do
     fn _, _, str ->
-      LogStreamer.log_string(str, type, build)
+      LogStreamer.log_string(str, type, build, increment_counter(counter))
+    end
+  end
+
+  defp increment_counter(counter) do
+    Agent.get_and_update counter, fn x ->
+      y = x + 1
+      {y, y}
     end
   end
 

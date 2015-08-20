@@ -11,6 +11,7 @@ defmodule RabbitCICore do
       supervisor(RabbitCICore.Endpoint, []),
       # Start the Ecto repository
       worker(RabbitCICore.Repo, []),
+      worker(RabbitCICore.LogSaver, []),
       # Here you could define other workers and supervisors as children
       # worker(RabbitCICore.Worker, [arg1, arg2, arg3]),
     ]

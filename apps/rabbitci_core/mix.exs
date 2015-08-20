@@ -21,7 +21,7 @@ defmodule RabbitCICore.Mixfile do
   def application do
     [mod: {RabbitCICore, []},
      applications: [:phoenix, :cowboy, :logger, :ecto, :postgrex, :exq,
-                    :phoenix_ecto]]
+                    :phoenix_ecto, :rabbitmq]]
   end
 
   # Specifies your project dependencies
@@ -30,10 +30,10 @@ defmodule RabbitCICore.Mixfile do
   defp deps do
     [{:phoenix, "~> 0.14.0"},
      {:phoenix_ecto, "~> 0.5.0"},
-     {:postgrex, "~> 0.8.0"},
+     {:postgrex, "~> 0.9.1"},
      {:cowboy, "~> 1.0"},
-     {:postgrex, "~> 0.8.0"},
-     {:ecto, "~> 0.13.0"},
+     {:rabbitmq, in_umbrella: true},
+     {:ecto, "~> 0.16.0"},
      {:ashes, ">= 0.0.3"},
      {:mock, "~> 0.1.1"},
      {:exq, github: "akira/exq"},
