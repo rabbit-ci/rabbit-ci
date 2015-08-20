@@ -5,6 +5,7 @@ defmodule RabbitCICore.Log do
 
   schema "logs" do
     field :stdio, :string
+    field :order, :integer
 
     belongs_to :script, Script
 
