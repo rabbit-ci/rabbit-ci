@@ -11,10 +11,8 @@ defmodule RabbitCICore.Router do
 
     get "/", IndexController, :index
 
-    post "/queue", QueueController, :create
-    post "/config_extraction", ConfigExtractionController, :create
-
     resources "/projects", ProjectController, except: [:new, :edit]
+    post "/projects/start_build", ProjectController, :start_build
 
     get "/projects/:project_name/branches", BranchController, :index
     get "/projects/:project_name/branches/:name", BranchController, :show
@@ -23,10 +21,6 @@ defmodule RabbitCICore.Router do
     BuildController, :index
     get "/projects/:project_name/branches/:branch_name/builds/:build_number",
     BuildController, :show
-    put "/projects/:project_name/branches/:branch_name/builds/:build_number/log",
-    BuildController, :log_put
-    get "/projects/:project_name/branches/:branch_name/builds/:build_number/log",
-    BuildController, :log_get
     get "/projects/:project_name/branches/:branch_name/builds/:build_number/config",
     BuildController, :config
   end

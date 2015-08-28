@@ -13,6 +13,7 @@ defmodule BuildMan.Vagrant do
   require EEx
   alias BuildMan.FileHelpers
   alias BuildMan.LogStreamer
+  alias BuildMan.GitHelpers
 
   # Client API
 
@@ -74,10 +75,12 @@ defmodule BuildMan.Vagrant do
   end
 
   def handle_info(:run_build_script, state =
-        %{config: %{repo: repo, script: scr}}) do
+        %{config: %{repo: repo, script: scr, git_cmd: git_cmd}})
+  do
     script = ~s"""
     set -x
-    git clone #{repo} workdir
+    set -e
+    #{git_cmd}
     cd workdir
     #{scr}
     """

@@ -6,6 +6,7 @@ defmodule RabbitCICore.BranchControllerTest do
   alias RabbitCICore.Project
   alias RabbitCICore.Branch
   alias RabbitCICore.Build
+  alias Ecto.Model
 
   test "Get all branches for project" do
     project = Repo.insert! %Project{name: "project1",
@@ -25,11 +26,17 @@ defmodule RabbitCICore.BranchControllerTest do
 
   test "get a single branch" do
     project = Repo.insert! %Project{name: "project1",
-                                   repo: "git@example.com:user/project"}
-    branch = Repo.insert! %Branch{name: "branch1", exists_in_git: false,
-                                 project_id: project.id}
-    build = Repo.insert! %Build{build_number: 1, branch_id: branch.id,
-                               commit: "xyz"}
+                                    repo: "git@example.com:user/project"}
+
+    branch =
+      Model.build(project, :branches, %{name: "branch1"})
+      |> Branch.changeset
+      |> Repo.insert!
+
+    build =
+      Model.build(branch, :builds, %{commit: "xyz"})
+      |> Build.changeset
+      |> Repo.insert!
 
     response = get("/projects/#{project.name}/branches/#{branch.name}")
     {:ok, body} =
@@ -38,7 +45,8 @@ defmodule RabbitCICore.BranchControllerTest do
     assert response.status == 200
     assert is_map(body["data"])
     assert body["data"]["attributes"]["name"] == branch.name
-    assert hd(body["data"]["relationships"]["builds"]["data"])["id"] == to_string(build.id)
+    assert hd(body["data"]["relationships"]["builds"]["data"])["id"] ==
+      to_string(build.id)
     assert hd(body["included"])["id"] == to_string(build.id)
   end
 

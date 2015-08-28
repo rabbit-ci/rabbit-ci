@@ -17,7 +17,7 @@ defmodule BuildMan.Mixfile do
   #
   # Type `mix help compile.app` for more information
   def application do
-    [applications: [:logger, :exec, :yaml_elixir, :rabbitmq],
+    [applications: [:logger, :exec, :yaml_elixir, :rabbitmq, :rabbitci_core],
      mod: {BuildMan, []}]
   end
 
@@ -38,6 +38,7 @@ defmodule BuildMan.Mixfile do
     [{:excoveralls, "~> 0.3.0", only: [:dev, :test]},
      {:rabbitmq, in_umbrella: true},
      {:yamerl, github: "yakaz/yamerl"},
+     {:rabbitci_core, in_umbrella: true},
      {:yaml_elixir, "~> 1.0.0"},
      {:mock, "0.1.1", only: :test},
      {:exec, github: "saleyn/erlexec"},

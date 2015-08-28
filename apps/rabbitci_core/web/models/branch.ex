@@ -8,7 +8,7 @@ defmodule RabbitCICore.Branch do
 
   schema "branches" do
     field :name, :string
-    field :exists_in_git, :boolean
+    field :exists_in_git, :boolean, default: true
 
     has_many :builds, Build
 
@@ -22,7 +22,7 @@ defmodule RabbitCICore.Branch do
   If `params` are nil, an invalid changeset is returned
   with no validation performed.
   """
-  def changeset(model, params \\ nil) do
+  def changeset(model, params \\ %{}) do
     cast(model, params, ~w(name exists_in_git project_id), ~w())
     |> validate_unique(:name, scope: [:project_id], on: Repo)
   end

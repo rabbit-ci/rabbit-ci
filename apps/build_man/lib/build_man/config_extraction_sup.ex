@@ -65,7 +65,9 @@ defmodule BuildMan.ConfigExtractionSup do
   end
 
   defp consume(channel, tag, _redelivered, packed_payload) do
-    payload = :erlang.binary_to_term(packed_payload)
+    payload = Map.merge(%{file: ".rabbitci.yaml"},
+                        :erlang.binary_to_term(packed_payload))
+
     Logger.debug "Extracting config. Payload: #{inspect payload}"
     {:ok, path} = unique_folder("rabbits")
 
@@ -76,7 +78,8 @@ defmodule BuildMan.ConfigExtractionSup do
         Path.join([path, payload.file])
       |> File.read!
 
-      BuildMan.FileExtraction.reply(payload.file, contents)
+      BuildMan.FileExtraction.reply(payload.file, contents, payload.build_id,
+                                    payload)
     after
       File.rm_rf!(path)
     end
@@ -90,13 +93,14 @@ defmodule BuildMan.FileExtraction do
   require Logger
   alias BuildMan.ProjectConfig
 
-  def reply(name, contents) when is_binary(name) and is_binary(contents) do
+  def reply(name, contents, build_id, payload)
+  when is_binary(name) and is_binary(contents) do
     pretty = String.split(contents, "\n") |> Enum.join("\n    ")
     Logger.debug "Got file #{name}, contents:\n\n    #{pretty}"
 
     contents
     |> ProjectConfig.parse_from_yaml
-    |> ProjectConfig.queue_builds
+    |> ProjectConfig.queue_builds(build_id, payload)
   end
 
   def finish do

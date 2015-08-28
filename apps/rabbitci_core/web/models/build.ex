@@ -5,6 +5,22 @@ defmodule RabbitCICore.Build do
   alias RabbitCICore.Branch
   alias RabbitCICore.Script
   alias RabbitCICore.ConfigFile
+  alias RabbitCICore.Build
+
+  before_insert :set_build_number
+
+  def set_build_number(changeset) do
+    branch_id = Ecto.Changeset.get_field(changeset, :branch_id)
+    query = (from b in Build,
+           where: b.branch_id == ^branch_id,
+        order_by: [desc: b.build_number],
+           limit: 1,
+          select: b.build_number
+    )
+
+    build_number = (Repo.one(query) || 0) + 1
+    Ecto.Changeset.change(changeset, %{build_number: build_number})
+  end
 
   schema "builds" do
     field :build_number, :integer
@@ -26,14 +42,9 @@ defmodule RabbitCICore.Build do
   If `params` are nil, an invalid changeset is returned
   with no validation performed.
   """
-  def changeset(model, params \\ nil) do
-    cast(model, params, ~w(build_number branch_id commit),
-         ~w(start_time finish_time))
-    |> validate_unique(:build_number, scope: [:branch_id], on: Repo)
-
-    # Build numbers are scoped on the branch. i.e. each branch counts
-    # builds separately. This is to prevent the confusion of Branch A
-    # having builds 1, 2, and 4 because Branch B took build 3.
+  def changeset(model, params \\ %{}) do
+    cast(model, params, ~w(branch_id commit),
+         ~w(start_time build_number finish_time))
   end
 
   def status(statuses) when is_list(statuses) do

@@ -6,7 +6,7 @@ defmodule RabbitCICore.Script do
   schema "scripts" do
     field :status, :string
     field :name, :string
-    has_one :log, Log
+    has_many :logs, Log
     # TODO: artifacts
     belongs_to :build, Log
     timestamps

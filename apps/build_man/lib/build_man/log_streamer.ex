@@ -134,7 +134,9 @@ defmodule BuildMan.LogProcessor do
 
   @exchange "rabbitci_builds_processed_logs"
 
-  def process(payload = %{text: text, order: order}, order, "stderr." <> identifier) do
+  def process(payload = %{text: text, order: order}, order,
+              "stderr." <> identifier)
+  do
     do_process(payload, "STDERR", identifier)
     Logger.debug "STDERR (#{identifier}:#{order}): #{String.strip text}"
     # Do something

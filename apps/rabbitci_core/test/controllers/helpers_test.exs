@@ -12,13 +12,13 @@ defmodule Rabibtci.HelpersTest do
     time = Ecto.DateTime.utc()
     project = Repo.insert!(%Project{name: "blah", repo: "lala"})
     branch1 = Repo.insert!(%Branch{name: "branch1", project_id: project.id})
-    build1 = Repo.insert!(%Build{branch_id: branch1.id, build_number: 1,
+    build1 = Repo.insert!(%Build{branch_id: branch1.id,
                        start_time: time, finish_time: time})
 
     branch2 = Repo.insert!(%Branch{name: "branch2", project_id: project.id})
-    build2 = Repo.insert!(%Build{branch_id: branch2.id, build_number: 1,
+    build2 = Repo.insert!(%Build{branch_id: branch2.id,
                                 start_time: time, finish_time: time})
-    build3 = Repo.insert!(%Build{branch_id: branch2.id, build_number: 2,
+    build3 = Repo.insert!(%Build{branch_id: branch2.id,
                                 start_time: time, finish_time: time})
 
     assert ControllerHelpers.get_build(branch1, "latest") == build1

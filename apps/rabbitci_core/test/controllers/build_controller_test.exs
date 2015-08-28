@@ -7,19 +7,20 @@ defmodule RabbitCICore.BuildControllerTest do
   alias RabbitCICore.Repo
   alias RabbitCICore.ConfigFile
   alias RabbitCICore.Script
-  alias RabbitCICore.Log
+  alias RabbitCICore.Build
+  alias Ecto.Model
   # TODO: Test bad params
   def generate_records(builds: amount) do
     project = Repo.insert!(%Project{name: "blah", repo: "lala"})
     branch = Repo.insert!(%Branch{name: "branch1", project_id: project.id})
     time = Ecto.DateTime.utc()
     builds = for n <- 1..amount do
-      %RabbitCICore.Build{build_number: n,
-                      start_time: time,
-                      finish_time: time,
-                      branch_id: branch.id,
-                      commit: "eccee02ec18a36bcb2615b8c86d401b0618738c2"}
-      |> RabbitCICore.Repo.insert!
+      Model.build(branch, :builds,
+                  %{start_time: time,
+                    finish_time: time,
+                    commit: "eccee02ec18a36bcb2615b8c86d401b0618738c2"})
+      |> Build.changeset
+      |> Repo.insert!
     end
 
     {project, branch, builds}
@@ -81,53 +82,5 @@ defmodule RabbitCICore.BuildControllerTest do
       "#{build.build_number}/config")
     response = get(url)
     assert Poison.decode!(response.resp_body) == expected
-  end
-
-  test "requesting a log" do
-    {project, branch, builds} = generate_records(builds: 1)
-    build = hd(builds)
-    url = ("/projects/#{project.name}/branches/#{branch.name}/builds/" <>
-      "#{build.build_number}/log")
-
-    logs = [{"main", "This is log 'main'"},
-            {"secondary", "This is log 'secondary'"}]
-    for {name, log} <- logs do
-      script = Repo.insert! %Script{name: name, status: "running",
-                                   build_id: build.id}
-      Repo.insert!(%Log{stdio: log, script_id: script.id})
-    end
-
-    response = get(url)
-    body = response.resp_body
-    for {_, log} <- logs do
-      assert String.contains?(body, log)
-    end
-  end
-
-  test "uploading logs" do
-    {project, branch, builds} = generate_records(builds: 1)
-    build = hd(builds)
-    url = ("/projects/#{project.name}/branches/#{branch.name}/builds/" <>
-      "#{build.build_number}/log")
-    resp = put(url, %{"log_string" => "This is log 'main'", "script" => "main"})
-    assert resp.status == 200
-
-    resp = get(url)
-    assert String.contains?(resp.resp_body, "This is log 'main'")
-
-    resp = put(url, %{"log_string" => "This should append to main",
-                      "script" => "main"})
-    assert resp.status == 200
-    resp = get(url)
-    assert String.contains?(resp.resp_body, "This is log 'main'")
-    assert String.contains?(resp.resp_body, "This should append to main")
-
-    resp = put(url, %{"log_string" => "This is a new script",
-                      "script" => "secondary"})
-    assert resp.status == 200
-    resp = get(url)
-    assert String.contains?(resp.resp_body, "This is log 'main'")
-    assert String.contains?(resp.resp_body, "This should append to main")
-    assert String.contains?(resp.resp_body, "This is a new script")
   end
 end

@@ -4,6 +4,7 @@ defmodule RabbitCICore.LogSaver do
   require Logger
   alias RabbitCICore.Log
   alias RabbitCICore.Repo
+  alias RabbitCICore.Script
 
   @exchange "rabbitci_builds_processed_logs"
 
@@ -66,8 +67,10 @@ defmodule RabbitCICore.LogSaver do
 
   def update_log(payload, tag, ident, chan) do
     %{text: text, order: order} = :erlang.binary_to_term(payload)
+    [_, build_id, script_name] = get_id(ident)
+    script = Repo.get_by(Script, name: script_name, build_id: build_id)
     # TODO: Script ID should *not* be hardcoded
-    %Log{stdio: text, script_id: 59, order: order}
+    %Log{stdio: text, script_id: script.id, order: order}
     |> Repo.insert
   end
 
@@ -79,7 +82,5 @@ defmodule RabbitCICore.LogSaver do
     end
   end
 
-  defp get_log_id("STDOUT." <> ident), do: ident
-  defp get_log_id("STDERR." <> ident), do: ident
-  defp get_log_id(ident), do: nil
+  defp get_id(ident), do: String.split(ident, ".")
 end

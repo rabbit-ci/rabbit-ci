@@ -50,7 +50,7 @@ defmodule BuildMan.BuildConsumer do
       :erlang.process_flag(:trap_exit, true)
 
       # [identifier, config]
-      Vagrant.start_link([inspect(tag), :erlang.binary_to_term(payload)])
+      Vagrant.start_link([routing_key, :erlang.binary_to_term(payload)])
 
       receive do
         {:EXIT, _pid, :normal} -> Basic.ack(chan, tag)

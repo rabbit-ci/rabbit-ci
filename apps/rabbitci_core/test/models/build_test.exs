@@ -6,28 +6,42 @@ defmodule RabbitCICore.BuildTest do
   alias RabbitCICore.Project
   alias RabbitCICore.Branch
   alias RabbitCICore.Build
+  alias Ecto.Model
 
+  # FIXME: Rewrite this test
   test "build_number must be unique in the scope of branch" do
-    p1 = Project.changeset(%Project{}, %{name: "project1", repo: "repo123"})
-    |> Repo.insert!
-    b1 = Branch.changeset(%Branch{}, %{name: "branch1", project_id: p1.id,
-                                       exists_in_git: false})
-    |> Repo.insert!
+    p1 =
+      Project.changeset(%Project{}, %{name: "project1", repo: "repo123"})
+      |> Repo.insert!
 
-    b2 = Branch.changeset(%Branch{}, %{name: "branch2", project_id: p1.id,
-                                       exists_in_git: false})
-    |> Repo.insert!
+    b1 =
+      Model.build(p1, :branches, %{name: "branch1"})
+      |> Branch.changeset
+      |> Repo.insert!
 
-    build = Repo.insert! Build.changeset(%Build{}, %{build_number: 1,
-                                                    branch_id: b1.id,
-                                                    commit: "xyz"})
-    assert !Build.changeset(%Build{}, %{build_number: 1,
-                                        branch_id: b1.id,
-                                        commit: "xyz"}).valid?
+    b2 =
+      Model.build(p1, :branches, %{name: "branch1"})
+      |> Branch.changeset
+      |> Repo.insert!
 
-    assert Build.changeset(%Build{}, %{build_number: 1,
-                                       branch_id: b2.id,
-                                       commit: "xyz"}).valid?
+    build1 =
+      Model.build(b1, :builds, %{commit: "xyz"})
+      |> Build.changeset
+      |> Repo.insert!
+
+    build2 =
+      Model.build(b1, :builds, %{commit: "xyz"})
+      |> Build.changeset
+      |> Repo.insert!
+
+    build3 =
+      Model.build(b2, :builds, %{commit: "xyz"})
+      |> Build.changeset
+      |> Repo.insert!
+
+    assert build1.build_number == 1
+    assert build2.build_number == 2
+    assert build3.build_number == 1
   end
 
   test "status" do
