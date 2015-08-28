@@ -16,10 +16,10 @@ defmodule BuildMan.ConfigExtractionSupTest do
     path = Path.join(__DIR__, "../fixtures/test_repos/example-project.bundle")
     |> Path.expand
 
-    term = :erlang.term_to_binary(%{repo: path,
-                                    pr: 1,
-                                    file: "README.md",
-                                    build_id: -1})
+    :erlang.term_to_binary(%{repo: path,
+                             pr: 1,
+                             file: "README.md",
+                             build_id: -1})
     |> do_test(@pr_content)
   end
 

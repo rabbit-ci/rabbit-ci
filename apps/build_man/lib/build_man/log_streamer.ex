@@ -72,7 +72,7 @@ defmodule BuildMan.LogStreamer do
 
   def handle_info({:basic_deliver, raw_payload,
                    %{delivery_tag: tag, routing_key: routing_key}},
-                  state = %{chan: chan, ref: ref, stop: stop, queue: queue})
+                  state = %{chan: chan, ref: _ref, stop: stop, queue: queue})
   do
     count = Queue.message_count(chan, queue)
 
@@ -103,7 +103,7 @@ defmodule BuildMan.LogStreamer do
   end
 
   # Channel died.
-  def handle_info({:DOWN, ref, :process, _pid, _reason}, state) do
+  def handle_info({:DOWN, _ref, :process, _pid, _reason}, state) do
     case _reason do
       :normal -> Logger.debug("RabbitMQ Channel shut down")
       _ -> Logger.warn("RabbitMQ Channel died!")
@@ -155,7 +155,7 @@ defmodule BuildMan.LogProcessor do
   defp remove_last_newline(string) do
     case String.last(string) do
       "\n" -> String.slice(string, 0..-2)
-      other -> string
+      :else -> string
     end
   end
 

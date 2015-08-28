@@ -6,15 +6,15 @@ defmodule RabbitCICore.BuildControllerTest do
   alias RabbitCICore.Branch
   alias RabbitCICore.Repo
   alias RabbitCICore.ConfigFile
-  alias RabbitCICore.Script
   alias RabbitCICore.Build
   alias Ecto.Model
+
   # TODO: Test bad params
   def generate_records(builds: amount) do
     project = Repo.insert!(%Project{name: "blah", repo: "lala"})
     branch = Repo.insert!(%Branch{name: "branch1", project_id: project.id})
     time = Ecto.DateTime.utc()
-    builds = for n <- 1..amount do
+    builds = for _ <- 1..amount do
       Model.build(branch, :builds,
                   %{start_time: time,
                     finish_time: time,

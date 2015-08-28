@@ -5,6 +5,8 @@
 # is restricted to this project.
 use Mix.Config
 
+config :rabbitci_core, :app_namespace, RabbitCICore
+
 # Configures the endpoint
 config :rabbitci_core, RabbitCICore.Endpoint,
   url: [host: "localhost"],

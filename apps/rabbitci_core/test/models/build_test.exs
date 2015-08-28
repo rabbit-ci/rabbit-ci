@@ -20,7 +20,7 @@ defmodule RabbitCICore.BuildTest do
       |> Repo.insert!
 
     b2 =
-      Model.build(p1, :branches, %{name: "branch1"})
+      Model.build(p1, :branches, %{name: "branch2"})
       |> Branch.changeset
       |> Repo.insert!
 

@@ -5,8 +5,6 @@ defmodule RabbitCICore.BuildController do
   alias RabbitCICore.Build
   alias RabbitCICore.Branch
   alias RabbitCICore.Project
-  alias RabbitCICore.Script
-  alias RabbitCICore.Log
   alias RabbitCICore.Repo
 
   # TODO: clean this up

@@ -1,6 +1,5 @@
 defmodule BuildMan.ProjectConfig do
   alias RabbitCICore.Repo
-  alias RabbitCICore.Script
   alias RabbitCICore.Build
   alias BuildMan.GitHelpers
 

@@ -21,5 +21,5 @@ defmodule RabbitCICore.Endpoint do
     signing_salt: "5yrWD+HO",
     encryption_salt: "frlrKqup"
 
-  plug :router, RabbitCICore.Router
+  plug RabbitCICore.Router
 end

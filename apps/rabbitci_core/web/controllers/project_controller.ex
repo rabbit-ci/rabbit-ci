@@ -7,7 +7,7 @@ defmodule RabbitCICore.ProjectController do
   alias RabbitCICore.Project
   alias RabbitCICore.Branch
 
-  def index(conn, params) do # This will be paginated later
+  def index(conn, _params) do # This will be paginated later
     projects = Repo.all(Project)
     conn
     |> assign(:projects, projects)
@@ -22,7 +22,7 @@ defmodule RabbitCICore.ProjectController do
     end
   end
 
-  def create(conn, params = %{}) do
+  def create(_conn, _params = %{}) do
   end
 
   plug :fix_params when action in [:start_build]
@@ -57,14 +57,14 @@ defmodule RabbitCICore.ProjectController do
     assign(conn, :new_params, _fix_params(conn, params))
   end
 
-  defp _fix_params(conn, params = %{"branch" => branch_name,
+  defp _fix_params(_conn, params = %{"branch" => branch_name,
                                     "repo" => repo,
                                     "commit" => commit})
   do
     %{branch_name: branch_name, repo: repo, commit: commit, pr: params["pr"]}
   end
 
-  defp _fix_params(conn, params) do
+  defp _fix_params(conn, _params) do
     reply_400(conn, %{message: "Missing required params!"})
   end
 

@@ -54,7 +54,7 @@ defmodule RabbitCICore.LogSaver do
                   chan) do
     Task.start_link fn ->
       try do
-        update_log(payload, tag, ident, chan)
+        update_log(payload, tag, ident)
       after
         Basic.ack(chan, tag)
       end
@@ -65,11 +65,11 @@ defmodule RabbitCICore.LogSaver do
 
   def handle_info({:EXIT, _pid, _reason}, chan), do: {:noreply, chan}
 
-  def update_log(payload, tag, ident, chan) do
+  def update_log(payload, _tag, ident) do
     %{text: text, order: order} = :erlang.binary_to_term(payload)
     [_, build_id, script_name] = get_id(ident)
     script = Repo.get_by(Script, name: script_name, build_id: build_id)
-    # TODO: Script ID should *not* be hardcoded
+
     %Log{stdio: text, script_id: script.id, order: order}
     |> Repo.insert
   end
