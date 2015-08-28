@@ -24,7 +24,7 @@ defmodule RabbitCICore.Branch do
   """
   def changeset(model, params \\ %{}) do
     cast(model, params, ~w(name exists_in_git project_id), ~w())
-    |> validate_unique(:name, scope: [:project_id], on: Repo)
+    |> unique_constraint(:name, name: :branches_name_project_id_index)
   end
 
   def latest_build(branch = %Branch{}) do
