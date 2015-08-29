@@ -11,7 +11,6 @@ The backend depends on:
 - Postgres (username: postgres, password: postgres, databases:
   rabbitci_test, rabbitci_dev)
 - RabbitMQ
-- Redis
 - Vagrant
 
 All other dependencies should be installed by running `mix cmd mix

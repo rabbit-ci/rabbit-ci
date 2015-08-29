@@ -23,10 +23,3 @@ config :rabbitci_core, RabbitCICore.Repo,
   password: "postgres",
   database: "rabbitci_dev",
   size: 10
-
-config :exq,
-  host: '127.0.0.1',
-  port: 6379,
-  namespace: "resque",
-  queues: ["nothing"] # Empty queue so that we do not timeout.
-               # We can add things to the queue just fine.

@@ -20,7 +20,7 @@ defmodule RabbitCICore.Mixfile do
   # Type `mix help compile.app` for more information
   def application do
     [mod: {RabbitCICore, []},
-     applications: [:phoenix, :cowboy, :logger, :ecto, :postgrex, :exq,
+     applications: [:phoenix, :cowboy, :logger, :ecto, :postgrex,
                     :phoenix_ecto, :rabbitmq]]
   end
 
@@ -34,9 +34,7 @@ defmodule RabbitCICore.Mixfile do
      {:cowboy, "~> 1.0"},
      {:rabbitmq, in_umbrella: true},
      {:ecto, "~> 1.0.0"},
-     {:ashes, ">= 0.0.3"},
      {:mock, "~> 0.1.1"},
-     {:exq, github: "akira/exq"},
      {:ja_serializer, github: "AgilionApps/ja_serializers"},
      {:excoveralls, "~> 0.3.0", only: [:dev, :test]}
     ]
