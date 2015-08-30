@@ -9,14 +9,15 @@ defmodule BuildMan.ConfigExtractionSup do
     GenServer.start_link(__MODULE__, :ok, [])
   end
 
-  @exchange "rabbitci_builds_file_extraction_exchange"
-  @queue "rabbitci_builds_file_extraction_queue"
+  @exchange Application.get_env(:build_man, :config_extraction_exchange)
+  @queue Application.get_env(:build_man, :config_extraction_queue)
+  @worker_limit Application.get_env(:build_man, :config_extraction_limit)
 
   def init(:ok) do
     open_chan = RabbitMQ.with_conn fn conn ->
       {:ok, chan} = Channel.open(conn)
 
-      Basic.qos(chan, prefetch_count: 1) # TODO: Config this per node.
+      Basic.qos(chan, prefetch_count: @worker_limit)
       Queue.declare(chan, @queue, durable: true)
       Exchange.fanout(chan, @exchange, durable: true)
       Queue.bind(chan, @queue, @exchange)

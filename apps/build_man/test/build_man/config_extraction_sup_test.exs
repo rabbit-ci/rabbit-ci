@@ -34,7 +34,7 @@ defmodule BuildMan.ConfigExtractionSupTest do
     |> do_test(@commit_content)
   end
 
-  @exchange "rabbitci_builds_file_extraction_exchange"
+  @exchange Application.get_env(:build_man, :config_extraction_exchange)
 
   defp do_test(term, content) do
     {:ok, conn} = AMQP.Connection.open

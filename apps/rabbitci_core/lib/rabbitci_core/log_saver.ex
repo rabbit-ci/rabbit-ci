@@ -6,13 +6,14 @@ defmodule RabbitCICore.LogSaver do
   alias RabbitCICore.Repo
   alias RabbitCICore.Script
 
-  @exchange "rabbitci_builds_processed_logs"
-
   # Client API
   def start_link do
     Logger.debug("Starting up LogSaver...")
     GenServer.start_link(__MODULE__, :ok)
   end
+
+  @exchange Application.get_env(:build_man, :processed_logs_exchange)
+  @log_saver_limit Application.get_env(:rabbitci_core, :log_saver_limit)
 
   # Server callbacks
   def init(:ok) do
@@ -21,7 +22,7 @@ defmodule RabbitCICore.LogSaver do
     open_chan = RabbitMQ.with_conn fn conn ->
       {:ok, chan} = Channel.open(conn)
 
-      Basic.qos(chan, prefetch_count: 5) # TODO: Config this per node.
+      Basic.qos(chan, prefetch_count: @log_saver_limit)
 
       {:ok, %{queue: queue}} = Queue.declare(chan, "", auto_delete: true)
       Exchange.topic(chan, @exchange)

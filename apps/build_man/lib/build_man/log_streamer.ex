@@ -28,7 +28,8 @@ defmodule BuildMan.LogStreamer do
     GenServer.start(__MODULE__, opts)
   end
 
-  @exchange "rabbitci_builds_logs"
+  @exchange Application.get_env(:build_man, :build_logs_exchange)
+  @log_streamer_limit Application.get_env(:build_man, :log_streamer_limit)
 
   def log_string(str, type, build_identifier, order) do
     # publish(exchange, routing_key, payload, options \\ [])
@@ -42,7 +43,7 @@ defmodule BuildMan.LogStreamer do
 
     open_chan = RabbitMQ.with_conn fn conn ->
       {:ok, chan} = Channel.open(conn)
-      Basic.qos(chan, prefetch_count: 10)
+      Basic.qos(chan, prefetch_count: @log_streamer_limit)
       {:ok, %{queue: queue}} = Queue.declare(chan, "", auto_delete: true)
       Exchange.topic(chan, @exchange)
       Queue.bind(chan, "", @exchange, routing_key: "#.#{build_identifier}")
@@ -132,7 +133,7 @@ end
 defmodule BuildMan.LogProcessor do
   require Logger
 
-  @exchange "rabbitci_builds_processed_logs"
+  @exchange Application.get_env(:build_man, :processed_logs_exchange)
 
   def process(payload = %{text: text, order: order}, order,
               "stderr." <> identifier)
@@ -155,7 +156,7 @@ defmodule BuildMan.LogProcessor do
   defp remove_last_newline(string) do
     case String.last(string) do
       "\n" -> String.slice(string, 0..-2)
-      :else -> string
+      _ -> string
     end
   end
 

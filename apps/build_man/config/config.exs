@@ -13,5 +13,6 @@ use Mix.Config
 config :logger, :console,
 format: "\n$time $metadata[$level] $levelpad$message"
 
+import_config "../../../config/rabbitmq.exs"
 import_config "../../rabbitci_core/config/config.exs"
 import_config "#{Mix.env}.exs"

@@ -7,7 +7,7 @@ defmodule BuildMan.ProjectConfig do
   Module for processing configs.
   """
 
-  @exchange "rabbitci_builds_build_exchange"
+  @exchange Application.get_env(:build_man, :build_exchange)
 
   @doc """
   Queue build from parsed config. See `parse_from_yaml/1` for parsing
