@@ -10,6 +10,16 @@ defmodule RabbitMQ.PoolSup do
   @moduledoc """
   This code was adapted from pma/phoenix_pubsub_rabbitmq which can be found on
   GitHub.
+
+    * `options` - The optional RabbitMQ options:
+      * `host` - The hostname of the broker (defaults to \"localhost\");
+      * `port` - The port the broker is listening on (defaults to `5672`);
+      * `username` - The name of a user registered with the broker (defaults to \"guest\");
+      * `password` - The password of user (defaults to \"guest\");
+      * `virtual_host` - The name of a virtual host in the broker (defaults to \"/\");
+      * `heartbeat` - The hearbeat interval in seconds (defaults to `0` - turned off);
+      * `connection_timeout` - The connection timeout in milliseconds (defaults to `infinity`);
+      * `pool_size` - Number of active connections to the broker
   """
 
   def start_link(opts \\ []) do

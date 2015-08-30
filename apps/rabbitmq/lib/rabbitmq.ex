@@ -6,8 +6,10 @@ defmodule RabbitMQ do
   def start(_type, _args) do
     import Supervisor.Spec, warn: false
 
+    rabbitmq_opts = Application.get_env(:rabbitmq, :options, [])
+
     children = [
-      supervisor(RabbitMQ.PoolSup, []),
+      supervisor(RabbitMQ.PoolSup, [rabbitmq_opts]),
     ]
 
     # See http://elixir-lang.org/docs/stable/elixir/Supervisor.html
