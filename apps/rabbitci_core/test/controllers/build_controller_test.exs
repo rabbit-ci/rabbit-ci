@@ -5,7 +5,6 @@ defmodule RabbitCICore.BuildControllerTest do
   alias RabbitCICore.Project
   alias RabbitCICore.Branch
   alias RabbitCICore.Repo
-  alias RabbitCICore.ConfigFile
   alias RabbitCICore.Build
   alias Ecto.Model
 
@@ -50,37 +49,5 @@ defmodule RabbitCICore.BuildControllerTest do
     response = get(url)
     body = Poison.decode!(response.resp_body)
     assert is_map(body)
-  end
-
-  test "get config file" do
-    config = %{"ENV" => %{"VAR1" => "VAR1 Global"},
-               "scripts" => [%{"ENV" => %{"SOMETHING" => "Just a variable"},
-                               "name" => "main"},
-                             %{"ENV" => %{"VAR1" => "Override global var"},
-                               "name" => "override-VAR1"}]}
-    |> Poison.encode!
-
-    expected =
-      %{"scripts" =>
-         [%{"ENV" =>
-             %{"RABBIT_CI_BRANCH" => "branch1",
-               "RABBIT_CI_BUILD_NUMBER" => 1,
-               "RABBIT_CI_COMMIT" => "eccee02ec18a36bcb2615b8c86d401b0618738c2",
-               "RABBIT_CI_PROJECT_NAME" => "blah", "RABBIT_CI_REPO" => "lala",
-               "SOMETHING" => "Just a variable", "VAR1" => "VAR1 Global"},
-            "name" => "main"},
-          %{"ENV" =>
-             %{"RABBIT_CI_BRANCH" => "branch1", "RABBIT_CI_BUILD_NUMBER" => 1,
-               "RABBIT_CI_COMMIT" => "eccee02ec18a36bcb2615b8c86d401b0618738c2",
-               "RABBIT_CI_PROJECT_NAME" => "blah", "RABBIT_CI_REPO" => "lala",
-               "VAR1" => "Override global var"}, "name" => "override-VAR1"}]}
-
-    {project, branch, builds} = generate_records(builds: 1)
-    build = hd(builds)
-    Repo.insert!(%ConfigFile{build_id: build.id, raw_body: config})
-    url = ("/projects/#{project.name}/branches/#{branch.name}/builds/" <>
-      "#{build.build_number}/config")
-    response = get(url)
-    assert Poison.decode!(response.resp_body) == expected
   end
 end

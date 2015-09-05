@@ -4,7 +4,6 @@ defmodule RabbitCICore.Build do
   alias RabbitCICore.Repo
   alias RabbitCICore.Branch
   alias RabbitCICore.Script
-  alias RabbitCICore.ConfigFile
   alias RabbitCICore.Build
 
   before_insert :set_build_number
@@ -31,7 +30,6 @@ defmodule RabbitCICore.Build do
 
     belongs_to :branch, Branch
     has_many :scripts, Script
-    has_one :config_file, ConfigFile
 
     timestamps
   end

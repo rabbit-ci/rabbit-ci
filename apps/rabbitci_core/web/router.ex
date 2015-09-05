@@ -23,8 +23,6 @@ defmodule RabbitCICore.Router do
     BuildController, :index
     get "/projects/:project_name/branches/:branch_name/builds/:build_number",
     BuildController, :show
-    get "/projects/:project_name/branches/:branch_name/builds/:build_number/config",
-    BuildController, :config
   end
 
   # This should be changed in production and must be based off of the server's

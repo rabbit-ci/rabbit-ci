@@ -16,16 +16,6 @@ defmodule RabbitCICore.BuildController do
     {project, branch}
   end
 
-  def config(conn, params = %{"build_number" => build_number}) do
-    {project, branch} = get_parents(params)
-    build = Repo.preload(get_build(branch, build_number), :config_file)
-    conn
-    |> assign(:build, build)
-    |> assign(:branch, branch)
-    |> assign(:project, project)
-    |> render("config.json")
-  end
-
   def index(conn, params = %{"page" => %{"offset" => page}}) do
     {_, branch} = get_parents(params)
     page = String.to_integer(page)
