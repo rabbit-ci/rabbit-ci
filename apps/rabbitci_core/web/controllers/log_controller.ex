@@ -40,7 +40,7 @@ defmodule RabbitCICore.LogController do
   end
 
   def show(conn, params) do
-    show(conn, Map.merge(params, %{"format" => "text"})
+    show(conn, Map.merge(params, %{"format" => "text"}))
   end
 
   defp _log(%{assigns: %{project: project, branch: branch, build: build}}) do
