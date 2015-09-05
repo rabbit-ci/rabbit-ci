@@ -32,6 +32,10 @@ defmodule BuildMan.Vagrant do
 
     send(self, :start_build)
 
+    start_msg = "STDOUT: Starting: #{build_identifier}. Box: #{config.box}\n\n"
+    LogStreamer.log_string(start_msg, :stdout, build_identifier,
+                           increment_counter(count_agent))
+
     {:ok, path} = FileHelpers.unique_folder("builder")
     {:ok, %{path: path, log_streamer: pid, build: build_identifier,
             config: config, cmd: nil, counter: count_agent}}
