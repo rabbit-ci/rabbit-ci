@@ -17,6 +17,7 @@ defmodule RabbitCICore.Project do
 
   def changeset(model, params \\ nil) do
     cast(model, params, ~w(name repo), ~w())
+    |> unique_constraint(:name)
   end
 
   def latest_build(project) do
