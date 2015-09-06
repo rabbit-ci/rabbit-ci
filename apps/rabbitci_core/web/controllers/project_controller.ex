@@ -7,22 +7,20 @@ defmodule RabbitCICore.ProjectController do
   alias RabbitCICore.Project
   alias RabbitCICore.Branch
 
-  def index(conn, _params) do # This will be paginated later
-    projects = Repo.all(Project)
+  def index(conn, _params) do # TODO: Paginate
     conn
-    |> assign(:projects, projects)
-    |> render("index.json")
+    |> assign(:projects, Repo.all(Project))
+    |> render
   end
 
-  def show(conn, %{"id" => name}) do
-    project = Repo.one(from p in Project, where: p.name == ^name)
-    case project do
-      nil -> conn |> send_resp(404, "Project not found.")
-      _ -> conn |> assign(:project, project) |> render("show.json")
+  def show(conn, %{"name" => name}) do
+    case Repo.get_by(Project, name: name) do
+      nil -> send_resp(conn, 404, "Project not found.")
+      project ->
+        conn
+        |> assign(:project, project)
+        |> render
     end
-  end
-
-  def create(_conn, _params = %{}) do
   end
 
   plug :fix_params when action in [:start_build]

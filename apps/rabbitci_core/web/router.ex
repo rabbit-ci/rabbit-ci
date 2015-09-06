@@ -11,11 +11,12 @@ defmodule RabbitCICore.Router do
 
     get "/", IndexController, :index
 
-    resources "/projects", ProjectController, except: [:new, :edit]
+    get "/projects", ProjectController, :index
+    get "/projects/:name", ProjectController, :show
     post "/projects/start_build", ProjectController, :start_build
 
-    get "/projects/:project_name/branches", BranchController, :index
-    get "/projects/:project_name/branches/:name", BranchController, :show
+    get "/branches", BranchController, :index
+    get "/branches/:branch", BranchController, :show
 
     get "/logs", LogController, :show
 

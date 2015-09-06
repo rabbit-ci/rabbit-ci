@@ -11,7 +11,7 @@
   "hackney": {:hex, :hackney, "1.3.1"},
   "idna": {:hex, :idna, "1.0.2"},
   "inflex": {:hex, :inflex, "1.4.1"},
-  "ja_serializer": {:git, "git://github.com/AgilionApps/ja_serializers.git", "e98b69ebda4854029dcb5f7c56787ed2a160e2fb", []},
+  "ja_serializer": {:git, "git://github.com/AgilionApps/ja_serializers.git", "ad11281610603369ba3175a4f25cc74dbe85dec3", []},
   "jsx": {:hex, :jsx, "2.6.2"},
   "meck": {:hex, :meck, "0.8.3"},
   "mock": {:hex, :mock, "0.1.1"},

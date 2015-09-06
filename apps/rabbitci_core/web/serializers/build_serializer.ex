@@ -3,18 +3,14 @@ defmodule RabbitCICore.BuildSerializer do
 
   alias RabbitCICore.Repo
   alias RabbitCICore.Build
-  alias RabbitCICore.Router.Helpers, as: RouterHelpers
+  alias RabbitCICore.BranchSerializer
 
   attributes [:build_number, :start_time, :finish_time,
               :updated_at, :inserted_at, :commit, :status]
-  has_one :branch, link: :branch_link, field: :branch_id, type: "branches"
+  has_one :branch, include: BranchSerializer
 
   def type, do: "builds"
 
-  def branch_link(record, conn) do
-    branch = Repo.preload(record, [branch: [:project]]).branch
-    RouterHelpers.branch_path(conn, :show, branch.project.name, branch.name)
-  end
-
+  def branch(r, _), do: Repo.preload(r, :branch).branch
   def status(record), do: Build.status(record)
 end
