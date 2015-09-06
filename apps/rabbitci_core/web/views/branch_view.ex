@@ -6,8 +6,4 @@ defmodule RabbitCICore.BranchView do
   def render("index.json", %{conn: conn, branches: branches}) do
     BranchSerializer.format(branches, conn, %{})
   end
-
-  def render("show.json", %{conn: conn, branch: branch}) do
-    BranchSerializer.format(branch, conn, %{})
-  end
 end
