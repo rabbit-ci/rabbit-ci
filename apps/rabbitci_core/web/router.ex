@@ -25,8 +25,7 @@ defmodule RabbitCICore.Router do
     BuildController, :show
   end
 
-  # This should be changed in production and must be based off of the server's
-  # configuration.
+  # This should be changed in production.
   defp allow_origin(conn, _opts) do
     headers = get_req_header(conn, "access-control-request-headers")
     |> Enum.join(", ")
