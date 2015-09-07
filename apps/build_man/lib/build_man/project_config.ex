@@ -40,7 +40,7 @@ defmodule BuildMan.ProjectConfig do
           name: step["name"],
           repo: repo,
           git_cmd: git_cmd
-        } |> queue_build(build_id, step["name"] <> box)
+        } |> queue_build(build_id, "#{step["name"]} #{box}")
       end
     end
   end
