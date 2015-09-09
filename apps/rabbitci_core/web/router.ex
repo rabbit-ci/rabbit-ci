@@ -16,6 +16,7 @@ defmodule RabbitCICore.Router do
     post "/projects/start_build", ProjectController, :start_build
 
     get "/branches", BranchController, :index
+    get "/branches/:branch", BranchController, :show
 
     get "/logs", LogController, :show
 

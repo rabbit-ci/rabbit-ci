@@ -5,7 +5,7 @@ defmodule RabbitCICore.BranchController do
   alias RabbitCICore.Project
   alias RabbitCICore.Branch
 
-  def index(conn, %{"project" => project_name, "branch" => branch_name}) do
+  def show(conn, %{"project" => project_name, "branch" => branch_name}) do
     branch =
       from(b in branch_query(project_name), where: b.name == ^branch_name)
       |> Repo.one
@@ -14,7 +14,7 @@ defmodule RabbitCICore.BranchController do
       nil -> send_resp(conn, 404, "Not found.")
       branch ->
         conn
-        |> assign(:branches, branch)
+        |> assign(:branch, branch)
         |> render
     end
   end
