@@ -27,8 +27,7 @@ defmodule RabbitCICore.BuildControllerTest do
 
   test "page offset should default to 0" do
     {project, branch, _} = generate_records(builds: 40)
-    url = "/projects/#{project.name}/branches/#{branch.name}/builds"
-    response = get(url)
+    response = get("/builds", [project: project.name, branch: branch.name])
     body = Poison.decode!(response.resp_body)
     assert hd(body["data"])["attributes"]["build-number"] == 40
     assert List.last(body["data"])["attributes"]["build-number"] == 11
@@ -36,17 +35,18 @@ defmodule RabbitCICore.BuildControllerTest do
 
   test "page offset should work" do
     {project, branch, _} = generate_records(builds: 40)
-    url = "/projects/#{project.name}/branches/#{branch.name}/builds"
-    response = get(url, [page: %{offset: "1"}])
+    response =
+      get("/builds", [project: project.name, branch: branch.name,
+                      page: %{offset: "1"}])
     body = Poison.decode!(response.resp_body)
     assert hd(body["data"])["attributes"]["build-number"] == 10
     assert List.last(body["data"])["attributes"]["build-number"] == 1
   end
 
   test "show a single build" do
-    {project, branch, _} = generate_records(builds: 1)
-    url = "/projects/#{project.name}/branches/#{branch.name}/builds/1"
-    response = get(url)
+    {project, branch, [build]} = generate_records(builds: 1)
+    url = "/builds/#{build.build_number}"
+    response = get(url, [project: project.name, branch: branch.name])
     body = Poison.decode!(response.resp_body)
     assert is_map(body)
   end

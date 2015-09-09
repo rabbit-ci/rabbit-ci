@@ -8,7 +8,7 @@ defmodule RabbitCICore.BuildController do
   alias RabbitCICore.Repo
 
   # TODO: clean this up
-  defp get_parents(%{"project_name" => project_name, "branch_name" => branch_name}) do
+  defp get_parents(%{"project" => project_name, "branch" => branch_name}) do
     project = Repo.one(from p in Project, where: p.name == ^project_name)
     branch = Repo.one(from b in Branch,
                       where: b.name == ^branch_name and

@@ -20,10 +20,8 @@ defmodule RabbitCICore.Router do
 
     get "/logs", LogController, :show
 
-    get "/projects/:project_name/branches/:branch_name/builds",
-    BuildController, :index
-    get "/projects/:project_name/branches/:branch_name/builds/:build_number",
-    BuildController, :show
+    get "/builds", BuildController, :index
+    get "/builds/:build_number", BuildController, :show
   end
 
   # This should be changed in production.

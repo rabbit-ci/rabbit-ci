@@ -16,7 +16,7 @@ defmodule RabbitCICore.BranchControllerTest do
                           project_id: project.id}
     end
 
-    response = get("/branches?project=#{project.name}")
+    response = get("/branches", [project: project.name])
     {:ok, body} = response.resp_body |> Poison.decode
     assert response.status == 200
     assert length(body["data"]) == 5
@@ -38,7 +38,7 @@ defmodule RabbitCICore.BranchControllerTest do
       |> Build.changeset
       |> Repo.insert!
 
-    response = get("/branches/#{branch.name}?project=#{project.name}")
+    response = get("/branches/#{branch.name}", [project: project.name])
     {:ok, body} =
       response.resp_body |> Poison.decode
 
@@ -53,7 +53,7 @@ defmodule RabbitCICore.BranchControllerTest do
   test "branch does not exist" do
     project = Repo.insert! %Project{name: "project1",
                                     repo: "git@example.com:user/project"}
-    response = get("/branches/fakebranch?project=#{project.name}")
+    response = get("/branches/fakebranch", [project: project.name])
     assert response.status == 404
   end
 end
