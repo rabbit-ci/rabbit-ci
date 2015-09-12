@@ -3,7 +3,7 @@ defmodule RabbitCICore.Router do
 
   pipeline :api do
     plug :allow_origin
-    plug :accepts, ["json", "json-api"]
+    plug :accepts, ["json"]
   end
 
   scope "/", RabbitCICore do

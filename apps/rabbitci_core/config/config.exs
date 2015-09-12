@@ -22,7 +22,7 @@ config :logger, :console,
   metadata: [:request_id]
 
 config :plug, :mimes, %{
-  "application/vnd.api+json" => ["json-api"]
+  "application/vnd.api+json" => ["json"]
 }
 
 import_config "../../../config/rabbitmq.exs"
