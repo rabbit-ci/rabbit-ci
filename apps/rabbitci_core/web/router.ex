@@ -1,6 +1,6 @@
 defmodule RabbitCICore.Router do
   use Phoenix.Router
-  require IEx
+
   pipeline :api do
     plug :allow_origin
     plug :accepts, ["json", "json-api"]
