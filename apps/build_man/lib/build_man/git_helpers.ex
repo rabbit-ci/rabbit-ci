@@ -9,7 +9,7 @@ defmodule BuildMan.GitHelpers do
     cmds = [["checkout", "-qf", commit],
             ["rev-parse", "HEAD"]]
 
-    [clone | for cmd <- cmds, do: git(cmd, [path: path], should_run)]
+    [clone | (for cmd <- cmds, do: git(cmd, [path: path], should_run))]
   end
   def clone_repo(path, %{repo: repo, pr: pr}, should_run) do
     clone = git(["clone", repo, path], should_run)
@@ -18,7 +18,7 @@ defmodule BuildMan.GitHelpers do
             ["checkout", "-qf", "pr/#{pr}"],
             ["rev-parse", "HEAD"]]
 
-    [clone | for cmd <- cmds, do: git(cmd, [path: path], should_run)]
+    [clone | (for cmd <- cmds, do: git(cmd, [path: path], should_run))]
   end
 
   def git(args, [path: path], should_run) when is_list(args) do
