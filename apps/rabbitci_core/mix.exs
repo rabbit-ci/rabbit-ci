@@ -1,3 +1,5 @@
+Code.require_file "../../shared.exs", __DIR__
+
 defmodule RabbitCICore.Mixfile do
   use Mix.Project
 
@@ -12,7 +14,7 @@ defmodule RabbitCICore.Mixfile do
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
      test_coverage: [tool: ExCoveralls],
-     deps: deps]
+     deps: Shared.deps ++ deps]
   end
 
   # Configuration for the OTP application
@@ -34,10 +36,7 @@ defmodule RabbitCICore.Mixfile do
      {:cowboy, "~> 1.0"},
      {:rabbitmq, in_umbrella: true},
      {:ecto, "~> 1.0.0"},
-     {:mock, "~> 0.1.1"},
-     {:ja_serializer, github: "AgilionApps/ja_serializers"},
-     {:excoveralls, "~> 0.3.0", only: [:dev, :test]}
-    ]
+     {:ja_serializer, github: "AgilionApps/ja_serializers"}]
   end
 
   # Specifies which paths to compile per environment
