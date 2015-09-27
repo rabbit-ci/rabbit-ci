@@ -104,8 +104,8 @@ defmodule BuildMan.LogStreamer do
   end
 
   # Channel died.
-  def handle_info({:DOWN, _ref, :process, _pid, _reason}, state) do
-    case _reason do
+  def handle_info({:DOWN, _ref, :process, _pid, reason}, state) do
+    case reason do
       :normal -> Logger.debug("RabbitMQ Channel shut down")
       _ -> Logger.warn("RabbitMQ Channel died!")
     end
