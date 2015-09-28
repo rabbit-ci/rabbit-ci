@@ -34,7 +34,7 @@ defmodule Rabbitmq.Mixfile do
   #
   # Type `mix help deps` for more examples and options
   defp deps do
-    [{:amqp, "0.1.1"},
+    [{:amqp, "0.1.3"},
      {:poolboy, "~> 1.5.0"}]
   end
 end

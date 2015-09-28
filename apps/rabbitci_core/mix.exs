@@ -31,7 +31,7 @@ defmodule RabbitCICore.Mixfile do
   # Type `mix help deps` for examples and options
   defp deps do
     [{:phoenix, "~> 1.0.0"},
-     {:phoenix_ecto, "~> 1.1.0"},
+     {:phoenix_ecto, "~> 1.2.0"},
      {:postgrex, "~> 0.9.1"},
      {:cowboy, "~> 1.0"},
      {:rabbitmq, in_umbrella: true},
