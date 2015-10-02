@@ -1,6 +1,7 @@
 defmodule RabbitCICore.BuildController do
   use RabbitCICore.Web, :controller
 
+  require Logger
   import Ecto.Query
   alias RabbitCICore.Build
   alias RabbitCICore.Branch
@@ -9,6 +10,7 @@ defmodule RabbitCICore.BuildController do
 
   # TODO: clean this up
   defp get_parents(%{"project" => project_name, "branch" => branch_name}) do
+    Logger.warn "get_parents called!"
     project = Repo.one(from p in Project, where: p.name == ^project_name)
     branch = Repo.one(from b in Branch,
                       where: b.name == ^branch_name and
@@ -34,12 +36,34 @@ defmodule RabbitCICore.BuildController do
     index(conn, Map.merge(params, %{"page" => %{"offset" => "0"}}))
   end
 
-  def show(conn, params = %{"build_number" => build_number}) do
-    {_, branch} = get_parents(params)
-    build = get_build(branch, build_number)
+  def show(conn, params = %{"build_number" => build_number, "branch" => branch,
+                            "project" => project}) do
+    try do
+      build =
+        (from b in Build,
+         join: br in assoc(b, :branch),
+         join: p in assoc(br, :project),
+         where: br.name == ^branch
+         and p.name == ^project
+         and b.build_number == ^build_number,
+         preload: [branch: {br, project: p}])
+        |> Repo.one
 
-    conn
-    |> assign(:build, Repo.preload(build, [branch: [:project]]))
-    |> render("show.json")
+      case build do
+        nil ->
+          conn
+          |> put_status(404)
+          |> text("Not found.")
+        _ ->
+          conn
+          |> assign(:build, build)
+          |> render("show.json")
+      end
+    rescue
+      Ecto.CastError ->
+        conn
+        |> put_status(400)
+        |> text("Invalid params.")
+    end
   end
 end
