@@ -50,7 +50,7 @@ defmodule BuildMan.ConfigExtractionSup do
 
   def handle_info({:basic_deliver, payload,
                    %{delivery_tag: tag, redelivered: redelivered}}, chan) do
-    spawn fn ->
+    Task.start_link fn ->
       :erlang.process_flag(:trap_exit, true)
 
       spawn_link fn ->
@@ -58,8 +58,9 @@ defmodule BuildMan.ConfigExtractionSup do
       end
 
       receive do
-        {:EXIT, _pid, :normal} -> nil
-        {:EXIT, _pid, _} -> Basic.reject(chan, tag, requeue: false)
+        {:EXIT, _pid, _reason} ->
+          if Process.alive?(chan.pid), do: Basic.ack(chan, tag)
+          BuildMan.FileExtraction.finish
       end
     end
     {:noreply, chan}
@@ -84,9 +85,6 @@ defmodule BuildMan.ConfigExtractionSup do
     after
       File.rm_rf!(path)
     end
-
-    Basic.ack(channel, tag)
-    BuildMan.FileExtraction.finish
   end
 end
 

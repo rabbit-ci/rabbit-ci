@@ -7,11 +7,12 @@ defmodule BuildMan do
     import Supervisor.Spec, warn: false
 
     children = [
-      supervisor(BuildMan.BuildConsumer, []),
-      supervisor(BuildMan.ConfigExtractionSup, []),
+      worker(BuildMan.BuildConsumer, []),
+      worker(BuildMan.ConfigExtractionSup, []),
     ]
 
-    opts = [strategy: :one_for_one, name: BuildMan.Supervisor]
+    opts = [strategy: :one_for_one, name: BuildMan.Supervisor,
+            max_restarts: 10_000]
     Supervisor.start_link(children, opts)
   end
 end

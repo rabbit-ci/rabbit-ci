@@ -44,18 +44,17 @@ defmodule BuildMan.BuildConsumer do
   def handle_info({:basic_cancel_ok, _}, state), do: {:noreply, state}
 
   def handle_info({:basic_deliver, payload,
-                   %{delivery_tag: tag, routing_key: routing_key}}, chan)
-  do
+                   %{delivery_tag: tag, routing_key: routing_key}}, chan) do
     Logger.debug("Starting build...")
-    spawn fn ->
-      :erlang.process_flag(:trap_exit, true)
 
-      # [identifier, config]
-      Vagrant.start_link([routing_key, :erlang.binary_to_term(payload)])
+    Task.start_link fn ->
+      Process.flag(:trap_exit, true)
+
+      {:ok, pid} =
+        Vagrant.start_link([routing_key, :erlang.binary_to_term(payload)])
 
       receive do
-        {:EXIT, _pid, :normal} -> Basic.ack(chan, tag)
-        {:EXIT, _pid, _} -> Basic.reject(chan, tag, requeue: false)
+        {:EXIT, ^pid, _} -> if Process.alive?(chan.pid), do: Basic.ack(chan, tag)
       end
     end
 

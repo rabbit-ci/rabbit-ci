@@ -61,11 +61,6 @@ defmodule BuildMan.Vagrant do
   def handle_info({:DOWN, _ref, :process, _pid, _reason},
                   state = %{cmd: {_, cmd_pid}}) do
     Logger.warn "Vagrant worker going down..."
-    # SIGINT will tell Vagrant to gracefully shutdown.
-    :exec.kill(cmd_pid, 2)
-    # Wait for Vagrant...
-    :timer.sleep(2000)
-    # We're not patient. Kill Vagrant if it's still running.
     :exec.stop(cmd_pid)
     {:stop, :normal, state}
   end
@@ -97,7 +92,10 @@ defmodule BuildMan.Vagrant do
 
   def terminate(_reason, state = %{path: path}) do
     Logger.debug("Vagrant build cleaning up!")
-    command(["destroy", "-f"], state, [:sync])
+
+    Task.async(fn -> command(["destroy", "-f"], state, [:sync]) end)
+    |> Task.await(30_000)
+
     case File.rm_rf(path) do
       {:ok, _} -> :ok
       {:error, err} -> Logger.error("Could not delete: #{path}. #{inspect err}")
@@ -112,10 +110,13 @@ defmodule BuildMan.Vagrant do
       [
         {:stdout, handle_log(build, counter, :stdout)},
         {:stderr, handle_log(build, counter, :stderr)},
-        # Vagrant will not terminate from a signal in the "importing
-        # box" stage unless it is running in a PTY. Running commands in
-        # a PTY also gives us colors!
+        # Running commands in a PTY gives us colors!
         :pty,
+        # We need to kill the entire Vagrant process group because Vagrant does
+        # most work in subprocesses. The `0` will tell erlexec to set the GPID
+        # to the OS PID of the vagrant command.
+        {:group, 0},
+        :kill_group,
         # Run all commands inside our temporary directory.
         cd: path,
       ] |> unique_merge(opts)
