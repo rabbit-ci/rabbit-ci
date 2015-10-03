@@ -33,11 +33,6 @@ defmodule RabbitCICore.BranchControllerTest do
       |> Branch.changeset
       |> Repo.insert!
 
-    build =
-      Model.build(branch, :builds, %{commit: "xyz"})
-      |> Build.changeset
-      |> Repo.insert!
-
     response = get("/branches/#{branch.name}", [project: project.name])
     {:ok, body} =
       response.resp_body |> Poison.decode
