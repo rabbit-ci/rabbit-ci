@@ -38,32 +38,25 @@ defmodule RabbitCICore.BuildController do
 
   def show(conn, params = %{"build_number" => build_number, "branch" => branch,
                             "project" => project}) do
-    try do
-      build =
-        (from b in Build,
-         join: br in assoc(b, :branch),
-         join: p in assoc(br, :project),
-         where: br.name == ^branch
-         and p.name == ^project
-         and b.build_number == ^build_number,
-         preload: [branch: {br, project: p}])
-        |> Repo.one
+    build =
+    (from b in Build,
+     join: br in assoc(b, :branch),
+     join: p in assoc(br, :project),
+     where: br.name == ^branch
+     and p.name == ^project
+     and b.build_number == ^build_number,
+     preload: [branch: {br, project: p}])
+    |> Repo.one
 
-      case build do
-        nil ->
-          conn
-          |> put_status(404)
-          |> text("Not found.")
-        _ ->
-          conn
-          |> assign(:build, build)
-          |> render("show.json")
-      end
-    rescue
-      Ecto.CastError ->
+    case build do
+      nil ->
         conn
-        |> put_status(400)
-        |> text("Invalid params.")
+        |> put_status(404)
+        |> text("Not found.")
+      _ ->
+        conn
+        |> assign(:build, build)
+        |> render("show.json")
     end
   end
 end
