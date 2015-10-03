@@ -28,10 +28,9 @@ defmodule RabbitCICore.Branch do
   end
 
   def latest_build(branch = %Branch{}) do
-    query = (from b in Build,
-             where: b.branch_id == ^branch.id,
+    query = (from b in assoc(branch, :builds),
              limit: 1,
-             order_by: [desc: b.build_number])
+             order_by: [desc: b.build_number], preload: :branch)
 
     Repo.one(query)
   end

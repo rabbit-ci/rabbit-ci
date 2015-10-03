@@ -45,9 +45,11 @@ defmodule RabbitCICore.BranchControllerTest do
     assert response.status == 200
     assert is_map(body["data"])
     assert body["data"]["attributes"]["name"] == branch.name
-    assert hd(body["data"]["relationships"]["builds"]["data"])["id"] ==
-      to_string(build.id)
-    assert hd(body["included"])["id"] == to_string(build.id)
+    assert body["data"]["relationships"]["builds"]["links"]["related"] ==
+      "/builds?branch=branch1&project=project1"
+    assert length(body["included"]) == 1
+    assert hd(body["included"])["type"] == "projects"
+    assert hd(body["included"])["id"] == to_string(project.id)
   end
 
   test "branch does not exist" do

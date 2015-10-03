@@ -39,14 +39,14 @@ defmodule RabbitCICore.BuildController do
   def show(conn, params = %{"build_number" => build_number, "branch" => branch,
                             "project" => project}) do
     build =
-    (from b in Build,
-     join: br in assoc(b, :branch),
-     join: p in assoc(br, :project),
-     where: br.name == ^branch
-     and p.name == ^project
-     and b.build_number == ^build_number,
-     preload: [branch: {br, project: p}])
-    |> Repo.one
+      (from b in Build,
+       join: br in assoc(b, :branch),
+       join: p in assoc(br, :project),
+       where: br.name == ^branch
+       and p.name == ^project
+       and b.build_number == ^build_number,
+       preload: [branch: {br, project: p}])
+      |> Repo.one
 
     case build do
       nil ->
