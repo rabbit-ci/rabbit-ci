@@ -6,7 +6,7 @@ defmodule RabbitCICore.Mixfile do
   def project do
     [app: :rabbitci_core,
      version: "0.0.1",
-     elixir: "~> 1.0",
+     elixir: "~> 1.1",
      elixirc_paths: elixirc_paths(Mix.env),
      deps_path: "../../deps",
      lockfile: "../../mix.lock",

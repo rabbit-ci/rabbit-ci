@@ -6,7 +6,7 @@ defmodule Rabbitmq.Mixfile do
      version: "0.0.1",
      deps_path: "../../deps",
      lockfile: "../../mix.lock",
-     elixir: "~> 1.0",
+     elixir: "~> 1.1",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
      deps: deps]
