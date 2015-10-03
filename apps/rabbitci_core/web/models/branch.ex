@@ -8,10 +8,7 @@ defmodule RabbitCICore.Branch do
 
   schema "branches" do
     field :name, :string
-    field :exists_in_git, :boolean, default: true
-
     has_many :builds, Build
-
     belongs_to :project, Project
     timestamps
   end
@@ -23,7 +20,7 @@ defmodule RabbitCICore.Branch do
   with no validation performed.
   """
   def changeset(model, params \\ %{}) do
-    cast(model, params, ~w(name exists_in_git project_id), ~w())
+    cast(model, params, ~w(name project_id), ~w())
     |> unique_constraint(:name, name: :branches_name_project_id_index)
   end
 

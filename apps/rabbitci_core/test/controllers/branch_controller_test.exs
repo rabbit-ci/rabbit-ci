@@ -12,8 +12,7 @@ defmodule RabbitCICore.BranchControllerTest do
     project = Repo.insert! %Project{name: "project1",
                                     repo: "git@example.com:user/project"}
     for n <- 1..5 do
-      Repo.insert! %Branch{name: "branch#{n}", exists_in_git: false,
-                          project_id: project.id}
+      Repo.insert! %Branch{name: "branch#{n}", project_id: project.id}
     end
 
     response = get("/branches", [project: project.name])
