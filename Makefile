@@ -6,8 +6,11 @@ default:
 test:
 	mix test
 
+apps/rabbitci_core/config/prod.secret.exs:
+	cp apps/rabbitci_core/config/prod.secret.exs.example apps/rabbitci_core/config/prod.secret.exs
+
 # Test env auto migrates
-migrate:
+migrate: apps/rabbitci_core/config/prod.secret.exs
 	MIX_ENV=dev mix ecto.create -r RabbitCICore.Repo
 	MIX_ENV=dev mix ecto.migrate -r RabbitCICore.Repo
 	MIX_ENV=prod mix ecto.create -r RabbitCICore.Repo
