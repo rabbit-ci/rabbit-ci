@@ -26,7 +26,8 @@ defmodule RabbitCICore.ProjectController do
   plug :fix_params when action in [:start_build]
   plug :find_branch when action in [:start_build]
 
-  @exchange Application.get_env(:build_man, :config_extraction_exchange)
+  @exchange Application.get_env(:rabbitci_core, :config_extraction_exchange,
+                                "fake_exchange")
 
   def start_build(conn = %{assigns: %{branch: branch,
                                       new_params: %{repo: repo,
