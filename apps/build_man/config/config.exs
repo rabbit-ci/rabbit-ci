@@ -21,6 +21,7 @@ config :build_man, :build_logs_exchange, "rabbitci.build_logs"
 config :build_man, :build_exchange, "rabbitci.builds"
 config :build_man, :build_queue, "rabbitci.builds"
 config :build_man, :config_extraction_exchange, "rabbitci.config_extraction"
+config :rabbitci_core, :config_extraction_exchange, "rabbitci.config_extraction"
 config :build_man, :config_extraction_queue, "rabbitci.config_extraction"
 
 import_config "../../rabbitci_core/config/config.exs"
