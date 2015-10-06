@@ -4,7 +4,7 @@ defmodule RabbitCICore.LogSaver do
   require Logger
   alias RabbitCICore.Log
   alias RabbitCICore.Repo
-  alias RabbitCICore.Script
+  alias RabbitCICore.Step
 
   # Client API
   def start_link do
@@ -68,10 +68,9 @@ defmodule RabbitCICore.LogSaver do
 
   def update_log(payload, _tag, ident) do
     %{text: text, order: order} = :erlang.binary_to_term(payload)
-    [_, build_id, script_name] = get_id(ident)
-    script = Repo.get_by(Script, name: script_name, build_id: build_id)
-
-    %Log{stdio: text, script_id: script.id, order: order}
+    [_, build_id, step_name] = get_id(ident)
+    step = Repo.get_by(Step, name: step_name, build_id: build_id)
+    %Log{stdio: text, step_id: step.id, order: order}
     |> Repo.insert
   end
 

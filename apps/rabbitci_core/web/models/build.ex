@@ -3,7 +3,7 @@ defmodule RabbitCICore.Build do
 
   alias RabbitCICore.Repo
   alias RabbitCICore.Branch
-  alias RabbitCICore.Script
+  alias RabbitCICore.Step
   alias RabbitCICore.Build
 
   before_insert :set_build_number
@@ -29,7 +29,7 @@ defmodule RabbitCICore.Build do
     field :commit, :string
 
     belongs_to :branch, Branch
-    has_many :scripts, Script
+    has_many :steps, Step
 
     timestamps
   end
@@ -59,7 +59,7 @@ defmodule RabbitCICore.Build do
   end
 
   def status(build) do
-    build = Repo.preload(build, :scripts)
-    Enum.map(build.scripts, &(&1.status)) |> status
+    build = Repo.preload(build, :steps)
+    Enum.map(build.steps, &(&1.status)) |> status
   end
 end

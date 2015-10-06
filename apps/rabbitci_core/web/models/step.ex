@@ -1,9 +1,9 @@
-defmodule RabbitCICore.Script do
+defmodule RabbitCICore.Step do
   use RabbitCICore.Web, :model
 
   alias RabbitCICore.Log
 
-  schema "scripts" do
+  schema "steps" do
     field :status, :string
     field :name, :string
     has_many :logs, Log

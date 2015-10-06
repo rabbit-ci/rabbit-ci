@@ -15,7 +15,7 @@ defmodule BuildMan.ProjectConfig do
   """
   def queue_build(config, build_id, step_name) do
     Repo.get(Build, build_id)
-    |> Ecto.Model.build(:scripts, %{status: "queued", name: step_name})
+    |> Ecto.Model.build(:steps, %{status: "queued", name: step_name})
     |> Repo.insert!
 
     RabbitMQ.publish(@exchange, "#{build_id}.#{step_name}",

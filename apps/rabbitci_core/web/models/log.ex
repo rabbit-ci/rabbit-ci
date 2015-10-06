@@ -1,13 +1,13 @@
 defmodule RabbitCICore.Log do
   use RabbitCICore.Web, :model
 
-  alias RabbitCICore.Script
+  alias RabbitCICore.Step
 
   schema "logs" do
     field :stdio, :string
     field :order, :integer
 
-    belongs_to :script, Script
+    belongs_to :step, Step
 
     timestamps
   end
@@ -19,6 +19,6 @@ defmodule RabbitCICore.Log do
   with no validation performed.
   """
   def changeset(model, params \\ nil) do
-    cast(model, params, ~w(stdio script_id), ~w())
+    cast(model, params, ~w(stdio step_id), ~w())
   end
 end

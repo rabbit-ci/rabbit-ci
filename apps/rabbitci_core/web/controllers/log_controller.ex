@@ -44,21 +44,21 @@ defmodule RabbitCICore.LogController do
   end
 
   defp _log(%{assigns: %{project: project, branch: branch, build: build}}) do
-    log_query = from(l in Log, order_by: [l.script_id, l.order])
-    script_fn = fn script ->
+    log_query = from(l in Log, order_by: [l.step_id, l.order])
+    step_fn = fn step ->
       stdio =
-        Enum.map(script.logs, &(&1.stdio))
+        Enum.map(step.logs, &(&1.stdio))
         |> Enum.join
      """
 ================================================================================
-"#{script.name}" -- #{project.name}/#{branch.name}##{build.build_number}
+"#{step.name}" -- #{project.name}/#{branch.name}##{build.build_number}
 
 #{stdio}
      """
     end
 
-    Repo.preload(build, [scripts: [logs: log_query]]).scripts
-    |> Enum.map(script_fn)
+    Repo.preload(build, [steps: [logs: log_query]]).steps
+    |> Enum.map(step_fn)
     |> Enum.join
   end
 end

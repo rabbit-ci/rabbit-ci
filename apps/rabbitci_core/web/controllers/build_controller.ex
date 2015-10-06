@@ -21,7 +21,7 @@ defmodule RabbitCICore.BuildController do
        limit: 30,
        offset: ^(page * 30),
        order_by: [desc: b.build_number],
-       preload: [:scripts, branch: {br, project: p}])
+       preload: [:steps, branch: {br, project: p}])
       |> Repo.all
 
     conn
