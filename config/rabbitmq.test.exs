@@ -1,6 +1,5 @@
 use Mix.Config
 
-config :build_man, :processed_logs_exchange, "rabbitci.processed_logs.test"
 config :build_man, :build_logs_exchange, "rabbitci.build_logs.test"
 config :build_man, :build_exchange, "rabbitci.builds.test"
 config :build_man, :build_queue, "rabbitci.builds.test"

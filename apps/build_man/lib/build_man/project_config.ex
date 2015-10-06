@@ -18,6 +18,8 @@ defmodule BuildMan.ProjectConfig do
     |> Ecto.Model.build(:steps, %{status: "queued", name: step_name})
     |> Repo.insert!
 
+    config = Map.merge(config, %{build_id: build_id, step_name: step_name})
+
     RabbitMQ.publish(@exchange, "#{build_id}.#{step_name}",
                      :erlang.term_to_binary(config))
   end

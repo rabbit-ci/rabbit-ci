@@ -31,10 +31,11 @@ defmodule BuildMan.LogStreamer do
   @exchange Application.get_env(:build_man, :build_logs_exchange)
   @log_streamer_limit Application.get_env(:build_man, :log_streamer_limit)
 
-  def log_string(str, type, build_identifier, order) do
+  def log_string(str, type, build_identifier, order, build_id, step_name) do
     # publish(exchange, routing_key, payload, options \\ [])
+    map = %{text: str, order: order, build_id: build_id, step_name: step_name}
     RabbitMQ.publish(@exchange, "#{type}.#{build_identifier}",
-                     :erlang.term_to_binary(%{text: str, order: order}))
+                     :erlang.term_to_binary(map))
   end
 
   # Server callbacks
@@ -131,43 +132,34 @@ defmodule BuildMan.LogStreamer do
 end
 
 defmodule BuildMan.LogProcessor do
-  require Logger
+  alias RabbitCICore.Repo
+  alias RabbitCICore.Log
+  alias RabbitCICore.Step
 
-  @exchange Application.get_env(:build_man, :processed_logs_exchange)
+  require Logger
 
   def process(payload = %{text: text, order: order}, order,
               "stderr." <> identifier)
   do
-    do_process(payload, "STDERR", identifier)
+    do_process(payload, "stderr", identifier)
     Logger.debug "STDERR (#{identifier}:#{order}): #{String.strip text}"
     # Do something
   end
 
   def process(payload = %{text: text, order: order}, "stdout." <> identifier) do
-    do_process(payload, "STDOUT", identifier)
+    do_process(payload, "stdout", identifier)
     Logger.debug "STDOUT (#{identifier}:#{order}): #{String.strip text}"
-    # Do something
   end
 
   def process(payload, other) do
     Logger.warn("Log with unknown identifier: #{other} #{inspect payload}")
   end
 
-  defp remove_last_newline(string) do
-    case String.last(string) do
-      "\n" -> String.slice(string, 0..-2)
-      _ -> string
-    end
-  end
-
-  defp do_process(%{text: text, order: order}, type, identifier) do
-    str =
-      text
-      |> remove_last_newline
-      |> String.split("\n")
-      |> Enum.join("\n#{type}: ")
-
-    payload = :erlang.term_to_binary(%{text: str, order: order})
-    RabbitMQ.publish(@exchange, "#{type}.#{identifier}", payload)
+  defp do_process(%{build_id: build_id, step_name: step_name, text: text,
+                    order: order}, type, identifier) do
+    Repo.get_by(Step, name: step_name, build_id: build_id)
+    |> Ecto.Model.build(:logs, %{stdio: text, order: order, type: type})
+    |> Log.changeset
+    |> Repo.insert!
   end
 end

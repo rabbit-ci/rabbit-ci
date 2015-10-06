@@ -34,7 +34,8 @@ defmodule BuildMan.Vagrant do
 
     start_msg = "STDOUT: Starting: #{build_identifier}. Box: #{config.box}\n\n"
     LogStreamer.log_string(start_msg, :stdout, build_identifier,
-                           increment_counter(count_agent))
+                           increment_counter(count_agent),
+                           config.build_id, config.step_name)
 
     {:ok, path} = FileHelpers.unique_folder("builder")
     {:ok, %{path: path, log_streamer: pid, build: build_identifier,
@@ -102,14 +103,15 @@ defmodule BuildMan.Vagrant do
     end
   end
 
-  defp command(args, %{build: build, path: path, counter: counter}, opts \\ [])
+  defp command(args, %{config: config, build: build, path: path,
+                       counter: counter}, opts \\ [])
   when is_list(opts) do
     vagrant_cmd = System.find_executable("vagrant")
     ExExec.run(
       [vagrant_cmd | args],
       [
-        {:stdout, handle_log(build, counter, :stdout)},
-        {:stderr, handle_log(build, counter, :stderr)},
+        {:stdout, handle_log(config, build, counter, :stdout)},
+        {:stderr, handle_log(config, build, counter, :stderr)},
         # Running commands in a PTY gives us colors!
         :pty,
         # We need to kill the entire Vagrant process group because Vagrant does
@@ -134,9 +136,11 @@ defmodule BuildMan.Vagrant do
     end
   end
 
-  defp handle_log(build, counter, type) do
+  defp handle_log(%{build_id: build_id, step_name: step_name},
+                  build, counter, type) do
     fn _, _, str ->
-      LogStreamer.log_string(str, type, build, increment_counter(counter))
+      LogStreamer.log_string(str, type, build, increment_counter(counter),
+                             build_id, step_name)
     end
   end
 
