@@ -20,6 +20,6 @@ defmodule RabbitCICore.Step do
   """
   def changeset(model, params \\ nil) do
     cast(model, params, ~w(build_id name status), ~w())
-    # |> validate_inclusion(:status, []) # Need to validate status
+    |> validate_inclusion(:status, ["queued", "running", "failed", "finished"])
   end
 end
