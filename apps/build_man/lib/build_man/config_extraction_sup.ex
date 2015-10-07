@@ -53,7 +53,7 @@ defmodule BuildMan.ConfigExtractionSup do
     Task.start_link fn ->
       :erlang.process_flag(:trap_exit, true)
 
-      spawn_link fn ->
+      Task.start_link fn ->
         consume(chan, tag, redelivered, payload)
       end
 
@@ -94,8 +94,11 @@ defmodule BuildMan.FileExtraction do
 
   def reply(name, contents, build_id, payload)
   when is_binary(name) and is_binary(contents) do
-    pretty = String.split(contents, "\n") |> Enum.join("\n    ")
-    Logger.debug "Got file #{name}, contents:\n\n    #{pretty}"
+    Logger.debug """
+    Got file #{name}, contents:\n\n    #{
+      String.split(contents, "\n") |> Enum.join("\n    ")
+    }"
+    """
 
     contents
     |> ProjectConfig.parse_from_yaml
