@@ -27,6 +27,7 @@ defmodule RabbitCICore.Build do
     field :start_time, Ecto.DateTime
     field :finish_time, Ecto.DateTime
     field :commit, :string
+    field :config_extracted, :boolean, default: false
 
     belongs_to :branch, Branch
     has_many :steps, Step
@@ -37,13 +38,15 @@ defmodule RabbitCICore.Build do
   @doc """
   Creates a changeset based on the `model` and `params`.
 
-  If `params` are nil, an invalid changeset is returned
+  If no params are provided, an invalid changeset is returned
   with no validation performed.
   """
-  def changeset(model, params \\ %{}) do
+  def changeset(model, params \\ :empty) do
     cast(model, params, ~w(branch_id commit),
-         ~w(start_time build_number finish_time))
+         ~w(start_time build_number finish_time config_extracted))
   end
+
+  def status([]), do: "queued"
 
   def status(statuses) when is_list(statuses) do
     cond do
@@ -54,12 +57,13 @@ defmodule RabbitCICore.Build do
         Enum.any?(statuses, fn(status) -> status == "queued" end) -> "running"
       Enum.all?(statuses, fn(status) -> status == "queued" end) -> "queued"
       Enum.all?(statuses, fn(status) -> status == "finished" end) -> "finished"
-      [] -> "queued"
     end
   end
 
   def status(build) do
-    build = Repo.preload(build, :steps)
-    Enum.map(build.steps, &(&1.status)) |> status
+    sa = Ecto.Model.assoc(build, :steps)
+    from(s in sa, select: s.status)
+    |> Repo.all
+    |> status
   end
 end

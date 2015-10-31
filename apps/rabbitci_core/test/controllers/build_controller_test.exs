@@ -14,11 +14,10 @@ defmodule RabbitCICore.BuildControllerTest do
     branch = Repo.insert!(%Branch{name: "branch1", project_id: project.id})
     time = Ecto.DateTime.utc()
     builds = for _ <- 1..amount do
-      Model.build(branch, :builds,
-                  %{start_time: time,
-                    finish_time: time,
-                    commit: "eccee02ec18a36bcb2615b8c86d401b0618738c2"})
-      |> Build.changeset
+      Model.build(branch, :builds)
+      |> Build.changeset(%{start_time: time,
+                           finish_time: time,
+                           commit: "eccee02ec18a36bcb2615b8c86d401b0618738c2"})
       |> Repo.insert!
     end
 

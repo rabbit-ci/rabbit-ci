@@ -28,8 +28,8 @@ defmodule RabbitCICore.BranchControllerTest do
                                     repo: "git@example.com:user/project"}
 
     branch =
-      Model.build(project, :branches, %{name: "branch1"})
-      |> Branch.changeset
+      Model.build(project, :branches)
+      |> Branch.changeset(%{name: "branch1"})
       |> Repo.insert!
 
     response = get("/branches/#{branch.name}", [project: project.name])

@@ -5,8 +5,8 @@ defmodule RabbitCICore.BuildSerializer do
   alias RabbitCICore.Build
   alias RabbitCICore.BranchSerializer
 
-  attributes [:build_number, :start_time, :finish_time,
-              :updated_at, :inserted_at, :commit, :status]
+  attributes [:build_number, :start_time, :finish_time, :updated_at,
+              :inserted_at, :commit, :status, :config_extracted]
   has_one :branch, include: BranchSerializer
 
   def type, do: "builds"

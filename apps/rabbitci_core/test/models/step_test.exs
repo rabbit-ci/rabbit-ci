@@ -5,10 +5,10 @@ defmodule RabbitCICore.StepTest do
   alias RabbitCICore.Step
 
   test "required fields" do
-    assert !Step.changeset(%Step{}, %{name: "xyz"}).valid?
-    assert !Step.changeset(%Step{}, %{status: "xyz"}).valid?
-    assert !Step.changeset(%Step{}, %{name: "xyz", status: "xyz"}).valid?
-    assert Step.changeset(%Step{}, %{name: "xyz", status: "xyz",
+    assert !Step.changeset(%Step{}, %{name: "queued"}).valid?
+    assert !Step.changeset(%Step{}, %{status: "queued"}).valid?
+    assert !Step.changeset(%Step{}, %{name: "xyz", status: "queued"}).valid?
+    assert Step.changeset(%Step{}, %{name: "xyz", status: "queued",
                                          build_id: 0}).valid?
   end
 end

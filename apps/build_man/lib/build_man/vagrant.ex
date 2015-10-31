@@ -15,6 +15,8 @@ defmodule BuildMan.Vagrant do
 
   alias BuildMan.FileHelpers
   alias BuildMan.LogStreamer
+  alias RabbitCICore.Repo
+  alias RabbitCICore.Step
 
   # Client API
 
@@ -28,7 +30,7 @@ defmodule BuildMan.Vagrant do
     {:ok, pid} = LogStreamer.start({self, build_identifier})
     Process.monitor(pid)
 
-    {:ok, count_agent} = Agent.start(fn -> 0 end)
+    {:ok, count_agent} = Agent.start_link(fn -> 0 end)
 
     send(self, :start_build)
 
@@ -39,11 +41,16 @@ defmodule BuildMan.Vagrant do
 
     {:ok, path} = FileHelpers.unique_folder("builder")
     {:ok, %{path: path, log_streamer: pid, build: build_identifier,
-            config: config, cmd: nil, counter: count_agent}}
+            config: config, cmd: nil, counter: count_agent, success: true}}
+  end
+
+  def handle_info({:DOWN, _ref, :process, pid, {:exit_status, exit_status}},
+                  state = %{cmd: {_, cmd_pid}}) when pid == cmd_pid do
+    {:stop, :normal, %{state | success: false}}
   end
 
   # This is called when "vagrant up" is done.
-  def handle_info({:DOWN, _ref, :process, pid, _reason},
+  def handle_info({:DOWN, _ref, :process, pid, :normal},
                   state = %{cmd: {:up, cmd_pid}}) when pid == cmd_pid do
     Logger.debug("'vagrant up' finished.")
     send(self, :run_build_script)
@@ -51,7 +58,7 @@ defmodule BuildMan.Vagrant do
   end
 
   # This is called when "vagrant ssh" is done.
-  def handle_info({:DOWN, _ref, :process, pid, _reason},
+  def handle_info({:DOWN, _ref, :process, pid, :normal},
                   state = %{build: build, cmd: {:ssh, cmd_pid}})
   when pid == cmd_pid do
     Logger.info "Vagrant worker finished #{build}. Going down..."
@@ -69,9 +76,7 @@ defmodule BuildMan.Vagrant do
   def handle_info(:start_build, state =
         %{build: _build, config: config, path: path}) do
     File.write(Path.join(path, "Vagrantfile"), vagrantfile(config))
-
     {_, pid, _} = command(["up", "--provider", "virtualbox"], state)
-    Process.monitor(pid)
     {:noreply, %{state | cmd: {:up, pid}}}
   end
 
@@ -87,19 +92,33 @@ defmodule BuildMan.Vagrant do
     """
     {_, pid, _} = command(["ssh", "-c", "sh", "-c", script], state)
 
-    Process.monitor(pid)
     {:noreply, %{state | cmd: {:ssh, pid}}}
   end
 
-  def terminate(_reason, state = %{path: path}) do
+  def terminate(_reason, state = %{path: path, success: success,
+                                   config: config}) do
     Logger.debug("Vagrant build cleaning up!")
 
     Task.async(fn -> command(["destroy", "-f"], state, [:sync]) end)
     |> Task.await(30_000)
 
     case File.rm_rf(path) do
-      {:ok, _} -> :ok
+      {:ok, _} ->
+        :ok
       {:error, err} -> Logger.error("Could not delete: #{path}. #{inspect err}")
+    end
+
+    case success do
+      true ->
+        Repo.get(Step, config.step_id)
+        |> Step.changeset(%{status: "finished"})
+        |> Repo.update
+        :ok
+      false ->
+        Repo.get(Step, config.step_id)
+        |> Step.changeset(%{status: "failed"})
+        |> Repo.update
+        :ok
     end
   end
 
@@ -119,6 +138,7 @@ defmodule BuildMan.Vagrant do
         # to the OS PID of the vagrant command.
         {:group, 0},
         :kill_group,
+        :monitor,
         # Run all commands inside our temporary directory.
         cd: path,
       ] |> unique_merge(opts)

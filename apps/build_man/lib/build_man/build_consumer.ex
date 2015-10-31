@@ -2,6 +2,8 @@ defmodule BuildMan.BuildConsumer do
   use AMQP
   use GenServer
   alias BuildMan.Vagrant
+  alias RabbitCICore.Step
+  alias RabbitCICore.Repo
   require Logger
 
   def start_link do
@@ -50,8 +52,14 @@ defmodule BuildMan.BuildConsumer do
     Task.start_link fn ->
       Process.flag(:trap_exit, true)
 
+      config = :erlang.binary_to_term(payload)
+
+      Repo.get(Step, config.step_id)
+      |> Step.changeset(%{status: "running"})
+      |> Repo.update
+
       {:ok, pid} =
-        Vagrant.start_link([routing_key, :erlang.binary_to_term(payload)])
+        Vagrant.start_link([routing_key, config])
 
       receive do
         {:EXIT, ^pid, _} -> if Process.alive?(chan.pid), do: Basic.ack(chan, tag)

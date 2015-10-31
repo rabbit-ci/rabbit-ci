@@ -1,6 +1,8 @@
 defmodule BuildMan.ConfigExtractionSup do
   import BuildMan.FileHelpers, only: [unique_folder: 1]
   import BuildMan.GitHelpers
+  alias RabbitCICore.Repo
+  alias RabbitCICore.Build
   require Logger
   use GenServer
   use AMQP
@@ -78,12 +80,15 @@ defmodule BuildMan.ConfigExtractionSup do
 
       contents =
         Path.join([path, payload.file])
-      |> File.read!
+        |> File.read!
 
       BuildMan.FileExtraction.reply(payload.file, contents, payload.build_id,
                                     payload)
     after
       File.rm_rf!(path)
+      Repo.get(Build, payload.build_id)
+      |> Build.changeset(%{config_extracted: true})
+      |> Repo.update!
     end
   end
 end

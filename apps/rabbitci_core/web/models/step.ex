@@ -15,10 +15,10 @@ defmodule RabbitCICore.Step do
   @doc """
   Creates a changeset based on the `model` and `params`.
 
-  If `params` are nil, an invalid changeset is returned
+  If no params are provided, an invalid changeset is returned
   with no validation performed.
   """
-  def changeset(model, params \\ nil) do
+  def changeset(model, params \\ :empty) do
     cast(model, params, ~w(build_id name status), ~w())
     |> validate_inclusion(:status, ["queued", "running", "failed", "finished"])
   end

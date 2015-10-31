@@ -14,11 +14,13 @@ defmodule BuildMan.ProjectConfig do
   the config.
   """
   def queue_build(config, build_id, step_name) do
-    Repo.get(Build, build_id)
-    |> Ecto.Model.build(:steps, %{status: "queued", name: step_name})
-    |> Repo.insert!
+    step =
+      Repo.get(Build, build_id)
+      |> Ecto.Model.build(:steps, %{status: "queued", name: step_name})
+      |> Repo.insert!
 
-    config = Map.merge(config, %{build_id: build_id, step_name: step_name})
+    config = Map.merge(config, %{build_id: build_id, step_name: step_name,
+                                 step_id: step.id})
 
     RabbitMQ.publish(@exchange, "#{build_id}.#{step_name}",
                      :erlang.term_to_binary(config))
@@ -28,11 +30,11 @@ defmodule BuildMan.ProjectConfig do
     YamlElixir.read_from_string(content)
   end
 
-  def queue_builds(%{"steps" => steps, "repo" => repo}, build_id, payload)
+  def queue_builds(%{"steps" => steps, "repo" => repo}, build_id, repo)
   when is_list(steps) do
     git_cmd =
-      GitHelpers.clone_repo("workdir", payload, false)
-    |> Enum.join("\n")
+      GitHelpers.clone_repo("workdir", repo, false)
+      |> Enum.join("\n")
 
     for step <- steps do
       for box <- step["boxes"] do

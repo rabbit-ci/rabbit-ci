@@ -16,10 +16,10 @@ defmodule RabbitCICore.Branch do
   @doc """
   Creates a changeset based on the `model` and `params`.
 
-  If `params` are nil, an invalid changeset is returned
+  If no params are provided, an invalid changeset is returned
   with no validation performed.
   """
-  def changeset(model, params \\ %{}) do
+  def changeset(model, params \\ :empty) do
     cast(model, params, ~w(name project_id), ~w())
     |> unique_constraint(:name, name: :branches_name_project_id_index)
   end

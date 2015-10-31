@@ -1,6 +1,12 @@
 defmodule BuildMan.ConfigExtractionSupTest do
   use ExUnit.Case, async: false # Mocks are sync
+  use BuildMan.Integration.Case
   import Mock
+  alias RabbitCICore.Project
+  alias RabbitCICore.Branch
+  alias RabbitCICore.Build
+  alias RabbitCICore.Repo
+  alias Ecto.Model
 
   @pr_content """
   # example-project
@@ -16,10 +22,11 @@ defmodule BuildMan.ConfigExtractionSupTest do
     path = Path.join(__DIR__, "../fixtures/test_repos/example-project.bundle")
     |> Path.expand
 
+    {_, _, build} = create_models
     :erlang.term_to_binary(%{repo: path,
                              pr: 1,
                              file: "README.md",
-                             build_id: -1})
+                             build_id: build.id})
     |> do_test(@pr_content)
   end
 
@@ -27,14 +34,33 @@ defmodule BuildMan.ConfigExtractionSupTest do
     path = Path.join(__DIR__, "../fixtures/test_repos/example-project.bundle")
     |> Path.expand
 
+    {_, _, build} = create_models
     :erlang.term_to_binary(%{repo: path,
                              commit: "3f9c0bdbab553aa565370e6933eea15a85e646d2",
                              file: "README.md",
-                             build_id: -1})
+                             build_id: build.id})
     |> do_test(@commit_content)
   end
 
   @exchange Application.get_env(:build_man, :config_extraction_exchange)
+
+  defp create_models do
+    project =
+      Project.changeset(%Project{}, %{name: "project1", repo: "repo123"})
+      |> Repo.insert!
+
+    branch =
+      Model.build(project, :branches)
+      |> Branch.changeset(%{name: "branch1"})
+      |> Repo.insert!
+
+    build =
+      Model.build(branch, :builds)
+      |> Build.changeset(%{commit: "xyz"})
+      |> Repo.insert!
+
+    {project, branch, build}
+  end
 
   defp do_test(term, content) do
     {:ok, conn} = AMQP.Connection.open

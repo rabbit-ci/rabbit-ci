@@ -35,8 +35,8 @@ defmodule RabbitCICore.ProjectController do
                                                     pr: pr}}}, _params)
   do
     changeset =
-      Ecto.Model.build(branch, :builds, %{commit: commit})
-      |> Build.changeset
+      Ecto.Model.build(branch, :builds)
+      |> Build.changeset(%{commit: commit})
 
     case Repo.insert(changeset) do
       {:ok, build} ->

@@ -158,8 +158,8 @@ defmodule BuildMan.LogProcessor do
   defp do_process(%{build_id: build_id, step_name: step_name, text: text,
                     order: order}, type, identifier) do
     Repo.get_by(Step, name: step_name, build_id: build_id)
-    |> Ecto.Model.build(:logs, %{stdio: text, order: order, type: type})
-    |> Log.changeset
+    |> Ecto.Model.build(:logs)
+    |> Log.changeset(%{stdio: text, order: order, type: type})
     |> Repo.insert!
   end
 end
