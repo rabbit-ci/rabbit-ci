@@ -10,7 +10,8 @@ The backend depends on:
 - Erlang
 - Postgres (username: postgres, password: postgres, databases:
   rabbitci_test, rabbitci_dev)
-- Redis
+- RabbitMQ
+- Vagrant
 
 All other dependencies should be installed by running `mix cmd mix
 deps.get, compile` in the project root.

@@ -3,28 +3,33 @@ defmodule RabbitCICore.BranchController do
 
   import Ecto.Query
   alias RabbitCICore.Project
+  alias RabbitCICore.Branch
 
-  defp get_project_id(%{"project_name" => project_name}) do
-    Repo.one(from p in Project, where: p.name == ^project_name).id
+  def show(conn, %{"project" => project_name, "branch" => branch_name}) do
+    branch =
+      from(b in branch_query(project_name), where: b.name == ^branch_name)
+      |> Repo.one
+
+    case branch do
+      nil -> send_resp(conn, 404, "Not found.")
+      branch ->
+        conn
+        |> assign(:branch, branch)
+        |> render
+    end
   end
 
-  def index(conn, params) do
-    query = from(b in RabbitCICore.Branch,
-                 where: b.project_id == ^get_project_id(params))
-    branches = RabbitCICore.Repo.all(query)
+  def index(conn, %{"project" => project_name}) do
+    branches = branch_query(project_name) |> Repo.all
 
     conn
     |> assign(:branches, branches)
-    |> render("index.json")
+    |> render
   end
 
-  def show(conn, params = %{"name" => name}) do
-    branch = Repo.one(from b in RabbitCICore.Branch,
-                      where: b.name == ^name and
-                      b.project_id == ^get_project_id(params))
-    case branch do
-      nil -> conn |> send_resp(404, "Branch not found.")
-      _ -> conn |> assign(:branch, branch) |> render("show.json")
-    end
+  defp branch_query(project_name) do
+    from(b in Branch,
+         join: p in assoc(b, :project),
+         where: p.name == ^project_name)
   end
 end

@@ -15,8 +15,15 @@ defmodule RabbitCICore.Project do
     timestamps
   end
 
-  def changeset(model, params \\ nil) do
+  @doc """
+  Creates a changeset based on the `model` and `params`.
+
+  If no params are provided, an invalid changeset is returned
+  with no validation performed.
+  """
+  def changeset(model, params \\ :empty) do
     cast(model, params, ~w(name repo), ~w())
+    |> unique_constraint(:name)
   end
 
   def latest_build(project) do

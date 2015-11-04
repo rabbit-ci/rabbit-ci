@@ -5,6 +5,8 @@
 # is restricted to this project.
 use Mix.Config
 
+config :rabbitci_core, :app_namespace, RabbitCICore
+
 # Configures the endpoint
 config :rabbitci_core, RabbitCICore.Endpoint,
   url: [host: "localhost"],
@@ -20,8 +22,13 @@ config :logger, :console,
   metadata: [:request_id]
 
 config :plug, :mimes, %{
-  "application/vnd.api+json" => ["json-api"]
+  "application/vnd.api+json" => ["json"]
 }
+
+# IMPORTANT! To run RabbitCICore separate from BuildMan, you _must_ set this in
+# RabbitCICore:
+#
+# config :rabbitci_core, :config_extraction_exchange, "rabbitci.config_extraction"
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.

@@ -28,7 +28,6 @@ defmodule RabbitCICore.Web do
       # Alias the data repository as a convenience
       alias RabbitCICore.Repo
 
-      import RabbitCICore.ControllerHelpers
       # Import URL helpers from the router
       import RabbitCICore.Router.Helpers
     end
@@ -37,6 +36,7 @@ defmodule RabbitCICore.Web do
   def model do
     quote do
       use Ecto.Model
+      use Ecto.Model.Callbacks
       import RabbitCICore.ModelHelpers
     end
   end
