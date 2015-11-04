@@ -1,9 +1,9 @@
 defmodule RabbitCICore.Router do
   use Phoenix.Router
-  require IEx
+
   pipeline :api do
     plug :allow_origin
-    plug :accepts, ["json", "json-api"]
+    plug :accepts, ["json"]
   end
 
   scope "/", RabbitCICore do
@@ -11,28 +11,20 @@ defmodule RabbitCICore.Router do
 
     get "/", IndexController, :index
 
-    post "/queue", QueueController, :create
-    post "/config_extraction", ConfigExtractionController, :create
+    get "/projects", ProjectController, :index
+    get "/projects/:name", ProjectController, :show
+    post "/projects/start_build", ProjectController, :start_build
 
-    resources "/projects", ProjectController, except: [:new, :edit]
+    get "/branches", BranchController, :index
+    get "/branches/:branch", BranchController, :show
 
-    get "/projects/:project_name/branches", BranchController, :index
-    get "/projects/:project_name/branches/:name", BranchController, :show
+    get "/logs", LogController, :show
 
-    get "/projects/:project_name/branches/:branch_name/builds",
-    BuildController, :index
-    get "/projects/:project_name/branches/:branch_name/builds/:build_number",
-    BuildController, :show
-    put "/projects/:project_name/branches/:branch_name/builds/:build_number/log",
-    BuildController, :log_put
-    get "/projects/:project_name/branches/:branch_name/builds/:build_number/log",
-    BuildController, :log_get
-    get "/projects/:project_name/branches/:branch_name/builds/:build_number/config",
-    BuildController, :config
+    get "/builds", BuildController, :index
+    get "/builds/:build_number", BuildController, :show
   end
 
-  # This should be changed in production and must be based off of the server's
-  # configuration.
+  # This should be changed in production.
   defp allow_origin(conn, _opts) do
     headers = get_req_header(conn, "access-control-request-headers")
     |> Enum.join(", ")

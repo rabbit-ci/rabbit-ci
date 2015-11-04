@@ -1,0 +1,27 @@
+spec-version: 0.0.1
+name: rabbit-ci/example-project
+human-name: "RabbitCI Example Project"
+github: rabbit-ci/example-project
+
+workers:
+  - name: linux-ubuntu-15-04
+    os: ubuntu
+    platform: linux
+    vm:
+      type: vagrant
+      box: ubuntu/trusty64
+      memory: 2GB
+      cpu_cores: 1
+      disk: 10GB
+    setup: |
+      apt-get install xyz
+      apt-get install abc
+      mix deps.get
+    file_deps:
+      - mix.lock
+
+steps:
+  - name: test
+    command: mix test
+    workers:
+      - linux-ubuntu-15-04

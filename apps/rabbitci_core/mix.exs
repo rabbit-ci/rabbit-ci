@@ -1,10 +1,12 @@
+Code.require_file "../../shared.exs", __DIR__
+
 defmodule RabbitCICore.Mixfile do
   use Mix.Project
 
   def project do
     [app: :rabbitci_core,
      version: "0.0.1",
-     elixir: "~> 1.0",
+     elixir: "~> 1.1",
      elixirc_paths: elixirc_paths(Mix.env),
      deps_path: "../../deps",
      lockfile: "../../mix.lock",
@@ -12,7 +14,7 @@ defmodule RabbitCICore.Mixfile do
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
      test_coverage: [tool: ExCoveralls],
-     deps: deps]
+     deps: Shared.deps ++ deps]
   end
 
   # Configuration for the OTP application
@@ -20,27 +22,21 @@ defmodule RabbitCICore.Mixfile do
   # Type `mix help compile.app` for more information
   def application do
     [mod: {RabbitCICore, []},
-     applications: [:phoenix, :cowboy, :logger, :ecto, :postgrex, :exq,
-                    :phoenix_ecto]]
+     applications: [:phoenix, :cowboy, :logger, :ecto, :postgrex,
+                    :phoenix_ecto, :rabbitmq]]
   end
 
   # Specifies your project dependencies
   #
   # Type `mix help deps` for examples and options
   defp deps do
-    [{:phoenix, "~> 0.14.0"},
-     {:phoenix_ecto, "~> 0.5.0"},
-     {:postgrex, "~> 0.8.0"},
+    [{:phoenix, "~> 1.0.0"},
+     {:phoenix_ecto, "~> 1.2.0"},
+     {:postgrex, "~> 0.9.1"},
      {:cowboy, "~> 1.0"},
-     {:postgrex, "~> 0.8.0"},
-     {:ecto, "~> 0.13.0"},
-     {:ashes, ">= 0.0.3"},
-     {:mock, "~> 0.1.1"},
-     {:exq, github: "akira/exq"},
-     {:ja_serializer, github: "AgilionApps/ja_serializers"},
-     {:excoveralls, "~> 0.3.0", only: [:dev, :test]},
-     {:eredis, github: 'wooga/eredis', tag: 'v1.0.5'}
-    ]
+     {:rabbitmq, in_umbrella: true},
+     {:ecto, "~> 1.0.0"},
+     {:ja_serializer, github: "AgilionApps/ja_serializers"}]
   end
 
   # Specifies which paths to compile per environment

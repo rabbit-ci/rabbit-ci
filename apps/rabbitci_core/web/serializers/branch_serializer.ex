@@ -1,26 +1,23 @@
 defmodule RabbitCICore.BranchSerializer do
   use JaSerializer
 
-  require RabbitCICore.SerializerHelpers
-  alias RabbitCICore.SerializerHelpers
+  alias RabbitCICore.Repo
+  alias RabbitCICore.Branch
+  alias RabbitCICore.BuildSerializer
+  alias RabbitCICore.ProjectSerializer
+  alias RabbitCICore.Router.Helpers, as: RouterHelpers
 
-  serialize "branches" do
-    attributes [:updated_at, :inserted_at, :name]
-    has_one :project, link: :project_link, field: :project_id, type: "projects"
-    has_many :builds, include: RabbitCICore.BuildSerializer, link: :builds_link
-  end
+  attributes [:updated_at, :inserted_at, :name]
+  has_one :project, include: ProjectSerializer
+  has_many :builds, link: :branches_link
 
-  def project_link(record, conn) do
-    project = RabbitCICore.Repo.preload(record, [:project]).project
-    RabbitCICore.Router.Helpers.project_path(conn, :show, project.name)
-  end
+  def type, do: "branches"
 
-  def builds_link(record, conn) do
-    project = RabbitCICore.Repo.preload(record, [:project]).project
-    RabbitCICore.Router.Helpers.build_path(conn, :index, project.name, record.name)
-  end
+  def project(r, _), do: Repo.preload(r, :project).project
 
-  def builds(record) do
-    (RabbitCICore.Branch.latest_build(record) || []) |> List.wrap
+  def branches_link(record, conn) do
+    record = Repo.preload(record, :project)
+    RouterHelpers.build_path(conn, :index, %{branch: record.name,
+                                             project: record.project.name})
   end
 end

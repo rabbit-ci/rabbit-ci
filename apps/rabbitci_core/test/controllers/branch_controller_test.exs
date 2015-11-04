@@ -6,16 +6,16 @@ defmodule RabbitCICore.BranchControllerTest do
   alias RabbitCICore.Project
   alias RabbitCICore.Branch
   alias RabbitCICore.Build
+  alias Ecto.Model
 
   test "Get all branches for project" do
     project = Repo.insert! %Project{name: "project1",
-                                   repo: "git@example.com:user/project"}
+                                    repo: "git@example.com:user/project"}
     for n <- 1..5 do
-      Repo.insert! %Branch{name: "branch#{n}", exists_in_git: false,
-                          project_id: project.id}
+      Repo.insert! %Branch{name: "branch#{n}", project_id: project.id}
     end
 
-    response = get("/projects/#{project.name}/branches")
+    response = get("/branches", [project: project.name])
     {:ok, body} = response.resp_body |> Poison.decode
     assert response.status == 200
     assert length(body["data"]) == 5
@@ -25,27 +25,31 @@ defmodule RabbitCICore.BranchControllerTest do
 
   test "get a single branch" do
     project = Repo.insert! %Project{name: "project1",
-                                   repo: "git@example.com:user/project"}
-    branch = Repo.insert! %Branch{name: "branch1", exists_in_git: false,
-                                 project_id: project.id}
-    build = Repo.insert! %Build{build_number: 1, branch_id: branch.id,
-                               commit: "xyz"}
+                                    repo: "git@example.com:user/project"}
 
-    response = get("/projects/#{project.name}/branches/#{branch.name}")
+    branch =
+      Model.build(project, :branches)
+      |> Branch.changeset(%{name: "branch1"})
+      |> Repo.insert!
+
+    response = get("/branches/#{branch.name}", [project: project.name])
     {:ok, body} =
       response.resp_body |> Poison.decode
 
     assert response.status == 200
     assert is_map(body["data"])
     assert body["data"]["attributes"]["name"] == branch.name
-    assert hd(body["data"]["relationships"]["builds"]["data"])["id"] == to_string(build.id)
-    assert hd(body["included"])["id"] == to_string(build.id)
+    assert body["data"]["relationships"]["builds"]["links"]["related"] ==
+      "/builds?branch=branch1&project=project1"
+    assert length(body["included"]) == 1
+    assert hd(body["included"])["type"] == "projects"
+    assert hd(body["included"])["id"] == to_string(project.id)
   end
 
   test "branch does not exist" do
     project = Repo.insert! %Project{name: "project1",
-                                   repo: "git@example.com:user/project"}
-    response = get("/projects/#{project.name}/branches/fakebranch")
+                                    repo: "git@example.com:user/project"}
+    response = get("/branches/fakebranch", [project: project.name])
     assert response.status == 404
   end
 end
