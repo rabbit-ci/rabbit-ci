@@ -61,9 +61,8 @@ defmodule RabbitCICore.Build do
   end
 
   def status(build) do
-    sa = Ecto.Model.assoc(build, :steps)
-    from(s in sa, select: s.status)
-    |> Repo.all
+    Repo.preload(build, :steps).steps
+    |> Enum.map(&(&1.status))
     |> status
   end
 end
