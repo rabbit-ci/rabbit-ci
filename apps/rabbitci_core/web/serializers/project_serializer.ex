@@ -1,9 +1,5 @@
 defmodule RabbitCICore.ProjectSerializer do
   use JaSerializer
-
-  alias RabbitCICore.Project
-  alias RabbitCICore.Repo
-  alias RabbitCICore.BranchSerializer
   alias RabbitCICore.Router.Helpers, as: RouterHelpers
 
   attributes [:name, :repo, :inserted_at, :updated_at]

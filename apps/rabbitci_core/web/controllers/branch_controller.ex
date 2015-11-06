@@ -2,7 +2,6 @@ defmodule RabbitCICore.BranchController do
   use RabbitCICore.Web, :controller
 
   import Ecto.Query
-  alias RabbitCICore.Project
   alias RabbitCICore.Branch
 
   def show(conn, %{"project" => project_name, "branch" => branch_name}) do

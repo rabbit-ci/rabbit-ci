@@ -2,13 +2,11 @@ defmodule RabbitCICore.BranchSerializer do
   use JaSerializer
 
   alias RabbitCICore.Repo
-  alias RabbitCICore.Branch
-  alias RabbitCICore.BuildSerializer
   alias RabbitCICore.ProjectSerializer
   alias RabbitCICore.Router.Helpers, as: RouterHelpers
 
   attributes [:updated_at, :inserted_at, :name]
-  has_one :project, include: ProjectSerializer
+  has_one :project, include: true, serializer: ProjectSerializer
   has_many :builds, link: :branches_link
 
   def type, do: "branches"

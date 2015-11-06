@@ -7,7 +7,7 @@ defmodule RabbitCICore.BuildSerializer do
 
   attributes [:build_number, :start_time, :finish_time, :updated_at,
               :inserted_at, :commit, :status, :config_extracted]
-  has_one :branch, include: BranchSerializer
+  has_one :branch, include: true, serializer: BranchSerializer
 
   def type, do: "builds"
 

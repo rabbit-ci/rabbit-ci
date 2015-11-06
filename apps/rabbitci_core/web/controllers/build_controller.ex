@@ -4,13 +4,11 @@ defmodule RabbitCICore.BuildController do
   require Logger
   import Ecto.Query
   alias RabbitCICore.Build
-  alias RabbitCICore.Branch
-  alias RabbitCICore.Project
   alias RabbitCICore.Repo
 
-  def index(conn, params = %{"branch" => branch,
-                             "project" => project,
-                             "page" => %{"offset" => page}}) do
+  def index(conn, _params = %{"branch" => branch,
+                              "project" => project,
+                              "page" => %{"offset" => page}}) do
     page = String.to_integer(page)
     builds =
       (from b in Build,
@@ -33,8 +31,8 @@ defmodule RabbitCICore.BuildController do
     index(conn, Map.merge(params, %{"page" => %{"offset" => "0"}}))
   end
 
-  def show(conn, params = %{"build_number" => build_number, "branch" => branch,
-                            "project" => project}) do
+  def show(conn, _params = %{"build_number" => build_number, "branch" => branch,
+                             "project" => project}) do
     build =
       (from b in Build,
        join: br in assoc(b, :branch),
