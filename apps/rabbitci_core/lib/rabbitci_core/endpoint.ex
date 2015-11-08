@@ -8,7 +8,7 @@ defmodule RabbitCICore.Endpoint do
   end
 
   plug Plug.Parsers,
-    parsers: [:urlencoded, :multipart, :json],
+    parsers: [:urlencoded, :multipart, RabbitCICore.JSONParser],
     pass: ["*/*"],
     json_decoder: Poison
 
