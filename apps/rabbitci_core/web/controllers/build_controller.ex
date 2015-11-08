@@ -1,10 +1,30 @@
 defmodule RabbitCICore.BuildController do
   use RabbitCICore.Web, :controller
-
-  require Logger
   import Ecto.Query
   alias RabbitCICore.Build
   alias RabbitCICore.Repo
+  alias RabbitCICore.IncomingWebhooks, as: Webhooks
+
+  def start_build(conn, p = %{"repo" => _, "commit" => _, "branch" => _}) do
+    case Map.take(p, ["repo", "commit", "branch", "pr"])
+    |> atomize_keys
+    |> Webhooks.start_build do
+      {:ok, build} ->
+        conn
+        |> assign(:build, build)
+        |> render("show.json")
+      {:error, reason} -> conn |> put_status(:bad_request) |> json(reason)
+    end
+  end
+  def start_build(conn, _) do
+    conn
+    |> put_status(:bad_request)
+    |> json(%{message: "Missing params. Required: repo, commit, branch."})
+  end
+
+  defp atomize_keys(map) do
+    for {key, val} <- map, into: %{}, do: {String.to_atom(key), val}
+  end
 
   def index(conn, _params = %{"branch" => branch,
                               "project" => project,
