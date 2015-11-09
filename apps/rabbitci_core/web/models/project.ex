@@ -9,6 +9,7 @@ defmodule RabbitCICore.Project do
   schema "projects" do
     field :name, :string
     field :repo, :string
+    field :webhook_secret, :string
 
     has_many :branches, Branch
 
