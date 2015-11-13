@@ -16,10 +16,10 @@ defmodule RabbitCICore.GitHubController do
     _create(conn, params, conn.assigns.event)
   end
 
-  defp _create(conn, params, event)
+  defp _create(conn, _params, event)
   when event in [@push_event, @pull_request_event] do
     case Webhooks.start_build(conn.assigns.fixed_params) do
-      {:ok, build} -> json(conn, %{message: "Success!"})
+      {:ok, _build} -> json(conn, %{message: "Success!"})
       {:error, error} -> conn |> put_status(:bad_request) |> json(error)
     end
   end
