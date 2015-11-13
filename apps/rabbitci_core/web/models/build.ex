@@ -27,7 +27,7 @@ defmodule RabbitCICore.Build do
     field :start_time, Ecto.DateTime
     field :finish_time, Ecto.DateTime
     field :commit, :string
-    field :config_extracted, :boolean, default: false
+    field :config_extracted, :string, default: "false"
 
     belongs_to :branch, Branch
     has_many :steps, Step

@@ -84,11 +84,21 @@ defmodule BuildMan.ConfigExtractionSup do
 
       BuildMan.FileExtraction.reply(payload.file, contents, payload.build_id,
                                     payload)
+    rescue
+      e ->
+        Repo.get(Build, payload.build_id)
+        |> Build.changeset(%{config_extracted: "error"})
+        |> Repo.update!
+        raise e
     after
       File.rm_rf!(path)
-      Repo.get(Build, payload.build_id)
-      |> Build.changeset(%{config_extracted: true})
-      |> Repo.update!
+      case Repo.get(Build, payload.build_id) do
+        build = %Build{config_extracted: "false"} ->
+          build
+          |> Build.changeset(%{config_extracted: "true"})
+          |> Repo.update!
+        _ -> nil
+      end
     end
   end
 end
