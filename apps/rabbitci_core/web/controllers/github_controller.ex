@@ -3,36 +3,65 @@ defmodule RabbitCICore.GitHubController do
   alias RabbitCICore.IncomingWebhooks, as: Webhooks
   alias RabbitCICore.Project
 
+  @push_event "push"
+  @pull_request_event "pull_request"
+
+  plug :check_event_type, [@push_event, @pull_request_event]
   plug :process_github_payload
   plug :load_project
   plug :check_signature
 
   # Queue a build from the GitHub push payload.
   def create(conn, params) do
-    _create(conn, params, get_req_header(conn, "x-github-event"))
+    _create(conn, params, conn.assigns.event)
   end
 
-  defp _create(conn, params, _event = ["PushEvent"]) do
+  defp _create(conn, params, event)
+  when event in [@push_event, @pull_request_event] do
     case Webhooks.start_build(conn.assigns.fixed_params) do
       {:ok, build} -> json(conn, %{message: "Success!"})
       {:error, error} -> conn |> put_status(:bad_request) |> json(error)
     end
   end
-  defp _create(conn, params, [event]), do: _create(conn, params, event)
-  defp _create(conn, params, []), do: _create(conn, params, nil)
-  defp _create(conn, _, event) do
-    conn
-    |> put_status(404)
-    |> json(%{message: "Event type not supported!", event: event})
+
+  defp check_event_type(conn, types) do
+    event = hd get_req_header(conn, "x-github-event")
+    case event in types do
+      true -> conn |> assign(:event, event)
+      # 200 OK because this isn't really an error. GitHub will think this was a
+      # failure if we return anything non 2XX.
+      _ -> json(conn, %{message: "Event type not supported!"})
+    end
   end
 
+
   # Converts a map of the GitHub payload to a map with the important parts.
-  defp process_github_payload(conn = %{params:
-                                       %{"after" => commit,
-                                         "ref" => ref,
-                                         "repository" =>
-                                           %{"clone_url" => repo}}}, []) do
+  defp process_github_payload(conn = %{assigns: %{event: event}}, []) do
+    _process_github_payload(conn, event)
+  end
+  defp _process_github_payload(conn = %{params:
+                                        %{"after" => commit,
+                                          "ref" => ref,
+                                          "repository" =>
+                                            %{"clone_url" => repo}}},
+                               @push_event) do
     assign(conn, :fixed_params, %{branch: branch_name(ref),
+                                  commit: commit,
+                                  repo: repo})
+  end
+  defp _process_github_payload(conn = %{params:
+                                        %{"action" => action,
+                                          "number" => number,
+                                          "pull_request" =>
+                                            %{"head" =>
+                                               %{"sha" => commit,
+                                                 "ref" => branch}},
+                                          "repository" =>
+                                            %{"clone_url" => repo}}},
+                               @pull_request_event)
+  when action in ["opened", "synchronize"] do
+    assign(conn, :fixed_params, %{pr: number,
+                                  branch: branch,
                                   commit: commit,
                                   repo: repo})
   end
