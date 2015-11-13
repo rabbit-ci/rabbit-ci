@@ -30,7 +30,7 @@ defmodule BuildMan.ProjectConfig do
     YamlElixir.read_from_string(content)
   end
 
-  def queue_builds(%{"steps" => steps, "repo" => repo}, build_id, repo)
+  def queue_builds(%{"steps" => steps, "repo" => repo_url}, build_id, repo)
   when is_list(steps) do
     git_cmd =
       GitHelpers.clone_repo("workdir", repo, false)
@@ -42,7 +42,7 @@ defmodule BuildMan.ProjectConfig do
           box: box,
           script: step["command"],
           name: step["name"],
-          repo: repo,
+          repo: repo_url,
           git_cmd: git_cmd
         } |> queue_build(build_id, "#{step["name"]} #{box}")
       end
