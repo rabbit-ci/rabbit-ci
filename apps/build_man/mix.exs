@@ -42,6 +42,6 @@ defmodule BuildMan.Mixfile do
      {:rabbitci_core, in_umbrella: true},
      {:yaml_elixir, "~> 1.0.0"},
      {:exec, github: "saleyn/erlexec"},
-     {:uuid, "~> 1.0.1"}]
+     {:uuid, "~> 1.1.0"}]
   end
 end

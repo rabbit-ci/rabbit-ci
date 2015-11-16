@@ -1,6 +1,5 @@
 defmodule RabbitCICore.Build do
   use RabbitCICore.Web, :model
-
   alias RabbitCICore.Repo
   alias RabbitCICore.Branch
   alias RabbitCICore.Step
@@ -23,11 +22,10 @@ defmodule RabbitCICore.Build do
 
   schema "builds" do
     field :build_number, :integer
-
     field :start_time, Ecto.DateTime
     field :finish_time, Ecto.DateTime
     field :commit, :string
-    field :config_extracted, :boolean, default: false
+    field :config_extracted, :string, default: "false"
 
     belongs_to :branch, Branch
     has_many :steps, Step
@@ -44,10 +42,10 @@ defmodule RabbitCICore.Build do
   def changeset(model, params \\ :empty) do
     cast(model, params, ~w(branch_id commit),
          ~w(start_time build_number finish_time config_extracted))
+    |> validate_inclusion(:config_extracted, ["false", "true", "error"])
   end
 
   def status([]), do: "queued"
-
   def status(statuses) when is_list(statuses) do
     cond do
       Enum.any?(statuses, fn(status) -> status == "failed" end) -> "failed"
@@ -59,11 +57,10 @@ defmodule RabbitCICore.Build do
       Enum.all?(statuses, fn(status) -> status == "finished" end) -> "finished"
     end
   end
-
+  def status(%Build{config_extracted: "error"}), do: "error"
   def status(build) do
-    sa = Ecto.Model.assoc(build, :steps)
-    from(s in sa, select: s.status)
-    |> Repo.all
+    Repo.preload(build, :steps).steps
+    |> Enum.map(&(&1.status))
     |> status
   end
 end

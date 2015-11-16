@@ -13,7 +13,6 @@ defmodule RabbitCICore.Router do
 
     get "/projects", ProjectController, :index
     get "/projects/:name", ProjectController, :show
-    post "/projects/start_build", ProjectController, :start_build
 
     get "/branches", BranchController, :index
     get "/branches/:branch", BranchController, :show
@@ -22,6 +21,9 @@ defmodule RabbitCICore.Router do
 
     get "/builds", BuildController, :index
     get "/builds/:build_number", BuildController, :show
+    post "/builds/start_build", BuildController, :start_build
+
+    post "/github", GitHubController, :create
   end
 
   # This should be changed in production.
