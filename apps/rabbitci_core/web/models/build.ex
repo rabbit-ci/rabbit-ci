@@ -44,6 +44,7 @@ defmodule RabbitCICore.Build do
   def changeset(model, params \\ :empty) do
     cast(model, params, ~w(branch_id commit),
          ~w(start_time build_number finish_time config_extracted))
+    |> validate_inclusion(:config_extracted, ["false", "true", "error"])
   end
 
   def status([]), do: "queued"
