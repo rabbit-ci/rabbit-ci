@@ -1,6 +1,5 @@
 defmodule RabbitCICore.Build do
   use RabbitCICore.Web, :model
-
   alias RabbitCICore.Repo
   alias RabbitCICore.Branch
   alias RabbitCICore.Step
@@ -23,7 +22,6 @@ defmodule RabbitCICore.Build do
 
   schema "builds" do
     field :build_number, :integer
-
     field :start_time, Ecto.DateTime
     field :finish_time, Ecto.DateTime
     field :commit, :string
@@ -48,7 +46,6 @@ defmodule RabbitCICore.Build do
   end
 
   def status([]), do: "queued"
-
   def status(statuses) when is_list(statuses) do
     cond do
       Enum.any?(statuses, fn(status) -> status == "failed" end) -> "failed"
@@ -60,7 +57,6 @@ defmodule RabbitCICore.Build do
       Enum.all?(statuses, fn(status) -> status == "finished" end) -> "finished"
     end
   end
-
   def status(build) do
     Repo.preload(build, :steps).steps
     |> Enum.map(&(&1.status))
