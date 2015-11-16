@@ -57,6 +57,7 @@ defmodule RabbitCICore.Build do
       Enum.all?(statuses, fn(status) -> status == "finished" end) -> "finished"
     end
   end
+  def status(%Build{config_extracted: "error"}), do: "error"
   def status(build) do
     Repo.preload(build, :steps).steps
     |> Enum.map(&(&1.status))
