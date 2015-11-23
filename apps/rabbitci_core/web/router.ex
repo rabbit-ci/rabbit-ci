@@ -10,19 +10,27 @@ defmodule RabbitCICore.Router do
     pipe_through :api
 
     get "/", IndexController, :index
-    get "/running_builds", IndexController, :running_builds
 
-    get "/projects", ProjectController, :index
-    get "/projects/:name", ProjectController, :show
+    scope "projects" do
+      get "/", ProjectController, :index
+      get "/:name", ProjectController, :show
+    end
 
-    get "/branches", BranchController, :index
-    get "/branches/:branch", BranchController, :show
+    scope "/branches" do
+      get "/", BranchController, :index
+      get "/:branch", BranchController, :show
+    end
 
     get "/logs", LogController, :show
 
-    get "/builds", BuildController, :index
-    get "/builds/:build_number", BuildController, :show
-    post "/builds/start_build", BuildController, :start_build
+    scope "/builds" do
+      get "/", BuildController, :index
+      get "/running_builds", BuildController, :running_builds
+      post "/start_build", BuildController, :start_build
+
+      # This is a catch all. Make sure it comes last!
+      get "/:build_number", BuildController, :show
+    end
 
     post "/github", GitHubController, :create
   end

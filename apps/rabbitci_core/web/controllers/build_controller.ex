@@ -2,8 +2,24 @@ defmodule RabbitCICore.BuildController do
   use RabbitCICore.Web, :controller
   import Ecto.Query
   alias RabbitCICore.Build
+  alias RabbitCICore.Step
   alias RabbitCICore.Repo
   alias RabbitCICore.IncomingWebhooks, as: Webhooks
+
+  def running_builds(conn, _params) do
+    builds =
+      Repo.all from(b in Build,
+                    join: s in assoc(b, :steps),
+                    join: br in assoc(b, :branch),
+                    join: p in assoc(br, :project),
+                    where: s.status in ["queued", "running"]
+                    or b.config_extracted == "false",
+                    preload: [steps: s, branch: {br, project: p}])
+
+    conn
+    |> assign(:builds, builds)
+    |> render
+  end
 
   def start_build(conn, p = %{"repo" => _, "commit" => _, "branch" => _}) do
     case Map.take(p, ["repo", "commit", "branch", "pr"])
@@ -47,7 +63,6 @@ defmodule RabbitCICore.BuildController do
     |> assign(:builds, builds)
     |> render("index.json")
   end
-
   def index(conn, params) do
     index(conn, Map.merge(params, %{"page" => %{"offset" => "0"}}))
   end
@@ -74,5 +89,8 @@ defmodule RabbitCICore.BuildController do
         |> assign(:build, build)
         |> render("show.json")
     end
+  end
+  def show(conn, %{"build_number" => bn}) when not is_integer(bn) do
+    send_resp(conn, :not_found, "")
   end
 end
