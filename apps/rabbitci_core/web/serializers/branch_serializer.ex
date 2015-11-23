@@ -1,6 +1,5 @@
 defmodule RabbitCICore.BranchSerializer do
   use JaSerializer
-
   alias RabbitCICore.Repo
   alias RabbitCICore.ProjectSerializer
   alias RabbitCICore.Router.Helpers, as: RouterHelpers
@@ -10,7 +9,6 @@ defmodule RabbitCICore.BranchSerializer do
   has_many :builds, link: :branches_link
 
   def type, do: "branches"
-
   def project(r, _), do: Repo.preload(r, :project).project
 
   def branches_link(record, conn) do

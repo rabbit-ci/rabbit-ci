@@ -10,6 +10,7 @@ defmodule RabbitCICore.Router do
     pipe_through :api
 
     get "/", IndexController, :index
+    get "/running_builds", IndexController, :running_builds
 
     get "/projects", ProjectController, :index
     get "/projects/:name", ProjectController, :show

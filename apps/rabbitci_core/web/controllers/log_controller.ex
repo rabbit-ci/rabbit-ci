@@ -35,7 +35,8 @@ defmodule RabbitCICore.LogController do
   end
 
   def show(conn, %{"format" => "text"}) do
-    log_text = Regex.replace(~r/\x1b\[[0-9;]*m/, _log(conn), "")
+    log_text =
+      Regex.replace(~r/\x1b(\[[0-9;]*[mK])?/u, _log(conn), "")
     text(conn, log_text)
   end
 
