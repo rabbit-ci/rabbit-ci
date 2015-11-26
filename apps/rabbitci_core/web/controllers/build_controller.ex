@@ -10,11 +10,12 @@ defmodule RabbitCICore.BuildController do
     builds =
       Repo.all from(b in Build,
                     join: s in assoc(b, :steps),
+                    join: sa in assoc(b, :steps),
                     join: br in assoc(b, :branch),
                     join: p in assoc(br, :project),
                     where: s.status in ["queued", "running"]
                     or b.config_extracted == "false",
-                    preload: [steps: s, branch: {br, project: p}])
+                    preload: [steps: sa, branch: {br, project: p}])
 
     conn
     |> assign(:builds, builds)
