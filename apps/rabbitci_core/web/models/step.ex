@@ -2,7 +2,6 @@ defmodule RabbitCICore.Step do
   use RabbitCICore.Web, :model
   alias RabbitCICore.Log
   alias RabbitCICore.Build
-  alias RabbitCICore.Step
   alias RabbitCICore.Log
   alias RabbitCICore.Repo
 
@@ -29,9 +28,10 @@ defmodule RabbitCICore.Step do
   def log(_step, _clean \\ :clean)
   def log(step, :clean), do: clean_log log(step, :no_clean)
   def log(step, :no_clean) do
-    Repo.preload(step, :logs).logs
-    |> Enum.sort(&(&1.order < &2.order))
-    |> Enum.map(&(&1.stdio))
+    from(l in assoc(step, :logs),
+         order_by: [asc: l.order],
+         select: l.stdio)
+    |> Repo.all
     |> Enum.join
   end
 
