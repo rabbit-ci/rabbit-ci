@@ -6,10 +6,22 @@ defmodule RabbitCICore.BuildController do
   alias RabbitCICore.Repo
   alias RabbitCICore.IncomingWebhooks, as: Webhooks
 
+  # This gets all of the currently running builds.
+  # A running build is defined as:
+  #   - A build that has not yet extracted its config
+  #   - A build that has steps which are in the "queued" or "running" state
+  #
+  # The response will include the builds that are running and _all_ of its
+  # steps, even the ones that are finished/failed.
   def running_builds(conn, _params) do
     builds =
       Repo.all from(b in Build,
                     join: s in assoc(b, :steps),
+                    # We want to get all of the steps for all of the builds that
+                    # have steps which have statuses that are either "queued" or
+                    # "running". Instead of doing two queries, we load all of
+                    # the steps (for preloading) here. The other join on steps
+                    # is used to filter the builds that we will be loading.
                     join: sa in assoc(b, :steps),
                     join: br in assoc(b, :branch),
                     join: p in assoc(br, :project),
