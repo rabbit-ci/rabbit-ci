@@ -90,20 +90,10 @@ defmodule RabbitCICore.BuildController do
        and p.name == ^project
        and b.build_number == ^build_number,
        preload: [branch: {br, project: p}])
-      |> Repo.one
+      |> Repo.one!
 
-    case build do
-      nil ->
-        conn
-        |> put_status(404)
-        |> text("Not found.")
-      _ ->
-        conn
-        |> assign(:build, build)
-        |> render("show.json")
-    end
-  end
-  def show(conn, %{"build_number" => bn}) when not is_integer(bn) do
-    send_resp(conn, :not_found, "")
+    conn
+    |> assign(:build, build)
+    |> render("show.json")
   end
 end
