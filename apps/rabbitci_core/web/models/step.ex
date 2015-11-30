@@ -4,6 +4,7 @@ defmodule RabbitCICore.Step do
   alias RabbitCICore.Build
   alias RabbitCICore.Log
   alias RabbitCICore.Repo
+  alias RabbitCICore.Step
 
   schema "steps" do
     field :status, :string
@@ -37,5 +38,13 @@ defmodule RabbitCICore.Step do
 
   def clean_log(raw_log) do
     Regex.replace(~r/\x1b(\[[0-9;]*[mK])?/, raw_log, "")
+  end
+
+  # This is for use in BuildMan.Vagrant. You can use it, but you probably
+  # shouldn't as it uses step_id instead of an actual step.
+  def update_status!(step_id, status) do
+    Repo.get!(Step, step_id)
+    |> Step.changeset(%{status: status})
+    |> Repo.update!
   end
 end

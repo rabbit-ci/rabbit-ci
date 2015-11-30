@@ -31,9 +31,7 @@ defmodule BuildMan.Vagrant do
     Process.monitor(pid)
 
     {:ok, count_agent} = Agent.start_link(fn -> 0 end)
-
     send(self, :start_build)
-
     start_msg = "STDOUT: Starting: #{build_identifier}. Box: #{config.box}\n\n"
     LogStreamer.log_string(start_msg, :stdout, build_identifier,
                            increment_counter(count_agent),
@@ -75,11 +73,7 @@ defmodule BuildMan.Vagrant do
 
   def handle_info(:start_build, state =
         %{build: _build, config: config, path: path}) do
-
-    Repo.get(Step, config.step_id)
-    |> Step.changeset(%{status: "running"})
-    |> Repo.update!
-
+    Step.update_status!(config.step_id, "running")
     File.write(Path.join(path, "Vagrantfile"), vagrantfile(config))
     {_, pid, _} = command(["up", "--provider", "virtualbox"], state)
     {:noreply, %{state | cmd: {:up, pid}}}
@@ -108,22 +102,13 @@ defmodule BuildMan.Vagrant do
     |> Task.await(30_000)
 
     case File.rm_rf(path) do
-      {:ok, _} ->
-        :ok
+      {:ok, _} -> :ok
       {:error, err} -> Logger.error("Could not delete: #{path}. #{inspect err}")
     end
 
     case success do
-      true ->
-        Repo.get(Step, config.step_id)
-        |> Step.changeset(%{status: "finished"})
-        |> Repo.update!
-        :ok
-      false ->
-        Repo.get(Step, config.step_id)
-        |> Step.changeset(%{status: "failed"})
-        |> Repo.update!
-        :ok
+      true -> Step.update_status!(config.step_id, "finished")
+      false -> Step.update_status!(config.step_id, "failed")
     end
   end
 
