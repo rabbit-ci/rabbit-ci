@@ -1,3 +1,5 @@
+Code.require_file "../../shared.exs", __DIR__
+
 defmodule Rabbitmq.Mixfile do
   use Mix.Project
 
@@ -9,7 +11,8 @@ defmodule Rabbitmq.Mixfile do
      elixir: "~> 1.1",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
-     deps: deps]
+     test_coverage: [tool: ExCoveralls],
+     deps: Shared.deps ++ deps]
   end
 
   # Configuration for the OTP application
