@@ -2,8 +2,37 @@ defmodule RabbitCICore.BuildController do
   use RabbitCICore.Web, :controller
   import Ecto.Query
   alias RabbitCICore.Build
+  alias RabbitCICore.Step
   alias RabbitCICore.Repo
   alias RabbitCICore.IncomingWebhooks, as: Webhooks
+
+  # This gets all of the currently running builds.
+  # A running build is defined as:
+  #   - A build that has not yet extracted its config
+  #   - A build that has steps which are in the "queued" or "running" state
+  #
+  # The response will include the builds that are running and _all_ of its
+  # steps, even the ones that are finished/failed.
+  def running_builds(conn, _params) do
+    builds =
+      Repo.all from(b in Build,
+                    join: s in assoc(b, :steps),
+                    # We want to get all of the steps for all of the builds that
+                    # have steps which have statuses that are either "queued" or
+                    # "running". Instead of doing two queries, we load all of
+                    # the steps (for preloading) here. The other join on steps
+                    # is used to filter the builds that we will be loading.
+                    join: sa in assoc(b, :steps),
+                    join: br in assoc(b, :branch),
+                    join: p in assoc(br, :project),
+                    where: s.status in ["queued", "running"]
+                    or b.config_extracted == "false",
+                    preload: [steps: sa, branch: {br, project: p}])
+
+    conn
+    |> assign(:builds, builds)
+    |> render
+  end
 
   def start_build(conn, p = %{"repo" => _, "commit" => _, "branch" => _}) do
     case Map.take(p, ["repo", "commit", "branch", "pr"])
@@ -39,14 +68,14 @@ defmodule RabbitCICore.BuildController do
        limit: 30,
        offset: ^(page * 30),
        order_by: [desc: b.build_number],
-       preload: [:steps, branch: {br, project: p}])
+       preload: [branch: {br, project: p}])
       |> Repo.all
+      |> Repo.preload(steps: :logs)
 
     conn
     |> assign(:builds, builds)
     |> render("index.json")
   end
-
   def index(conn, params) do
     index(conn, Map.merge(params, %{"page" => %{"offset" => "0"}}))
   end
@@ -61,17 +90,10 @@ defmodule RabbitCICore.BuildController do
        and p.name == ^project
        and b.build_number == ^build_number,
        preload: [branch: {br, project: p}])
-      |> Repo.one
+      |> Repo.one!
 
-    case build do
-      nil ->
-        conn
-        |> put_status(404)
-        |> text("Not found.")
-      _ ->
-        conn
-        |> assign(:build, build)
-        |> render("show.json")
-    end
+    conn
+    |> assign(:build, build)
+    |> render("show.json")
   end
 end

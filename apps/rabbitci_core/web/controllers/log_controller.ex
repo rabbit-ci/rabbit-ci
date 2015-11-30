@@ -4,6 +4,7 @@ defmodule RabbitCICore.LogController do
   import Ecto.Query
   alias RabbitCICore.Project
   alias RabbitCICore.Repo
+  alias RabbitCICore.Step
   alias RabbitCICore.Log
 
   plug :get_models
@@ -33,31 +34,26 @@ defmodule RabbitCICore.LogController do
   def show(conn, %{"format" => "ansi"}) do
     text(conn, _log(conn))
   end
-
   def show(conn, %{"format" => "text"}) do
-    log_text = Regex.replace(~r/\x1b\[[0-9;]*m/, _log(conn), "")
-    text(conn, log_text)
+    # We're cleaning it _after_ we concat all the logs because the step name
+    # could possibly include some ANSI codes.
+    text(conn, _log(conn) |> Step.clean_log)
   end
-
   def show(conn, params) do
     show(conn, Map.merge(params, %{"format" => "text"}))
   end
 
   defp _log(%{assigns: %{project: project, branch: branch, build: build}}) do
-    log_query = from(l in Log, order_by: [l.step_id, l.order])
     step_fn = fn step ->
-      stdio =
-        Enum.map(step.logs, &(&1.stdio))
-        |> Enum.join
      """
 ================================================================================
 "#{step.name}" -- #{project.name}/#{branch.name}##{build.build_number}
 
-#{stdio}
-     """
+ #{Step.log(step, :no_clean)}
+ """
     end
 
-    Repo.preload(build, [steps: [logs: log_query]]).steps
+    Repo.preload(build, [steps: :logs]).steps
     |> Enum.map(step_fn)
     |> Enum.join
   end

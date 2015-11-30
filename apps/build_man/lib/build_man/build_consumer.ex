@@ -51,21 +51,22 @@ defmodule BuildMan.BuildConsumer do
 
     Task.start_link fn ->
       Process.flag(:trap_exit, true)
-
       config = :erlang.binary_to_term(payload)
-
-      Repo.get(Step, config.step_id)
-      |> Step.changeset(%{status: "running"})
-      |> Repo.update
-
-      {:ok, pid} =
-        Vagrant.start_link([routing_key, config])
+      {:ok, _pid} = Vagrant.start_link([routing_key, config])
 
       receive do
-        {:EXIT, ^pid, _} -> if Process.alive?(chan.pid), do: Basic.ack(chan, tag)
+        {:EXIT, _pid, _} -> if Process.alive?(chan.pid), do: Basic.ack(chan, tag)
       end
     end
 
     {:noreply, chan}
+  end
+
+  def terminate(_reason, chan) do
+    try do
+      Channel.close(chan)
+    catch
+      _, _ -> :ok
+    end
   end
 end
