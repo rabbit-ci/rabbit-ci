@@ -75,6 +75,11 @@ defmodule BuildMan.Vagrant do
 
   def handle_info(:start_build, state =
         %{build: _build, config: config, path: path}) do
+
+    Repo.get(Step, config.step_id)
+    |> Step.changeset(%{status: "running"})
+    |> Repo.update!
+
     File.write(Path.join(path, "Vagrantfile"), vagrantfile(config))
     {_, pid, _} = command(["up", "--provider", "virtualbox"], state)
     {:noreply, %{state | cmd: {:up, pid}}}
@@ -112,12 +117,12 @@ defmodule BuildMan.Vagrant do
       true ->
         Repo.get(Step, config.step_id)
         |> Step.changeset(%{status: "finished"})
-        |> Repo.update
+        |> Repo.update!
         :ok
       false ->
         Repo.get(Step, config.step_id)
         |> Step.changeset(%{status: "failed"})
-        |> Repo.update
+        |> Repo.update!
         :ok
     end
   end
