@@ -32,7 +32,7 @@ defmodule RabbitCICore.Mixfile do
   defp deps do
     [{:phoenix, "~> 1.0.0"},
      {:phoenix_ecto, "~> 1.2.0"},
-     {:postgrex, "~> 0.9.1"},
+     {:postgrex, ">= 0.0.0"},
      {:cowboy, "~> 1.0"},
      {:rabbitmq, in_umbrella: true},
      {:ecto, "~> 1.0.0"},
