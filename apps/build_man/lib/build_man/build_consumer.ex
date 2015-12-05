@@ -2,8 +2,6 @@ defmodule BuildMan.BuildConsumer do
   use AMQP
   use GenServer
   alias BuildMan.Vagrant
-  alias RabbitCICore.Step
-  alias RabbitCICore.Repo
   require Logger
 
   def start_link do
