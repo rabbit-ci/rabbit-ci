@@ -41,7 +41,7 @@ defmodule RabbitCICore.Step do
   end
 
   # This is for use in BuildMan.Vagrant. You can use it, but you probably
-  # shouldn't as it uses step_id instead of an actual step.
+  # shouldn't as it uses step_id instead of a %Step{}.
   def update_status!(step_id, status) do
     Repo.get!(Step, step_id)
     |> Step.changeset(%{status: status})

@@ -18,6 +18,7 @@ config :build_man, :config_extraction_limit, 2
 config :build_man, :log_streamer_limit, 10
 
 config :build_man, :build_logs_exchange, "rabbitci.build_logs"
+config :build_man, :build_logs_queue, "rabbitci.build_logs"
 config :build_man, :build_exchange, "rabbitci.builds"
 config :build_man, :build_queue, "rabbitci.builds"
 config :build_man, :config_extraction_exchange, "rabbitci.config_extraction"

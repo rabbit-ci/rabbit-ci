@@ -4,53 +4,49 @@ defmodule BuildMan.Vagrant do
 
       [build_identifier, config]
 
-  The worker will stop whenever the build is done or when the LogStreamer
-  dies. All Vagrant output is sent to the LogStreamer.
+  All Vagrant output is sent to the LogStreamer.
   """
 
   use GenServer
-
   require Logger
   require EEx
-
   alias BuildMan.FileHelpers
   alias BuildMan.LogStreamer
-  alias RabbitCICore.Repo
   alias RabbitCICore.Step
 
   # Client API
-
   def start_link(opts) do
     GenServer.start_link(__MODULE__, opts)
   end
 
   # Server callbacks
-
   def init([build_identifier, config]) do
-    {:ok, pid} = LogStreamer.start({self, build_identifier})
-    Process.monitor(pid)
-
+    Process.flag(:trap_exit, true)
     {:ok, count_agent} = Agent.start_link(fn -> 0 end)
     send(self, :start_build)
-    start_msg = "STDOUT: Starting: #{build_identifier}. Box: #{config.box}\n\n"
-    LogStreamer.log_string(start_msg, :stdout, build_identifier,
+
+    start_msg = "Starting: #{build_identifier}. Box: #{config.box}\n\n"
+    LogStreamer.log_string(start_msg, "stdout",
                            increment_counter(count_agent),
-                           config.build_id, config.step_name)
+                           config.step_id)
 
     {:ok, path} = FileHelpers.unique_folder("builder")
-    {:ok, %{path: path, log_streamer: pid, build: build_identifier,
-            config: config, cmd: nil, counter: count_agent, success: true}}
+    {:ok,
+     %{path: path, build: build_identifier,
+       config: config, cmd: nil, counter: count_agent, success: true}}
   end
 
-  def handle_info({:DOWN, _ref, :process, pid, {:exit_status, exit_status}},
+  # Exit status is set when the command finished due to a non-zero exit status.
+  def handle_info({:DOWN, _ref, :process, pid, {:exit_status, _exit_status}},
                   state = %{cmd: {_, cmd_pid}}) when pid == cmd_pid do
     {:stop, :normal, %{state | success: false}}
   end
 
   # This is called when "vagrant up" is done.
   def handle_info({:DOWN, _ref, :process, pid, :normal},
-                  state = %{cmd: {:up, cmd_pid}}) when pid == cmd_pid do
-    Logger.debug("'vagrant up' finished.")
+                  state = %{build: build, cmd: {:up, cmd_pid}})
+  when pid == cmd_pid do
+    Logger.debug("'vagrant up' finished. #{inspect build}")
     send(self, :run_build_script)
     {:noreply, state}
   end
@@ -59,20 +55,13 @@ defmodule BuildMan.Vagrant do
   def handle_info({:DOWN, _ref, :process, pid, :normal},
                   state = %{build: build, cmd: {:ssh, cmd_pid}})
   when pid == cmd_pid do
-    Logger.info "Vagrant worker finished #{build}. Going down..."
-    {:stop, :normal, state}
-  end
-
-  # This gets called when the LogStreamer goes down.
-  def handle_info({:DOWN, _ref, :process, _pid, _reason},
-                  state = %{cmd: {_, cmd_pid}}) do
-    Logger.warn "Vagrant worker going down..."
-    :exec.stop(cmd_pid)
+    Logger.debug("'vagrant ssh' finished. #{inspect build}")
     {:stop, :normal, state}
   end
 
   def handle_info(:start_build, state =
-        %{build: _build, config: config, path: path}) do
+        %{build: build, config: config, path: path}) do
+    Logger.info("Starting vagrant build. #{inspect build}")
     Step.update_status!(config.step_id, "running")
     File.write(Path.join(path, "Vagrantfile"), vagrantfile(config))
     {_, pid, _} = command(["up", "--provider", "virtualbox"], state)
@@ -94,9 +83,10 @@ defmodule BuildMan.Vagrant do
     {:noreply, %{state | cmd: {:ssh, pid}}}
   end
 
-  def terminate(_reason, state = %{path: path, success: success,
-                                   config: config}) do
+  def terminate(_reason, state = %{path: path, success: success, build: build,
+                                  config: config, cmd: {_, cmd_pid}}) do
     Logger.debug("Vagrant build cleaning up!")
+    :exec.stop(cmd_pid)
 
     Task.async(fn -> command(["destroy", "-f"], state, [:sync]) end)
     |> Task.await(30_000)
@@ -110,17 +100,19 @@ defmodule BuildMan.Vagrant do
       true -> Step.update_status!(config.step_id, "finished")
       false -> Step.update_status!(config.step_id, "failed")
     end
+
+    Logger.info("Vagrant build finished. #{inspect build}")
   end
 
-  defp command(args, %{config: config, build: build, path: path,
+  defp command(args, %{config: config, build: _build, path: path,
                        counter: counter}, opts \\ [])
   when is_list(opts) do
     vagrant_cmd = System.find_executable("vagrant")
     ExExec.run(
       [vagrant_cmd | args],
       [
-        {:stdout, handle_log(config, build, counter, :stdout)},
-        {:stderr, handle_log(config, build, counter, :stderr)},
+        {:stdout, handle_log(config, counter, "stdout")},
+        {:stderr, handle_log(config, counter, "stderr")},
         # Running commands in a PTY gives us colors!
         :pty,
         # We need to kill the entire Vagrant process group because Vagrant does
@@ -146,11 +138,9 @@ defmodule BuildMan.Vagrant do
     end
   end
 
-  defp handle_log(%{build_id: build_id, step_name: step_name},
-                  build, counter, type) do
+  defp handle_log(%{step_id: step_id}, counter, type) do
     fn _, _, str ->
-      LogStreamer.log_string(str, type, build, increment_counter(counter),
-                             build_id, step_name)
+      LogStreamer.log_string(str, type, increment_counter(counter), step_id)
     end
   end
 
