@@ -8,7 +8,7 @@ defmodule BuildMan.ConfigExtractionSup do
   use AMQP
 
   def start_link do
-    GenServer.start_link(__MODULE__, :ok, [])
+    GenServer.start_link(__MODULE__, :ok, name: __MODULE__)
   end
 
   @exchange Application.get_env(:build_man, :config_extraction_exchange)

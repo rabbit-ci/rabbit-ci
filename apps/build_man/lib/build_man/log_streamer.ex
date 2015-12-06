@@ -15,7 +15,7 @@ defmodule BuildMan.LogStreamer do
   """
   def start_link do
     Logger.debug("Starting up LogStreamer...")
-    GenServer.start_link(__MODULE__, [])
+    GenServer.start_link(__MODULE__, [], name: __MODULE__)
   end
 
   @exchange Application.get_env(:build_man, :build_logs_exchange)
