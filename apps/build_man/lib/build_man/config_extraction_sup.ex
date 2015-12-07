@@ -37,9 +37,8 @@ defmodule BuildMan.ConfigExtractionSup do
   end
 
   # Confirmation sent by the broker after registering this process as a consumer
-  def handle_info({:basic_consume_ok, %{consumer_tag: _consumer_tag}}, chan) do
-    {:ok, hostname} = :inet.gethostname
-    Logger.info("BuildMan.ConfigExtractionSup started on #{hostname}")
+  def handle_info({:basic_consume_ok, _}, chan) do
+    Logger.info("#{__MODULE__} connected to RabbitMQ.")
     {:noreply, chan}
   end
 
@@ -68,7 +67,7 @@ defmodule BuildMan.ConfigExtractionSup do
     {:noreply, chan}
   end
 
-  defp consume(channel, tag, _redelivered, packed_payload) do
+  defp consume(channel, _tag, _redelivered, packed_payload) do
     payload = Map.merge(%{file: ".rabbitci.yaml"},
                         :erlang.binary_to_term(packed_payload))
 

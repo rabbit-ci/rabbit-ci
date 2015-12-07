@@ -35,8 +35,7 @@ defmodule BuildMan.BuildConsumer do
 
   # AMQP Stuff
   def handle_info({:basic_consume_ok, _}, state) do
-    {:ok, hostname} = :inet.gethostname
-    Logger.info("BuildMan.BuildProcessor started on #{hostname}")
+    Logger.info("#{__MODULE__} connected to RabbitMQ.")
     {:noreply, state}
   end
 

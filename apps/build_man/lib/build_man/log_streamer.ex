@@ -14,7 +14,6 @@ defmodule BuildMan.LogStreamer do
   Starts the log streamer.
   """
   def start_link do
-    Logger.debug("Starting up LogStreamer...")
     GenServer.start_link(__MODULE__, [], name: __MODULE__)
   end
 
@@ -51,7 +50,7 @@ defmodule BuildMan.LogStreamer do
   end
 
   def handle_info({:basic_consume_ok, _}, state) do
-    Logger.info("BuildMan.LogStreamer connected to RabbitMQ.")
+    Logger.info("#{__MODULE__} connected to RabbitMQ.")
     {:noreply, state}
   end
   def handle_info({:basic_deliver, raw_payload,
