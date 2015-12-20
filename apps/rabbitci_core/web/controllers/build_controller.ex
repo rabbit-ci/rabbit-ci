@@ -34,8 +34,8 @@ defmodule RabbitCICore.BuildController do
     |> render
   end
 
-  def start_build(conn, p = %{"repo" => _, "commit" => _, "branch" => _}) do
-    case Map.take(p, ["repo", "commit", "branch", "pr"])
+  def start_build(conn, p = %{"name" => _, "commit" => _, "branch" => _}) do
+    case Map.take(p, ["name", "commit", "branch", "pr"])
     |> atomize_keys
     |> Webhooks.start_build do
       {:ok, build} ->
@@ -48,7 +48,7 @@ defmodule RabbitCICore.BuildController do
   def start_build(conn, _) do
     conn
     |> put_status(:bad_request)
-    |> json(%{message: "Missing params. Required: repo, commit, branch."})
+    |> json(%{message: "Missing params. Required: name, commit, branch."})
   end
 
   defp atomize_keys(map) do

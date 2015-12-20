@@ -46,11 +46,11 @@ defmodule RabbitCICore.GitHubController do
                                         %{"after" => commit,
                                           "ref" => ref,
                                           "repository" =>
-                                            %{"clone_url" => repo}}},
+                                            %{"full_name" => name}}},
                                @push_event) do
     assign(conn, :fixed_params, %{branch: branch_name(ref),
                                   commit: commit,
-                                  repo: repo})
+                                  name: name})
   end
   defp _process_github_payload(conn = %{params:
                                         %{"action" => action,
@@ -60,13 +60,13 @@ defmodule RabbitCICore.GitHubController do
                                                %{"sha" => commit,
                                                  "ref" => branch}},
                                           "repository" =>
-                                            %{"clone_url" => repo}}},
+                                            %{"full_name" => name}}},
                                @pull_request_event)
   when action in ["opened", "synchronize"] do
     assign(conn, :fixed_params, %{pr: number,
                                   branch: branch,
                                   commit: commit,
-                                  repo: repo})
+                                  name: name})
   end
 
   # Gets the branch name from the "ref" key on the payload. Example "ref" value
@@ -74,8 +74,8 @@ defmodule RabbitCICore.GitHubController do
   defp branch_name("refs/heads/" <> name), do: name
 
   defp load_project(conn = %{assigns:
-                             %{fixed_params: %{repo: repo}}}, []) do
-    assign(conn, :project, Repo.get_by!(Project, repo: repo))
+                             %{fixed_params: %{name: name}}}, []) do
+    assign(conn, :project, Repo.get_by!(Project, name: name))
   end
 
   # Plug to check signature from x-hub-signature header. In the format: sha1=...
