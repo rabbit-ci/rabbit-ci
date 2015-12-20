@@ -4,6 +4,7 @@ defmodule RabbitCICore.Project do
   alias RabbitCICore.Repo
   alias RabbitCICore.Branch
   alias RabbitCICore.Build
+  alias RabbitCICore.SSHKey
   alias RabbitCICore.Project
 
   schema "projects" do
@@ -12,6 +13,7 @@ defmodule RabbitCICore.Project do
     field :webhook_secret, :string
 
     has_many :branches, Branch
+    has_one :ssh_key, SSHKey
 
     timestamps
   end

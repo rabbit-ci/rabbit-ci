@@ -1,8 +1,9 @@
 defmodule BuildMan.ConfigExtractionSup do
   import BuildMan.FileHelpers, only: [unique_folder: 1]
-  import BuildMan.GitHelpers
+  alias BuildMan.GitHelpers
   alias RabbitCICore.Repo
   alias RabbitCICore.Build
+  alias RabbitCICore.SSHKey
   require Logger
   use GenServer
   use AMQP
@@ -75,7 +76,8 @@ defmodule BuildMan.ConfigExtractionSup do
     {:ok, path} = unique_folder("rabbits")
 
     try do
-      clone_repo(path, payload)
+      ssh_key = SSHKey.private_key_from_build_id(payload.build_id)
+      clone_repo(path, payload, ssh_key)
 
       contents =
         Path.join([path, payload.file])
@@ -99,6 +101,11 @@ defmodule BuildMan.ConfigExtractionSup do
         _ -> nil
       end
     end
+  end
+
+  defp clone_repo(path, payload, nil), do: GitHelpers.clone_repo(path, payload)
+  defp clone_repo(path, payload, ssh_key) do
+    GitHelpers.clone_repo_with_ssh_key(path, payload, ssh_key)
   end
 end
 
