@@ -49,7 +49,9 @@ defmodule RabbitCICore.BranchControllerTest do
   test "branch does not exist" do
     project = Repo.insert! %Project{name: "project1",
                                     repo: "git@example.com:user/project"}
-    response = get("/branches/fakebranch", [project: project.name])
-    assert response.status == 404
+    assert_raise Plug.Conn.WrapperError,
+    ~r/expected at least one result but got none in query/, fn ->
+      response = get("/branches/fakebranch", [project: project.name])
+    end
   end
 end
