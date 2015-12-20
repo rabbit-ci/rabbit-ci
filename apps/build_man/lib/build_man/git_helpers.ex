@@ -34,10 +34,11 @@ defmodule BuildMan.GitHelpers do
   end
 
   def git(args, true, opts \\ []) when is_list(args) do
-    args = case Keyword.get(opts, :path) do
-      nil -> args
-      path -> ["-C", path] ++ args
-    end
+    args =
+      case Keyword.get(opts, :path) do
+        nil -> args
+        path -> ["-C", path] ++ args
+      end
 
     exec_opts = Keyword.get(opts, :exec_opts, [])
     git_cmd = System.find_executable("git")
@@ -50,7 +51,13 @@ defmodule BuildMan.GitHelpers do
         raise GitError, message: "#{out}"
     end
   end
-  def git(args, false, exec_opts) when is_list(args) do
+  def git(args, false, opts) when is_list(args) do
+    args =
+      case Keyword.get(opts, :path) do
+        nil -> args
+        path -> ["-C", path] ++ args
+      end
+
     "git " <> Enum.join(args, " ")
   end
 
