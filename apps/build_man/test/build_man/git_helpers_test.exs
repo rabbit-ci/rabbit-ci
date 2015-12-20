@@ -30,7 +30,7 @@ defmodule BuildMan.BuildHelpersTest do
       true
     )
 
-    rev = hd(GitHelpers.git(["rev-parse", "HEAD"], [path: path], true))
+    rev = hd(GitHelpers.git(["rev-parse", "HEAD"], true, [path: path]))
     assert rev == "eccee02ec18a36bcb2615b8c86d401b0618738c2\n"
   end
 
@@ -47,7 +47,7 @@ defmodule BuildMan.BuildHelpersTest do
       true
     )
 
-    rev = hd(GitHelpers.git(["rev-parse", "HEAD"], [path: path], true))
+    rev = hd(GitHelpers.git(["rev-parse", "HEAD"], true, [path: path]))
     assert rev == "b78104685141fec938866fd4591bfc0caaee9424\n"
   end
 end
