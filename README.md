@@ -1,7 +1,10 @@
-# RabbitCI Backend
+# RabbitCI
 
-This is (most of) the backend for RabbitCI. See
-http://github.com/rabbit-ci/rabbit-ci to learn what RabbitCI is.
+This is RabbitCI.
+
+RabbitCI is a Continuous Integration server. It is currently in pre-alpha
+stage. It would help if you would write some code. Look at the issues page for
+things to do.
 
 ## Dependencies
 The backend depends on:
