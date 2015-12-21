@@ -6,12 +6,12 @@ defmodule RabbitCICore.BranchSerializer do
 
   attributes [:updated_at, :inserted_at, :name]
   has_one :project, include: true, serializer: ProjectSerializer
-  has_many :builds, link: :branches_link
+  has_many :builds, link: :builds_link
 
   def type, do: "branches"
   def project(r, _), do: Repo.preload(r, :project).project
 
-  def branches_link(record, conn) do
+  def builds_link(record, conn) do
     record = Repo.preload(record, :project)
     RouterHelpers.build_path(conn, :index, %{branch: record.name,
                                              project: record.project.name})
