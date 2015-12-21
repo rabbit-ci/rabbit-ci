@@ -15,6 +15,8 @@ Router.map(function() {
     this.route('index', {path: '/:project_name/branches'});
     this.route('show', {path: '/:project_name/b/:branch_name'});
   });
+
+  this.route('builds.show', {path: '/:project_name/b/:branch_name/b/:build_number'});
 });
 
 export default Router;
