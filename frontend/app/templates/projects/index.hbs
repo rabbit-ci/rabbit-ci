@@ -1,0 +1,18 @@
+<h1>Projects</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Repo</th>
+    </tr>
+  </thead>
+  <tbody>
+    {{#each model as |project|}}
+      <tr>
+        <td>{{project.name}}</td>
+        <td>{{project.repo}}</td>
+      </tr>
+    {{/each}}
+  </tbody>
+</table>
