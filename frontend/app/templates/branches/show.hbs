@@ -1,6 +1,6 @@
 {{#link-to "projects.show" model.project.name}}&#171; All Branches{{/link-to}}
 
-<h1>{{model.project.name}}/{{model.branch.name}}</h1>
+<h1>{{model.project.name}}/{{model.name}}</h1>
 
 <table>
   <thead>
@@ -9,23 +9,22 @@
       <th>Commit</th>
       <th>Status</th>
       <th>Inserted at</th>
+      <th>Steps</th>
     </tr>
   </thead>
   <tbody>
     {{#each model.builds as |build|}}
-      {{#link-to "builds.show" model.project.name model.name build.buildNumber}}
-        <tr>
-          <td>{{build.buildNumber}}</td>
-          <td>{{build.commit}}</td>
-          <td>{{build.status}}</td>
-          <td>{{moment-from-now build.insertedAt}}</td>
-          <ul>
-            {{#each build.steps as |step|}}
-              <li>{{step.name}}</li>
-            {{/each}}
-          </ul>
-        </tr>
-      {{/link-to}}
+      <tr>
+        <td>{{#link-to "builds.show" model.project.name model.name build.buildNumber}}{{build.buildNumber}}{{/link-to}}</td>
+        <td>{{build.commit}}</td>
+        <td class="status-{{build.status}}">{{build.status}}</td>
+        <td>{{moment-from-now build.insertedAt}}</td>
+        <td><ul>
+          {{#each build.steps as |step|}}
+            <li>{{step.name}}</li>
+          {{/each}}
+        </ul></td>
+      </tr>
     {{/each}}
   </tbody>
 </table>
