@@ -17,3 +17,32 @@
   color: yellow;
   font-weight: bold;
 }
+
+.log {
+  padding: 2em;
+  border: 5px solid #505050;
+  font-family: "Source Code Pro", "Courier New";
+  font-size: 13px;
+  color: #d0d0d0;
+  background-color: #151515;
+}
+.log .reset     {color: #d0d0d0;}
+.log .bg-reset  {background-color: #151515;}
+.log .dimgray   {color: #505050;}
+.log .red       {color: #ac4142;}
+.log .green     {color: #90a959;}
+.log .yellow    {color: #f4bf75;}
+.log .blue      {color: #6a9fb5;}
+.log .purple    {color: #aa759f;}
+.log .cyan      {color: #75b5aa;}
+.log .white     {color: #d0d0d0;}
+.log .bg-black  {background-color: #151515;}
+.log .bg-red    {background-color: #ac4142;}
+.log .bg-green  {background-color: #90a959;}
+.log .bg-yellow {background-color: #f4bf75;}
+.log .bg-blue   {background-color: #6a9fb5;}
+.log .bg-purple {background-color: #aa759f;}
+.log .bg-cyan   {background-color: #75b5aa;}
+.log .bg-white  {background-color: #d0d0d0;}
+.log .underline {text-decoration: underline;}
+.log .bold      {font-weight: bold;}

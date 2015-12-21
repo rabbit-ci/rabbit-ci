@@ -26,7 +26,7 @@ module.exports = function(environment) {
       'font-src': "'self'",
       'connect-src': "'self' localhost:4000",
       'img-src': "'self'",
-      'style-src': "'self'",
+      'style-src': "'self' 'unsafe-inline'",
       'media-src': "'self'"
     };
     // ENV.APP.LOG_RESOLVER = true;
