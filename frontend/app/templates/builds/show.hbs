@@ -1,7 +1,7 @@
 {{#link-to "branches.show" model.branch.project.name model.branch.name}}&#171; All Builds{{/link-to}}
 
 <h1>{{model.branch.project.name}}/{{model.branch.name}} #{{model.buildNumber}}</h1>
-<p>Status: {{model.status}}</p>
+<p>Status: {{model.status}} <button {{action "reloadModel"}}>Refresh</button></p>
 
 {{#each model.steps as |step|}}
   <h3>{{step.name}} <span class="status-{{step.status}}">{{step.status}}</span></h3>
