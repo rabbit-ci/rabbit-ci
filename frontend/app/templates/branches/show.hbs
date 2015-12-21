@@ -2,6 +2,8 @@
 
 <h1>{{model.project.name}}/{{model.name}}</h1>
 
+{{#link-to "builds.show" model.project.name model.name "latest"}}Latest{{/link-to}}
+
 <table>
   <thead>
     <tr>

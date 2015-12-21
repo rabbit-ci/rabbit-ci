@@ -77,17 +77,35 @@ defmodule RabbitCICore.BuildController do
     |> render
   end
 
-  def index(conn, _params = %{"build_number" => build_number, "branch" => branch,
-                             "project" => project}) do
+  def index(conn, _params = %{"build_number" => "latest", "branch" => branch,
+                              "project" => project}) do
     build =
       (from b in Build,
        join: br in assoc(b, :branch),
        join: p in assoc(br, :project),
        where: br.name == ^branch
-       and p.name == ^project
-       and b.build_number == ^build_number,
+       and p.name == ^project,
+       order_by: [desc: b.build_number],
+       limit: 1,
        preload: [branch: {br, project: p}])
       |> Repo.one!
+
+    conn
+    |> assign(:build, build)
+    |> render
+  end
+
+  def index(conn, _params = %{"build_number" => build_number, "branch" => branch,
+                              "project" => project}) do
+    build =
+    (from b in Build,
+     join: br in assoc(b, :branch),
+     join: p in assoc(br, :project),
+     where: br.name == ^branch
+     and p.name == ^project
+     and b.build_number == ^build_number,
+     preload: [branch: {br, project: p}])
+    |> Repo.one!
 
     conn
     |> assign(:build, build)
