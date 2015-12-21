@@ -3,8 +3,9 @@ defmodule RabbitCICore.BranchController do
 
   import Ecto.Query
   alias RabbitCICore.Branch
+  alias RabbitCICore.Router.Helpers, as: RouterHelpers
 
-  def show(conn, %{"project" => project_name, "branch" => branch_name}) do
+  def index(conn, %{"project" => project_name, "branch" => branch_name}) do
     branch =
       from(b in branch_query(project_name), where: b.name == ^branch_name)
       |> Repo.one!

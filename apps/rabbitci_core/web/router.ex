@@ -18,7 +18,7 @@ defmodule RabbitCICore.Router do
 
     scope "/branches" do
       get "/", BranchController, :index
-      get "/:branch", BranchController, :show
+      get "/:branch", BranchController, :index
     end
 
     get "/logs", LogController, :show
