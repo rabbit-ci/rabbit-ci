@@ -29,7 +29,7 @@ defmodule RabbitCICore.Router do
       post "/start_build", BuildController, :start_build
 
       # This is a catch all. Make sure it comes last!
-      get "/:build_number", BuildController, :show
+      get "/:build_number", BuildController, :index
     end
 
     post "/github", GitHubController, :create

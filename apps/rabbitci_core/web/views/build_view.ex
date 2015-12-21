@@ -5,7 +5,7 @@ defmodule RabbitCICore.BuildView do
   def render("index.json", %{conn: conn, builds: builds}) do
     BuildSerializer.format(builds, conn, %{})
   end
-  def render("show.json", %{conn: conn, build: build}) do
+  def render("index.json", %{conn: conn, build: build}) do
     BuildSerializer.format(build, conn, %{})
   end
   def render("running_builds.json", %{conn: conn, builds: builds}) do

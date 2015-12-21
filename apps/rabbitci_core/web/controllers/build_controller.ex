@@ -41,7 +41,7 @@ defmodule RabbitCICore.BuildController do
       {:ok, build} ->
         conn
         |> assign(:build, build)
-        |> render("show.json")
+        |> render("index.json")
       {:error, reason} -> conn |> put_status(:bad_request) |> json(reason)
     end
   end
@@ -74,13 +74,10 @@ defmodule RabbitCICore.BuildController do
 
     conn
     |> assign(:builds, builds)
-    |> render("index.json")
-  end
-  def index(conn, params) do
-    index(conn, Map.merge(params, %{"page" => %{"offset" => "0"}}))
+    |> render
   end
 
-  def show(conn, _params = %{"build_number" => build_number, "branch" => branch,
+  def index(conn, _params = %{"build_number" => build_number, "branch" => branch,
                              "project" => project}) do
     build =
       (from b in Build,
@@ -94,6 +91,10 @@ defmodule RabbitCICore.BuildController do
 
     conn
     |> assign(:build, build)
-    |> render("show.json")
+    |> render
+  end
+
+  def index(conn, params) do
+    index(conn, Map.merge(params, %{"page" => %{"offset" => "0"}}))
   end
 end
