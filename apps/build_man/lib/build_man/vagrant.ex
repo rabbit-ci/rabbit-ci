@@ -13,6 +13,7 @@ defmodule BuildMan.Vagrant do
   alias BuildMan.FileHelpers
   alias BuildMan.LogStreamer
   alias RabbitCICore.Step
+  alias RabbitCICore.SSHKey
 
   # Client API
   def start_link(opts) do
@@ -63,9 +64,31 @@ defmodule BuildMan.Vagrant do
         %{build: build, config: config, path: path}) do
     Logger.info("Starting vagrant build. #{inspect build}")
     Step.update_status!(config.step_id, "running")
+    config =
+      SSHKey.private_key_from_build_id(config.build_id)
+      |> ssh_key_string(path)
+      |> Map.merge(config)
     File.write(Path.join(path, "Vagrantfile"), vagrantfile(config))
     {_, pid, _} = command(["up", "--provider", "virtualbox"], state)
     {:noreply, %{state | cmd: {:up, pid}}}
+  end
+
+  defp ssh_key_string(nil, path), do: %{ssh_key_string: ""}
+  defp ssh_key_string(secret_key, path) do
+    key_path = Path.join([path, "git-ssh-secret-key"])
+    File.write!(key_path, secret_key)
+    File.chmod!(key_path, 0o600)
+    ssh_config = """
+    Host *
+        StrictHostKeyChecking no
+    """
+    ssh_config_path = Path.join([path, "ssh-config-file"])
+    File.write!(ssh_config_path, ssh_config)
+    str = """
+      config.vm.provision "file", source: "ssh-config-file", destination: "~/.ssh/config"
+      config.vm.provision "file", source: "git-ssh-secret-key", destination: "~/.ssh/id_rsa"
+    """
+    %{ssh_key_string: str}
   end
 
   def handle_info(:run_build_script, state =

@@ -11,6 +11,7 @@ defmodule RabbitCICore.BranchController do
 
     conn
     |> assign(:branch, branch)
+    |> render
   end
 
   def index(conn, %{"project" => project_name}) do
