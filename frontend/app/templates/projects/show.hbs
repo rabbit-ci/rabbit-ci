@@ -1,0 +1,14 @@
+{{#link-to "projects.index"}}&#171; All Projects{{/link-to}}
+<h1>{{model.name}}</h1>
+<p>{{model.repo}}</p>
+
+<h3>Branches</h3>
+<ul>
+  {{#each model.branches as |branch|}}
+    <li>
+      {{#link-to "branches.show" model.name branch.name}}
+        {{branch.name}}
+      {{/link-to}}
+    </li>
+  {{/each}}
+</ul>

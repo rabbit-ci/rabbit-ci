@@ -8,6 +8,12 @@ const Router = Ember.Router.extend({
 Router.map(function() {
   this.route('projects', {path: '/'}, function() {
     this.route('index', {path: '/'});
+    this.route('show', {path: '/:project_name'});
+  });
+
+  this.route('branches', {path: '/'} , function() {
+    this.route('index', {path: '/:project_name/branches'});
+    this.route('show', {path: '/:project_name/b/:branch_name'});
   });
 });
 

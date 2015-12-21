@@ -10,7 +10,11 @@
   <tbody>
     {{#each model as |project|}}
       <tr>
-        <td>{{project.name}}</td>
+        <td>
+          {{#link-to "projects.show" project.name}}
+            {{project.name}}
+          {{/link-to}}
+        </td>
         <td>{{project.repo}}</td>
       </tr>
     {{/each}}
