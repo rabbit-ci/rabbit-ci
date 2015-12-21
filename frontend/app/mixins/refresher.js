@@ -11,7 +11,8 @@ export default Ember.Mixin.create({
   },
 
   doRefresh() {
-    this.refresh();
+    if(this.get('shouldRefresh') !== false)
+      this.refresh();
     Em.run.later(this, this.doRefresh, 1000);
   }
 });
