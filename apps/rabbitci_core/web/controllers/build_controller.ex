@@ -95,6 +95,9 @@ defmodule RabbitCICore.BuildController do
   end
 
   def index(conn, params) do
-    index(conn, Map.merge(params, %{"page" => %{"offset" => "0"}}))
+    case params["page"] do
+      nil -> index(conn, Map.merge(params, %{"page" => %{"offset" => "0"}}))
+      _ -> send_resp(conn, :not_found, "")
+    end
   end
 end
