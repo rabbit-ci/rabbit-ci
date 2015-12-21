@@ -28,6 +28,19 @@ defmodule RabbitCICore.Step do
 
   def log(_step, _clean \\ :clean)
   def log(step, :clean), do: clean_log log(step, :no_clean)
+  def log(step, :html) do
+    log_str = log(step, :no_clean)
+    aha = System.find_executable("aha")
+    {:ok, path} = BuildMan.FileHelpers.unique_folder("aha")
+    inpath = Path.join([path, "input-file.txt"])
+    {:ok, _, aha_pid} =
+      ExExec.run([aha | ["--no-header", "--stylesheet", "--black"]],
+                 [{:stdin, to_char_list inpath}, :stdout, :monitor])
+    File.write!(inpath, log_str)
+    html_str = agg_output("")
+    File.rm_rf!(path)
+    html_str
+  end
   def log(step, :no_clean) do
     from(l in assoc(step, :logs),
          order_by: [asc: l.order],
@@ -35,6 +48,15 @@ defmodule RabbitCICore.Step do
     |> Repo.all
     |> Enum.join
   end
+
+  defp agg_output(acc) do
+    html_str = receive do
+      {:stdout, _pid, body} -> agg_output(acc <> body)
+      {:DOWN, _, :process, _, :normal} -> acc
+    after 200 -> :timeout
+    end
+  end
+
 
   def clean_log(raw_log) do
     Regex.replace(~r/\x1b(\[[0-9;]*[mK])?/, raw_log, "")

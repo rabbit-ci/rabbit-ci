@@ -15,6 +15,7 @@ The backend depends on:
   rabbitci_test, rabbitci_dev)
 - RabbitMQ
 - Vagrant
+- [`aha`](https://github.com/theZiz/aha) (for ANSI -> HTML conversion)
 
 All other dependencies should be installed by running `mix cmd mix
 deps.get, compile` in the project root.
