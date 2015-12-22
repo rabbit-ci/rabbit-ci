@@ -7,5 +7,5 @@ defmodule RabbitCICore.StepSerializer do
   attributes [:name, :status, :log]
 
   def type, do: "steps"
-  def log(r, _), do: Step.log(r)
+  def log(r, _), do: Step.log(r, :no_clean)
 end

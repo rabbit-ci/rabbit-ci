@@ -8,7 +8,7 @@
 
 {{#each model.steps as |step|}}
   <h3>{{step.name}} <span class="status-{{step.status}}">{{step.status}}</span></h3>
-  <pre class="log">{{{step.log}}}</pre>
+  <pre class="log">{{{step.htmlLog}}}</pre>
 {{/each}}
 
 {{outlet}}
