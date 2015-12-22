@@ -70,7 +70,7 @@ defmodule RabbitCICore.BuildController do
        order_by: [desc: b.build_number],
        preload: [branch: {br, project: p}])
       |> Repo.all
-      |> Repo.preload(steps: :logs)
+      |> Repo.preload(:steps)
 
     conn
     |> assign(:builds, builds)
