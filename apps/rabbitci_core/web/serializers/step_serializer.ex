@@ -11,6 +11,7 @@ defmodule RabbitCICore.StepSerializer do
   attributes [:name, :status, :log]
 
   def type, do: "steps"
+  def log(r, %Plug.Conn{assigns: %{no_logs: true}}), do: nil
   def log(r, _) do
     Task.async fn ->
       Step.log(r, :no_clean)

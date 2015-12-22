@@ -55,6 +55,8 @@ defmodule RabbitCICore.BuildController do
     for {key, val} <- map, into: %{}, do: {String.to_atom(key), val}
   end
 
+  # This route will *NOT* provide log output. You must fetch a *SINGLE* build if
+  # you want the logs.
   def index(conn, _params = %{"branch" => branch,
                               "project" => project,
                               "page" => %{"offset" => page}}) do
@@ -74,6 +76,7 @@ defmodule RabbitCICore.BuildController do
 
     conn
     |> assign(:builds, builds)
+    |> assign(:no_logs, true)
     |> render
   end
 
