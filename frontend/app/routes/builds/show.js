@@ -11,7 +11,7 @@ export default Ember.Route.extend(RefresherMixin, {
 
   setupController(controller, model) {
     this._super(controller, model);
-    controller.set("shouldRefresh", true);
+    controller.set("shouldRefresh", false);
   },
 
   actions: {

@@ -1,6 +1,8 @@
 defmodule RabbitCICore.Endpoint do
   use Phoenix.Endpoint, otp_app: :rabbitci_core
 
+  socket "/socket", RabbitCICore.UserSocket
+
   plug Plug.Logger
 
   if code_reloading? do

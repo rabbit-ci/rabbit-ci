@@ -1,7 +1,17 @@
 defmodule RabbitCICore.Log do
   use RabbitCICore.Web, :model
-
   alias RabbitCICore.Step
+  alias RabbitCICore.Repo
+  alias RabbitCICore.StepUpdaterChannel
+
+  after_insert :notify_chan
+
+  def notify_chan(changeset) do
+    id = changeset.model.step_id
+    payload = %{log_append: changeset.model.stdio, step_id: id}
+    StepUpdaterChannel.publish_log(id, payload)
+    changeset
+  end
 
   schema "logs" do
     field :stdio, :string

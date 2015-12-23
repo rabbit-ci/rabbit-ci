@@ -5,6 +5,7 @@ module.exports = function(environment) {
     modulePrefix: 'rabbit-ci',
     environment: environment,
     baseURL: '/',
+    SocketURI: 'ws://localhost:4000/socket',
     locationType: 'auto',
     EmberENV: {
       FEATURES: {
@@ -24,7 +25,7 @@ module.exports = function(environment) {
       'default-src': "'none'",
       'script-src': "'self'",
       'font-src': "'self' https://fonts.gstatic.com",
-      'connect-src': "'self' localhost:4000",
+      'connect-src': "'self' localhost:4000 ws://localhost:4000",
       'img-src': "'self'",
       'style-src': "'self' 'unsafe-inline' https://fonts.googleapis.com",
       'media-src': "'self'"

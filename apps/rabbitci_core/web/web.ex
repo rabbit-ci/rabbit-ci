@@ -41,6 +41,15 @@ defmodule RabbitCICore.Web do
     end
   end
 
+  def channel do
+    quote do
+      use Phoenix.Channel
+      alias RabbitCICore.Repo
+      import Ecto
+      import Ecto.Query, only: [from: 1, from: 2]
+    end
+  end
+
   @doc """
   When used, dispatch to the appropriate controller/view/etc.
   """
