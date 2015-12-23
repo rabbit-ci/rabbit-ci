@@ -1,9 +1,11 @@
 defmodule RabbitCICore.StepUpdaterChannel do
   use RabbitCICore.Web, :channel
   alias RabbitCICore.Endpoint
+  alias RabbitCICore.Step
 
   def join("steps:" <> step_id, payload, socket) do
     if authorized?(payload) do
+      connect_log(step_id)
       {:ok, socket}
     else
       {:error, %{reason: "unauthorized"}}
@@ -34,6 +36,16 @@ defmodule RabbitCICore.StepUpdaterChannel do
   # Add authorization logic here as required.
   defp authorized?(_payload) do
     true
+  end
+
+  defp connect_log(step_id) do
+    Task.start fn ->
+      log =
+        Repo.get!(Step, step_id)
+        |> Step.log(:no_clean)
+      Endpoint.broadcast("steps:#{step_id}", "set_log:step",
+                         %{step_id: step_id, log: log})
+    end
   end
 
   def publish_log(step_id, log_append) do

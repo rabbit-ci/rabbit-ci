@@ -20,6 +20,10 @@ export default DS.Model.extend({
     chan.onError(e => console.log("something went wrong", e));
     chan.onClose(e => console.log("channel closed", e));
 
+    chan.on("set_log:step", payload => {
+      this.set('log', payload["log"]);
+    });
+
     chan.on("append_log:step", payload => {
       this.set('log', this.get('log') + payload["log_append"]);
     });
