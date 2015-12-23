@@ -1,9 +1,6 @@
 import Ember from 'ember';
-import RefresherMixin from "rabbit-ci/mixins/refresher";
 
-export default Ember.Route.extend(RefresherMixin, {
-  refreshInterval: 5000,
-
+export default Ember.Route.extend({
   model(params) {
     return this.store.queryRecord("branch", {
       branch: params.branch_name,

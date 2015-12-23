@@ -4,7 +4,6 @@
   <span class="status-{{model.status}}">{{model.status}}</span>
 </h1>
 <button {{action "reloadModel"}}>Refresh</button>
-<button {{action "toggleRefresh"}}>Toggle Refresh ({{shouldRefresh}})</button>
 
 {{#each model.steps as |step|}}
   <h3>{{step.name}} <span class="status-{{step.status}}">{{step.status}}</span></h3>

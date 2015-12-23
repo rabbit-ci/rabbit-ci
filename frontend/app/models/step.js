@@ -11,11 +11,12 @@ export default DS.Model.extend({
     return ansi_up.ansi_to_html(this.get('log'), {use_classes: true});
   }).property('log'),
 
-  phoenixLoad: Ember.on('didLoad', function() {
+  connectToChan() {
     let socket = this.get('phoenix');
     let chan = socket.channel("steps:" + this.get('id'), {});
 
-    chan.join().receive("ignore", () => console.log("auth error"));
+    chan.join().receive("ignore", () => console.log("auth error"))
+      .receive("ok", () => console.log("connected"));
 
     chan.onError(e => console.log("something went wrong", e));
     chan.onClose(e => console.log("channel closed", e));
@@ -29,5 +30,11 @@ export default DS.Model.extend({
     });
 
     this.set('channel', chan);
-  })
+  },
+
+  disconnectFromChan() {
+    let chan = this.get('channel');
+    if (chan) chan.leave();
+    this.set('channel', null);
+  }
 });
