@@ -2,6 +2,7 @@ defmodule RabbitCICore.UserSocket do
   use Phoenix.Socket
 
   channel "steps:*", RabbitCICore.StepUpdaterChannel
+  channel "builds:*", RabbitCICore.BuildUpdaterChannel
 
   ## Transports
   transport :websocket, Phoenix.Transports.WebSocket

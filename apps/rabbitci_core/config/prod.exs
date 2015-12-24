@@ -7,8 +7,8 @@ use Mix.Config
 # You should also configure the url host to something
 # meaningful, we use this information when generating URLs.
 config :rabbitci_core, RabbitCICore.Endpoint,
-  http: [port: {:system, "PORT"}],
-  url: [host: "example.com"]
+  http: [port: {:system, "PORT"}]
+  # url: [host: "example.com"]
 
 # ## SSL Support
 #

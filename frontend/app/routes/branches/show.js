@@ -10,7 +10,34 @@ export default Ember.Route.extend({
 
   afterModel(branch) {
     if (branch.get('builds').isFulfilled === true) {
-      branch.get('builds').reload();
+      branch.get('builds').reload()
+        .then(builds => this._connectBuildsToChan(builds));
+    } else {
+      branch.get('builds')
+        .then(builds => this._connectBuildsToChan(builds));
+    }
+  },
+
+  _connectBuildsToChan(builds) {
+    builds.forEach((build) => {
+      build.connectToChan();
+    });
+  },
+
+  _disconnectBuildsFromChan(builds) {
+    builds.forEach((build) => {
+      build.disconnectFromChan();
+    });
+  },
+
+  actions: {
+    willTransition() {
+      if (this.get('currentModel.builds')) {
+        this.get('currentModel.builds')
+          .then((builds) => this._disconnectBuildsFromChan(builds));
+      }
+
+      return true;
     }
   }
 });

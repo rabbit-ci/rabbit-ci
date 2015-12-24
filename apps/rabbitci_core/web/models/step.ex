@@ -5,6 +5,16 @@ defmodule RabbitCICore.Step do
   alias RabbitCICore.Log
   alias RabbitCICore.Repo
   alias RabbitCICore.Step
+  alias RabbitCICore.BuildUpdaterChannel
+
+  after_insert :notify_chan
+  after_update :notify_chan
+
+  def notify_chan(changeset) do
+    id = changeset.model.build_id
+    BuildUpdaterChannel.update_build(id)
+    changeset
+  end
 
   schema "steps" do
     field :status, :string

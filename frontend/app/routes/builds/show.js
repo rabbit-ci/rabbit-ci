@@ -8,9 +8,11 @@ export default Ember.Route.extend({
   },
 
   afterModel(build) {
-    build.get('steps').map((step, _index, _enum) => {
+    build.get('steps').forEach((step) => {
       step.connectToChan();
     });
+
+    build.connectToChan();
   },
 
   actions: {
@@ -19,11 +21,12 @@ export default Ember.Route.extend({
     },
 
     willTransition() {
-      this.currentModel.get('steps').map((step, _index, _enum) => {
+      this.currentModel.get('steps').forEach((step) => {
         step.disconnectFromChan();
       });
 
-      this._super();
+      this.currentModel.disconnectFromChan();
+      return true;
     }
   }
 });
