@@ -11,6 +11,8 @@ export default DS.Model.extend({
   }).property('log'),
 
   connectToChan() {
+    if (this.get('channel')) return;
+
     let socket = this.get('phoenix');
     let chan = socket.channel("steps:" + this.get('id'), {});
 

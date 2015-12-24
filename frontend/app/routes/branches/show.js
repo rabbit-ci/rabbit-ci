@@ -9,13 +9,16 @@ export default Ember.Route.extend({
   },
 
   afterModel(branch) {
+    Ember.addObserver(branch, 'builds', this, 'buildsChanged');
+    branch.connectToChan();
+
     if (branch.get('builds').isFulfilled === true) {
-      branch.get('builds').reload()
-        .then(builds => this._connectBuildsToChan(builds));
-    } else {
-      branch.get('builds')
-        .then(builds => this._connectBuildsToChan(builds));
+      branch.get('builds').reload();
     }
+  },
+
+  buildsChanged() {
+    this._connectBuildsToChan(this.get('currentModel.builds'));
   },
 
   _connectBuildsToChan(builds) {
@@ -32,11 +35,13 @@ export default Ember.Route.extend({
 
   actions: {
     willTransition() {
+      Ember.removeObserver(this, 'currentModel.builds', this, 'buildsChanged');
       if (this.get('currentModel.builds')) {
         this.get('currentModel.builds')
           .then((builds) => this._disconnectBuildsFromChan(builds));
       }
 
+      this.currentModel.disconnectFromChan();
       return true;
     }
   }

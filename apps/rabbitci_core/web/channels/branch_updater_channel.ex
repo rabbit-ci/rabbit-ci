@@ -1,9 +1,9 @@
-defmodule RabbitCICore.BuildUpdaterChannel do
+defmodule RabbitCICore.BranchUpdaterChannel do
   use RabbitCICore.Web, :channel
-  alias RabbitCICore.Endpoint
   alias RabbitCICore.Build
+  alias RabbitCICore.Endpoint
 
-  def join("builds:" <> build_id, payload, socket) do
+  def join("branches:" <> branch_id, payload, socket) do
     if authorized?(payload) do
       {:ok, socket}
     else
@@ -16,10 +16,10 @@ defmodule RabbitCICore.BuildUpdaterChannel do
     true
   end
 
-  def update_build(build_id) do
+  def new_build(branch_id, build_id) do
     Task.start fn ->
       payload = Build.json_from_id!(build_id)
-      Endpoint.broadcast("builds:#{build_id}", "update:build", payload)
+      Endpoint.broadcast("branches:#{branch_id}", "new:build", payload)
     end
   end
 end

@@ -5,9 +5,12 @@ defmodule RabbitCICore.Build do
   alias RabbitCICore.Step
   alias RabbitCICore.Build
   alias RabbitCICore.BuildUpdaterChannel
+  alias RabbitCICore.BranchUpdaterChannel
+  alias RabbitCICore.BuildSerializer
+  alias RabbitCICore.Endpoint
 
   before_insert :set_build_number
-  after_insert :notify_chan
+  after_insert :notify_branch_chan
   after_update :notify_chan
 
   def set_build_number(changeset) do
@@ -26,6 +29,11 @@ defmodule RabbitCICore.Build do
   def notify_chan(changeset) do
     id = changeset.model.id
     BuildUpdaterChannel.update_build(id)
+    changeset
+  end
+
+  def notify_branch_chan(changeset) do
+    BranchUpdaterChannel.new_build(changeset.model.branch_id, changeset.model.id)
     changeset
   end
 
@@ -71,5 +79,17 @@ defmodule RabbitCICore.Build do
     Repo.preload(build, :steps).steps
     |> Enum.map(&(&1.status))
     |> status
+  end
+
+  def json_from_id!(build_id) do
+    import Ecto.Query, only: [from: 1, from: 2]
+
+    (from b in Build,
+     join: br in assoc(b, :branch),
+     join: p in assoc(br, :project),
+     where: b.id == ^build_id,
+     preload: [branch: {br, project: p}])
+    |> Repo.one!
+    |> BuildSerializer.format(Endpoint, %{})
   end
 end

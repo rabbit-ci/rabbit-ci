@@ -15,7 +15,7 @@
     </tr>
   </thead>
   <tbody>
-    {{#each model.builds as |build|}}
+    {{#each model.sortedBuilds as |build|}}
       <tr>
         <td>{{#link-to "builds.show" model.project.name model.name build.buildNumber}}{{build.buildNumber}}{{/link-to}}</td>
         <td>{{build.commit}}</td>
