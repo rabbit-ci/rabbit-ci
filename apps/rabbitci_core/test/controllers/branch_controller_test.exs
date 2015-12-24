@@ -5,7 +5,6 @@ defmodule RabbitCICore.BranchControllerTest do
   alias RabbitCICore.Repo
   alias RabbitCICore.Project
   alias RabbitCICore.Branch
-  alias RabbitCICore.Build
   alias Ecto.Model
 
   test "Get all branches for project" do
@@ -51,7 +50,7 @@ defmodule RabbitCICore.BranchControllerTest do
                                     repo: "git@example.com:user/project"}
     assert_raise Plug.Conn.WrapperError,
     ~r/expected at least one result but got none in query/, fn ->
-      response = get("/branches/fakebranch", [project: project.name])
+      get("/branches/fakebranch", [project: project.name])
     end
   end
 end
