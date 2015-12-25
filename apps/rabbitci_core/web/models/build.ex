@@ -4,14 +4,10 @@ defmodule RabbitCICore.Build do
   alias RabbitCICore.Branch
   alias RabbitCICore.Step
   alias RabbitCICore.Build
-  alias RabbitCICore.BuildUpdaterChannel
-  alias RabbitCICore.BranchUpdaterChannel
   alias RabbitCICore.BuildSerializer
   alias RabbitCICore.Endpoint
 
   before_insert :set_build_number
-  after_insert :notify_branch_chan
-  after_update :notify_chan
 
   def set_build_number(changeset) do
     branch_id = Ecto.Changeset.get_field(changeset, :branch_id)
@@ -24,17 +20,6 @@ defmodule RabbitCICore.Build do
 
     build_number = (Repo.one(query) || 0) + 1
     Ecto.Changeset.change(changeset, %{build_number: build_number})
-  end
-
-  def notify_chan(changeset) do
-    id = changeset.model.id
-    BuildUpdaterChannel.update_build(id)
-    changeset
-  end
-
-  def notify_branch_chan(changeset) do
-    BranchUpdaterChannel.new_build(changeset.model.branch_id, changeset.model.id)
-    changeset
   end
 
   schema "builds" do
