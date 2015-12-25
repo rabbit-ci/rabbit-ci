@@ -10,12 +10,9 @@ defmodule RabbitCICore.ProjectController do
   end
 
   def show(conn, %{"name" => name}) do
-    case Repo.get_by(Project, name: name) do
-      nil -> send_resp(conn, 404, "Project not found.")
-      project ->
-        conn
-        |> assign(:project, project)
-        |> render
-    end
+    project = Repo.get_by!(Project, name: name)
+    conn
+    |> assign(:project, project)
+    |> render
   end
 end
