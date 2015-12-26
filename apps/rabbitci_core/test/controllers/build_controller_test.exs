@@ -1,10 +1,8 @@
 defmodule RabbitCICore.BuildControllerTest do
-  use RabbitCICore.Integration.Case
-  use RabbitCICore.TestHelper
+  use RabbitCICore.ConnCase
 
   alias RabbitCICore.Project
   alias RabbitCICore.Branch
-  alias RabbitCICore.Repo
   alias RabbitCICore.Build
   alias Ecto.Model
 
@@ -24,29 +22,38 @@ defmodule RabbitCICore.BuildControllerTest do
     {project, branch, builds}
   end
 
-  test "page offset should default to 0" do
+  test "page offset should default to 0", %{conn: conn} do
     {project, branch, _} = generate_records(builds: 40)
-    response = get("/builds", [project: project.name, branch: branch.name])
-    body = Poison.decode!(response.resp_body)
+    conn = get conn, build_path(conn, :index, [project: project.name,
+                                               branch: branch.name])
+    body = json_response(conn, 200)
     assert hd(body["data"])["attributes"]["build-number"] == 40
     assert List.last(body["data"])["attributes"]["build-number"] == 11
   end
 
-  test "page offset should work" do
+  test "page offset should work", %{conn: conn} do
     {project, branch, _} = generate_records(builds: 40)
-    response =
-      get("/builds", [project: project.name, branch: branch.name,
-                      page: %{offset: "1"}])
-    body = Poison.decode!(response.resp_body)
+    conn = get conn, build_path(conn, :index, [project: project.name,
+                                               branch: branch.name,
+                                               page: %{offset: "1"}])
+    body = json_response(conn, 200)
     assert hd(body["data"])["attributes"]["build-number"] == 10
     assert List.last(body["data"])["attributes"]["build-number"] == 1
   end
 
-  test "show a single build" do
+  test "show a single build", %{conn: conn} do
     {project, branch, [build]} = generate_records(builds: 1)
-    url = "/builds/#{build.build_number}"
-    response = get(url, [project: project.name, branch: branch.name])
-    body = Poison.decode!(response.resp_body)
+    conn = get conn, build_path(conn, :index,
+                                [project: project.name,
+                                 branch: branch.name,
+                                 build_number: build.build_number])
+    body = json_response(conn, 200)
+
+    conn_alt = get conn, build_path(conn, :index, build.build_number,
+                                    [project: project.name,
+                                     branch: branch.name])
+    body_alt = json_response(conn_alt, 200)
+    assert body == body_alt
     assert is_map(body)
   end
 end

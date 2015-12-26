@@ -1,7 +1,6 @@
 defmodule RabbitCICore.ProjectControllerTest do
   use RabbitCICore.ConnCase
 
-  alias RabbitCICore.Repo
   alias RabbitCICore.Project
 
   test "index page with no projects", %{conn: conn} do
@@ -23,7 +22,7 @@ defmodule RabbitCICore.ProjectControllerTest do
 
   test "show page for non existing project", %{conn: conn} do
     assert_raise Ecto.NoResultsError, fn ->
-      conn = get conn, project_path(conn, :show, "fake")
+      get conn, project_path(conn, :show, "fake")
     end
   end
 

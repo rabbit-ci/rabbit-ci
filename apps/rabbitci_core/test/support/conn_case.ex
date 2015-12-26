@@ -24,6 +24,15 @@ defmodule RabbitCICore.ConnCase do
 
       # The default endpoint for testing
       @endpoint RabbitCICore.Endpoint
+
+      # Sorts left and right before asserting, not that args are sorted.
+      defmacro assert_sort({op, meta, [left, right]}) do
+        quote do
+          left = Enum.sort(unquote(left))
+          right = Enum.sort(unquote(right))
+          assert unquote(op)(left, right)
+        end
+      end
     end
   end
 

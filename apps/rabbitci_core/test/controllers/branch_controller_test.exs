@@ -1,7 +1,6 @@
 defmodule RabbitCICore.BranchControllerTest do
   use RabbitCICore.ConnCase
 
-  alias RabbitCICore.Repo
   alias RabbitCICore.Project
   alias RabbitCICore.Branch
   alias Ecto.Model
@@ -17,8 +16,8 @@ defmodule RabbitCICore.BranchControllerTest do
     body = json_response(conn, 200)
     assert length(body["data"]) == 5
 
-    attrs = Map.keys(hd(body["data"])["attributes"]) |> Enum.sort
-    assert attrs == Enum.sort ["name", "inserted-at", "updated-at"]
+    assert_sort Map.keys(hd(body["data"])["attributes"]) ==
+      ["name", "inserted-at", "updated-at"]
   end
 
   test "get a single branch", %{conn: conn} do
@@ -30,10 +29,12 @@ defmodule RabbitCICore.BranchControllerTest do
       |> Branch.changeset(%{name: "branch1"})
       |> Repo.insert!
 
-    conn = get conn, branch_path(conn, :index, [branch: branch.name, project: project.name])
+    conn = get conn, branch_path(conn, :index, [branch: branch.name,
+                                                project: project.name])
     body = json_response(conn, 200)
 
-    conn_alt = get conn, branch_path(conn, :index, branch.name, [project: project.name])
+    conn_alt = get conn, branch_path(conn, :index, branch.name,
+                                     [project: project.name])
     body_alt = json_response(conn_alt, 200)
 
     assert body == body_alt
@@ -44,11 +45,11 @@ defmodule RabbitCICore.BranchControllerTest do
       build_path(conn, :index, [branch: branch.name, project: project.name])
     assert length(body["included"]) == 1
 
-    types = Enum.flat_map(body["included"], &([&1["type"]])) |> Enum.sort
-    ids = Enum.flat_map(body["included"], &([&1["id"]])) |> Enum.sort
+    types = Enum.flat_map(body["included"], &([&1["type"]]))
+    ids = Enum.flat_map(body["included"], &([&1["id"]]))
 
-    assert types == Enum.sort ["projects"]
-    assert ids == [to_string project.id]
+    assert_sort types == ["projects"]
+    assert_sort ids == [to_string project.id]
   end
 
 
