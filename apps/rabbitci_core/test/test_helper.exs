@@ -1,9 +1,9 @@
 ExUnit.start
 IO.puts "Creating DB and running migrations"
-Mix.Task.run "ecto.create"
-Mix.Task.run "ecto.migrate"
-Ecto.Adapters.SQL.rollback_test_transaction(RabbitCICore.Repo)
-Ecto.Adapters.SQL.begin_test_transaction(RabbitCICore.Repo)
+Mix.Task.run "ecto.create", ["-r", "RabbitCICore.EctoRepo"]
+Mix.Task.run "ecto.migrate", ["-r", "RabbitCICore.EctoRepo"]
+Ecto.Adapters.SQL.rollback_test_transaction(RabbitCICore.EctoRepo)
+Ecto.Adapters.SQL.begin_test_transaction(RabbitCICore.EctoRepo)
 
 defmodule RabbitCICore.TestHelper do
   import Plug.Test
@@ -32,7 +32,7 @@ defmodule RabbitCICore.Integration.Case do
 
   setup tags do
     unless tags[:async] do
-      Ecto.Adapters.SQL.restart_test_transaction(RabbitCICore.Repo, [])
+      Ecto.Adapters.SQL.restart_test_transaction(RabbitCICore.EctoRepo, [])
     end
     :ok
   end

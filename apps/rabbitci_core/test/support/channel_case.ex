@@ -28,7 +28,7 @@ defmodule RabbitCICore.ChannelCase do
 
   setup tags do
     unless tags[:async] do
-      Ecto.Adapters.SQL.restart_test_transaction(RabbitCICore.Repo, [])
+      Ecto.Adapters.SQL.restart_test_transaction(RabbitCICore.EctoRepo, [])
     end
     :ok
   end

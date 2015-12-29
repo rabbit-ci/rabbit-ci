@@ -10,7 +10,7 @@ config :rabbitci_core, RabbitCICore.Endpoint,
 config :logger, level: :warn
 
 # Configure your database
-config :rabbitci_core, RabbitCICore.Repo,
+config :rabbitci_core, RabbitCICore.EctoRepo,
   adapter: Ecto.Adapters.Postgres,
   username: "postgres",
   password: "postgres",
