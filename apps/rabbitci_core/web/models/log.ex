@@ -22,5 +22,6 @@ defmodule RabbitCICore.Log do
   def changeset(model, params \\ :empty) do
     cast(model, params, ~w(stdio step_id type order), ~w())
     |> validate_inclusion(:type, ["stdout", "stderr"])
+    |> foreign_key_constraint(:step_id)
   end
 end
