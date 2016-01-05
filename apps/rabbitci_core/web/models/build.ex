@@ -42,9 +42,10 @@ defmodule RabbitCICore.Build do
   with no validation performed.
   """
   def changeset(model, params \\ :empty) do
-    cast(model, params, ~w(branch_id commit),
-         ~w(start_time build_number finish_time config_extracted))
+    cast(model, params, ~w(branch_id commit config_extracted),
+         ~w(start_time build_number finish_time))
     |> validate_inclusion(:config_extracted, ["false", "true", "error"])
+    |> foreign_key_constraint(:branch_id)
   end
 
   def status([]), do: "queued"

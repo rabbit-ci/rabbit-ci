@@ -1,15 +1,46 @@
 defmodule RabbitCICore.BuildTest do
-  use RabbitCICore.Integration.Case
-  use RabbitCICore.TestHelper
+  use RabbitCICore.ModelCase
 
-  alias RabbitCICore.Repo
-  alias RabbitCICore.Project
-  alias RabbitCICore.Branch
-  alias RabbitCICore.Build
-  alias RabbitCICore.Step
+  alias RabbitCICore.{Project, Branch, Build, Step}
   alias Ecto.Model
 
-  # FIXME: Rewrite this test
+  # Only valid _before_ calling Repo.insert.
+  @valid_attrs %{commit: "abc", branch_id: -1}
+  @invalid_attrs %{}
+
+  test "changeset with valid attributes" do
+    changeset = Build.changeset(%Build{}, @valid_attrs)
+    assert changeset.model.config_extracted == "false"
+    assert changeset.valid?
+  end
+
+  test "changeset with invalid attributes" do
+    changeset = Build.changeset(%Build{}, @invalid_attrs)
+    refute changeset.valid?
+    assert {:branch_id, "can't be blank"} in changeset.errors
+    assert {:commit, "can't be blank"} in changeset.errors
+    assert changeset.model.config_extracted == "false"
+  end
+
+  test "changeset without branch is invalid" do
+    changeset = Build.changeset(%Build{}, @valid_attrs)
+    assert {:error, changeset} = Repo.insert changeset
+    refute changeset.valid?
+    assert {:branch_id, "does not exist"} in changeset.errors
+  end
+
+  test "changset with branch is valid" do
+    assert {:ok, _model} =
+      Project.changeset(%Project{}, %{name: "project1", repo: "repo123"})
+      |> Repo.insert!
+      |> Model.build(:branches)
+      |> Branch.changeset(%{name: "branch1"})
+      |> Repo.insert!
+      |> Model.build(:builds)
+      |> Build.changeset(%{commit: "xyz"})
+      |> Repo.insert
+  end
+
   test "build_number must be unique in the scope of branch" do
     p1 =
       Project.changeset(%Project{}, %{name: "project1", repo: "repo123"})
@@ -55,27 +86,16 @@ defmodule RabbitCICore.BuildTest do
     assert Build.status([]) == "queued"
   end
 
-  defp create_models do
-    project =
+  test "status/1 for build" do
+    build =
       Project.changeset(%Project{}, %{name: "project1", repo: "repo123"})
       |> Repo.insert!
-
-    branch =
-      Model.build(project, :branches)
+      |> Model.build(:branches)
       |> Branch.changeset(%{name: "branch1"})
       |> Repo.insert!
-
-    build =
-      Model.build(branch, :builds)
+      |> Model.build(:builds)
       |> Build.changeset(%{commit: "xyz"})
       |> Repo.insert!
-
-    {project, branch, build}
-  end
-
-
-  test "status/1 for build" do
-    {_, _, build} = create_models
 
     for {status, index} <- Enum.with_index ["queued", "running", "failed"] do
       Model.build(build, :steps)
@@ -87,7 +107,16 @@ defmodule RabbitCICore.BuildTest do
   end
 
   test "status/1 for build with no steps" do
-    {_, _, build} = create_models
+    build =
+      Project.changeset(%Project{}, %{name: "project1", repo: "repo123"})
+      |> Repo.insert!
+      |> Model.build(:branches)
+      |> Branch.changeset(%{name: "branch1"})
+      |> Repo.insert!
+      |> Model.build(:builds)
+      |> Build.changeset(%{commit: "xyz"})
+      |> Repo.insert!
+
     assert Build.status(build) == "queued"
   end
 end
