@@ -35,6 +35,6 @@ defmodule RabbitCICore.SSHKeyTest do
 
     attrs = put_in(@valid_attrs.project_id, project.id)
     changeset = SSHKey.changeset(%SSHKey{}, attrs)
-    assert {:ok, model} = Repo.insert changeset
+    assert {:ok, _model} = Repo.insert changeset
   end
 end
