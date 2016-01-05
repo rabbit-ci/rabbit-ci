@@ -37,7 +37,6 @@ defmodule RabbitCICore.Web do
     quote do
       use Ecto.Model
       use Ecto.Model.Callbacks
-      import RabbitCICore.ModelHelpers
     end
   end
 
