@@ -24,6 +24,7 @@ defmodule RabbitCICore.Step do
   def changeset(model, params \\ :empty) do
     cast(model, params, ~w(build_id name status), ~w())
     |> validate_inclusion(:status, ["queued", "running", "failed", "finished"])
+    |> foreign_key_constraint(:build_id)
   end
 
   def log(_step, _clean \\ :clean)

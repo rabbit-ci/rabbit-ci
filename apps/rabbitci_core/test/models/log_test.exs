@@ -41,7 +41,7 @@ defmodule RabbitCICore.LogTest do
     assert {:step_id, "does not exist"} in changeset.errors
   end
 
-  test "changeset with project is valid" do
+  test "changeset with step is valid" do
     step =
       %Project{name: "Project", repo: "git@example.com:my/repo.git"}
       |> Repo.insert!
