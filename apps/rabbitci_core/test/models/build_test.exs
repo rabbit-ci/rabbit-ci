@@ -14,6 +14,24 @@ defmodule RabbitCICore.BuildTest do
     assert changeset.valid?
   end
 
+  test "changeset with valid config_extracted" do
+    for config_extracted <- ["true", "false", "error"] do
+      attrs = %{commit: "abc", branch_id: -1, config_extracted: config_extracted}
+      changeset = Build.changeset(%Build{}, attrs)
+      assert Ecto.Changeset.get_field(changeset, :config_extracted) == config_extracted
+      assert changeset.valid?
+    end
+  end
+
+  test "changeset with invalid config_extracted" do
+    for config_extracted <- ["bacon", "turtles", "sandwich"] do
+      attrs = %{commit: "abc", branch_id: -1, config_extracted: config_extracted}
+      changeset = Build.changeset(%Build{}, attrs)
+      refute changeset.valid?
+      assert {:config_extracted, "is invalid"} in changeset.errors
+    end
+  end
+
   test "changeset with invalid attributes" do
     changeset = Build.changeset(%Build{}, @invalid_attrs)
     refute changeset.valid?
