@@ -1,7 +1,8 @@
 defmodule RabbitCICore.StepTest do
   use RabbitCICore.ModelCase
+  import RabbitCICore.Factory
 
-  alias RabbitCICore.{Project, Branch, Build, Step}
+  alias RabbitCICore.{Project, Branch, Build, Step, Log}
 
   @valid_attrs %{name: "step1", status: "queued", build_id: -1}
   @invalid_attrs %{}
@@ -58,5 +59,32 @@ defmodule RabbitCICore.StepTest do
     attrs = put_in(@valid_attrs.build_id, build.id)
     changeset = Step.changeset(%Step{}, attrs)
     assert {:ok, model} = Repo.insert changeset
+  end
+
+  test "Step.log/2 :no_clean" do
+    step = create(:step)
+
+    for str <- ~w(foo bar baz) do
+      stdio = IO.ANSI.format([:bright, :red, str]) |> to_string
+      # Make sure that the string we start with contains ANSI escape codes.
+      assert String.contains?(stdio, "\e[31m")
+      create(:log, %{stdio: stdio, step: step})
+    end
+
+    assert Step.log(step, :no_clean) ==
+      "\e[1m\e[31mfoo\e[0m\e[1m\e[31mbar\e[0m\e[1m\e[31mbaz\e[0m"
+  end
+
+  test "Step.log/2 :clean" do
+    step = create(:step)
+
+    for str <- ~w(foo bar baz) do
+      stdio = IO.ANSI.format([:bright, :red, str]) |> to_string
+      # Make sure that the string we start with contains ANSI escape codes.
+      assert String.contains?(stdio, "\e[31m")
+      create(:log, %{stdio: stdio, step: step})
+    end
+
+    assert Step.log(step, :clean) == "foobarbaz"
   end
 end

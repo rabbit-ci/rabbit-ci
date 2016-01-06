@@ -31,11 +31,12 @@ defmodule RabbitCICore.Mixfile do
   # Type `mix help deps` for examples and options
   defp deps do
     [{:phoenix, "~> 1.0.0"},
-     {:phoenix_ecto, "~> 1.2.0"},
+     {:phoenix_ecto, "~> 2.0.0"},
      {:postgrex, ">= 0.0.0"},
      {:cowboy, "~> 1.0"},
      {:rabbitmq, in_umbrella: true},
-     {:ecto, "~> 1.0.0"},
+     {:ecto, "~> 1.1.1"},
+     {:ex_machina, "~> 0.6.0", only: :test, github: "thoughtbot/ex_machina"},
      {:ja_serializer, github: "AgilionApps/ja_serializers"}]
   end
 
