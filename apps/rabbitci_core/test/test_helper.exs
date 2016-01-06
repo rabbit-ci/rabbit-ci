@@ -26,14 +26,3 @@ defmodule RabbitCICore.TestHelper do
     |> RabbitCICore.Router.call(RabbitCICore.Router.init([]))
   end
 end
-
-defmodule RabbitCICore.Integration.Case do
-  use ExUnit.CaseTemplate
-
-  setup tags do
-    unless tags[:async] do
-      Ecto.Adapters.SQL.restart_test_transaction(RabbitCICore.EctoRepo, [])
-    end
-    :ok
-  end
-end

@@ -1,6 +1,5 @@
 defmodule BuildMan.ConfigExtractionSupTest do
-  use ExUnit.Case, async: false # Mocks are sync
-  use BuildMan.Integration.Case
+  use RabbitCICore.ModelCase
   import Mock
   alias RabbitCICore.Project
   alias RabbitCICore.Branch
