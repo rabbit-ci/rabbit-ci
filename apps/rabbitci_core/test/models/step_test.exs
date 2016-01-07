@@ -46,16 +46,7 @@ defmodule RabbitCICore.StepTest do
   end
 
   test "changeset with step is valid" do
-    build =
-      %Project{name: "Project", repo: "git@example.com:my/repo.git"}
-      |> Repo.insert!
-      |> Ecto.Model.build(:branches)
-      |> Branch.changeset(%{name: "branch1"})
-      |> Repo.insert!
-      |> Ecto.Model.build(:builds)
-      |> Build.changeset(%{commit: "abc"})
-      |> Repo.insert!
-
+    build = create(:build)
     attrs = put_in(@valid_attrs.build_id, build.id)
     changeset = Step.changeset(%Step{}, attrs)
     assert {:ok, model} = Repo.insert changeset
