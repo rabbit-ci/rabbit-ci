@@ -52,6 +52,14 @@ defmodule RabbitCICore.StepTest do
     assert {:ok, model} = Repo.insert changeset
   end
 
+  test "Step.update_status!/2 should update the status of a step" do
+    for status <- ["queued", "running", "failed", "finished"] do
+      step = create(:step)
+      updated_step = Step.update_status!(step.id, status)
+      assert updated_step.status == status
+    end
+  end
+
   test "Step.log/2 :no_clean" do
     step = create(:step)
 
