@@ -7,7 +7,7 @@
   "coverex": {:hex, :coverex, "1.4.8"},
   "cowboy": {:hex, :cowboy, "1.0.4"},
   "cowlib": {:hex, :cowlib, "1.0.2"},
-  "credo": {:hex, :credo, "0.1.10"},
+  "credo": {:hex, :credo, "0.2.5"},
   "decimal": {:hex, :decimal, "1.1.1"},
   "ecto": {:hex, :ecto, "1.1.1"},
   "ex_machina": {:git, "https://github.com/thoughtbot/ex_machina.git", "08ed540f1dd6960ac89f0eec58a4c89576a50f35", []},
@@ -32,6 +32,6 @@
   "ranch": {:hex, :ranch, "1.2.0"},
   "ssl_verify_hostname": {:hex, :ssl_verify_hostname, "1.0.5"},
   "timex": {:hex, :timex, "0.13.5"},
-  "uuid": {:hex, :uuid, "1.1.1"},
+  "uuid": {:hex, :uuid, "1.1.2"},
   "yamerl": {:git, "https://github.com/yakaz/yamerl.git", "ae810a808817d9482b4628ae3e20d746e3729fe0", []},
   "yaml_elixir": {:hex, :yaml_elixir, "1.0.0"}}
