@@ -7,8 +7,6 @@ defmodule RabbitCICore.Build do
   alias RabbitCICore.BuildSerializer
   alias RabbitCICore.Endpoint
 
-  before_insert :set_build_number
-
   def set_build_number(changeset) do
     branch_id = Ecto.Changeset.get_field(changeset, :branch_id)
     query = (from b in Build,
@@ -19,7 +17,7 @@ defmodule RabbitCICore.Build do
     )
 
     build_number = (Repo.one(query) || 0) + 1
-    Ecto.Changeset.change(changeset, %{build_number: build_number})
+    put_change(changeset, :build_number, build_number)
   end
 
   schema "builds" do
@@ -46,6 +44,7 @@ defmodule RabbitCICore.Build do
          ~w(start_time build_number finish_time))
     |> validate_inclusion(:config_extracted, ["false", "true", "error"])
     |> foreign_key_constraint(:branch_id)
+    |> prepare_changes(&set_build_number/1)
   end
 
   def status([]), do: "queued"

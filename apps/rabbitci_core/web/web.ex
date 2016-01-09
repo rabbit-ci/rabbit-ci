@@ -35,8 +35,11 @@ defmodule RabbitCICore.Web do
 
   def model do
     quote do
-      use Ecto.Model
-      use Ecto.Model.Callbacks
+      use Ecto.Schema
+
+      import Ecto
+      import Ecto.Changeset
+      import Ecto.Query, only: [from: 1, from: 2]
     end
   end
 

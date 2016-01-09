@@ -20,7 +20,9 @@ defmodule RabbitCICore.Factory do
   def factory(:build) do
     %Build{
       commit: "abc",
-      branch: build(:branch)
+      branch: build(:branch),
+      # Temporary fix. See thoughtbot/ex_machina#78
+      build_number: sequence(:build_number, fn(x) -> x end)
     }
   end
 
