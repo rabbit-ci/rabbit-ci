@@ -8,9 +8,11 @@ defmodule Rabbitmq.Mixfile do
      version: "0.0.1",
      deps_path: "../../deps",
      lockfile: "../../mix.lock",
-     elixir: "~> 1.1",
+     elixir: "~> 1.2",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
+     build_path: "../../_build",
+     config_path: "../../config/config.exs",
      test_coverage: [tool: Coverex.Task],
      deps: Shared.deps ++ deps]
   end

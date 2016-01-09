@@ -6,13 +6,15 @@ defmodule RabbitCICore.Mixfile do
   def project do
     [app: :rabbitci_core,
      version: "0.0.1",
-     elixir: "~> 1.1",
+     elixir: "~> 1.2",
      elixirc_paths: elixirc_paths(Mix.env),
      deps_path: "../../deps",
      lockfile: "../../mix.lock",
      compilers: [:phoenix] ++ Mix.compilers,
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
+     build_path: "../../_build",
+     config_path: "../../config/config.exs",
      test_coverage: [tool: Coverex.Task],
      deps: Shared.deps ++ deps]
   end
