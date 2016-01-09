@@ -30,6 +30,9 @@ defmodule RabbitCICore.Web do
 
       # Import URL helpers from the router
       import RabbitCICore.Router.Helpers
+
+      import Ecto
+      import Ecto.Query, only: [from: 1, from: 2]
     end
   end
 
