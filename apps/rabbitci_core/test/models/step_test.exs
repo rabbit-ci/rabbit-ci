@@ -2,7 +2,7 @@ defmodule RabbitCICore.StepTest do
   use RabbitCICore.ModelCase
   import RabbitCICore.Factory
 
-  alias RabbitCICore.{Project, Branch, Build, Step, Log}
+  alias RabbitCICore.Step
 
   @valid_attrs %{name: "step1", status: "queued", build_id: -1}
   @invalid_attrs %{}
@@ -49,7 +49,7 @@ defmodule RabbitCICore.StepTest do
     build = create(:build)
     attrs = put_in(@valid_attrs.build_id, build.id)
     changeset = Step.changeset(%Step{}, attrs)
-    assert {:ok, model} = Repo.insert changeset
+    assert {:ok, _model} = Repo.insert changeset
   end
 
   test "Step.update_status!/2 should update the status of a step" do

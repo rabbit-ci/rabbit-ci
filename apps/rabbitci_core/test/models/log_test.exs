@@ -57,6 +57,6 @@ defmodule RabbitCICore.LogTest do
 
     attrs = put_in(@valid_attrs.step_id, step.id)
     changeset = Log.changeset(%Log{}, attrs)
-    assert {:ok, model} = Repo.insert changeset
+    assert {:ok, _model} = Repo.insert changeset
   end
 end
