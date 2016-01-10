@@ -7,8 +7,8 @@ defmodule RabbitCICore.Build do
   alias RabbitCICore.BuildSerializer
   alias RabbitCICore.Endpoint
 
-  def set_build_number(changeset) do
-    branch_id = Ecto.Changeset.get_field(changeset, :branch_id)
+  def set_build_number(changes) do
+    branch_id = Ecto.Changeset.get_field(changes, :branch_id)
     query = (from b in Build,
            where: b.branch_id == ^branch_id,
         order_by: [desc: b.build_number],
@@ -17,7 +17,7 @@ defmodule RabbitCICore.Build do
     )
 
     build_number = (Repo.one(query) || 0) + 1
-    put_change(changeset, :build_number, build_number)
+    put_change(changes, :build_number, build_number)
   end
 
   schema "builds" do
@@ -50,13 +50,13 @@ defmodule RabbitCICore.Build do
   def status([]), do: "queued"
   def status(statuses) when is_list(statuses) do
     cond do
-      Enum.any?(statuses, fn(status) -> status == "failed" end) -> "failed"
-      Enum.any?(statuses, fn(status) -> status == "error" end) -> "error"
-      Enum.any?(statuses, fn(status) -> status == "running" end) -> "running"
-      Enum.any?(statuses, fn(status) -> status == "finished" end) &&
-        Enum.any?(statuses, fn(status) -> status == "queued" end) -> "running"
-      Enum.all?(statuses, fn(status) -> status == "queued" end) -> "queued"
-      Enum.all?(statuses, fn(status) -> status == "finished" end) -> "finished"
+      Enum.any?(statuses, fn(s) -> s == "failed" end) -> "failed"
+      Enum.any?(statuses, fn(s) -> s == "error" end) -> "error"
+      Enum.any?(statuses, fn(s) -> s == "running" end) -> "running"
+      Enum.any?(statuses, fn(s) -> s == "finished" end) &&
+        Enum.any?(statuses, fn(s) -> s == "queued" end) -> "running"
+      Enum.all?(statuses, fn(s) -> s == "queued" end) -> "queued"
+      Enum.all?(statuses, fn(s) -> s == "finished" end) -> "finished"
     end
   end
   def status(%Build{config_extracted: "error"}), do: "error"

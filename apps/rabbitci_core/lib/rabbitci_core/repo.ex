@@ -20,8 +20,8 @@ defmodule RabbitCICore.Repo do
   def delete_all(queryable, opts \\ []), do: EctoRepo.delete_all(queryable, opts)
   def insert_or_update(changeset, opts \\ []), do: EctoRepo.insert_or_update(changeset, opts)
   def insert_or_update!(changeset, opts \\ []), do: EctoRepo.insert_or_update!(changeset, opts)
-  def delete(struct, opts \\ []), do: EctoRepo.delete(struct, opts)
-  def delete!(struct, opts \\ []), do: EctoRepo.delete!(struct, opts)
+  def delete(record_struct, opts \\ []), do: EctoRepo.delete(record_struct, opts)
+  def delete!(record_struct, opts \\ []), do: EctoRepo.delete!(record_struct, opts)
   def preload(struct_or_structs, preloads), do: EctoRepo.preload(struct_or_structs, preloads)
   def log(entry), do: EctoRepo.log(entry)
 

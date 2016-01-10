@@ -73,24 +73,6 @@ defmodule BuildMan.Vagrant do
     {:noreply, %{state | cmd: {:up, pid}}}
   end
 
-  defp ssh_key_string(nil, path), do: %{ssh_key_string: ""}
-  defp ssh_key_string(secret_key, path) do
-    key_path = Path.join([path, "git-ssh-secret-key"])
-    File.write!(key_path, secret_key)
-    File.chmod!(key_path, 0o600)
-    ssh_config = """
-    Host *
-        StrictHostKeyChecking no
-    """
-    ssh_config_path = Path.join([path, "ssh-config-file"])
-    File.write!(ssh_config_path, ssh_config)
-    str = """
-      config.vm.provision "file", source: "ssh-config-file", destination: "~/.ssh/config"
-      config.vm.provision "file", source: "git-ssh-secret-key", destination: "~/.ssh/id_rsa"
-    """
-    %{ssh_key_string: str}
-  end
-
   def handle_info(:run_build_script, state =
         %{config: %{repo: _repo, script: scr, git_cmd: git_cmd}})
   do
@@ -127,6 +109,24 @@ defmodule BuildMan.Vagrant do
     Logger.info("Vagrant build finished. #{inspect build}")
   end
 
+  defp ssh_key_string(nil, path), do: %{ssh_key_string: ""}
+  defp ssh_key_string(secret_key, path) do
+    key_path = Path.join([path, "git-ssh-secret-key"])
+    File.write!(key_path, secret_key)
+    File.chmod!(key_path, 0o600)
+    ssh_config = """
+    Host *
+        StrictHostKeyChecking no
+    """
+    ssh_config_path = Path.join([path, "ssh-config-file"])
+    File.write!(ssh_config_path, ssh_config)
+    str = """
+      config.vm.provision "file", source: "ssh-config-file", destination: "~/.ssh/config"
+      config.vm.provision "file", source: "git-ssh-secret-key", destination: "~/.ssh/id_rsa"
+    """
+    %{ssh_key_string: str}
+  end
+
   defp command(args, %{config: config, build: _build, path: path,
                        counter: counter}, opts \\ [])
   when is_list(opts) do
@@ -153,12 +153,12 @@ defmodule BuildMan.Vagrant do
   # opts2 will override duplicate keys in opts1.
   defp unique_merge(opts1, opts2) do
     opts2 ++ opts1
-    |> Enum.uniq fn x ->
+    |> Enum.uniq(fn x ->
       case x do
         {y, _} -> y
         z -> z
       end
-    end
+    end)
   end
 
   defp handle_log(%{step_id: step_id}, counter, type) do

@@ -33,7 +33,8 @@ defmodule BuildMan.GitHelpers do
                                        [path: path, exec_opts: exec_opts]))]
   end
 
-  def git(args, true, opts \\ []) when is_list(args) do
+  def git(args, should_run, opts \\ [])
+  def git(args, true, opts) when is_list(args) do
     args =
       case Keyword.get(opts, :path) do
         nil -> args
