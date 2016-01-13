@@ -1,5 +1,9 @@
 defimpl JaSerializer.Formatter, for: [Task] do
-  def format(task), do: Task.await(task) |> JaSerializer.Formatter.format
+  def format(task) do
+    task
+    |> Task.await
+    |> JaSerializer.Formatter.format
+  end
 end
 
 defmodule RabbitCICore.StepSerializer do

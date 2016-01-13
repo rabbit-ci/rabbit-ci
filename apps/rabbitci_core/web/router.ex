@@ -37,8 +37,10 @@ defmodule RabbitCICore.Router do
 
   # This should be changed in production.
   defp allow_origin(conn, _opts) do
-    headers = get_req_header(conn, "access-control-request-headers")
-    |> Enum.join(", ")
+    headers =
+      conn
+      |> get_req_header("access-control-request-headers")
+      |> Enum.join(", ")
 
     conn
     |> put_resp_header("access-control-allow-origin", "*")

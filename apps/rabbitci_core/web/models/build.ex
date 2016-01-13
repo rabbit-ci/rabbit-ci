@@ -33,6 +33,9 @@ defmodule RabbitCICore.Build do
     timestamps
   end
 
+  @required_params ~w(branch_id commit config_extracted)
+  @optional_params ~w(start_time build_number finish_time)
+
   @doc """
   Creates a changeset based on the `model` and `params`.
 
@@ -40,8 +43,8 @@ defmodule RabbitCICore.Build do
   with no validation performed.
   """
   def changeset(model, params \\ :empty) do
-    cast(model, params, ~w(branch_id commit config_extracted),
-         ~w(start_time build_number finish_time))
+    model
+    |> cast(params, @required_params, @optional_params)
     |> validate_inclusion(:config_extracted, ["false", "true", "error"])
     |> foreign_key_constraint(:branch_id)
     |> prepare_changes(&set_build_number/1)
@@ -67,14 +70,17 @@ defmodule RabbitCICore.Build do
   end
 
   def json_from_id!(build_id) do
-    import Ecto.Query, only: [from: 1, from: 2]
-
-    (from b in Build,
-     join: br in assoc(b, :branch),
-     join: p in assoc(br, :project),
-     where: b.id == ^build_id,
-     preload: [branch: {br, project: p}])
+    build_id
+    |> json_from_id_query
     |> Repo.one!
     |> BuildSerializer.format(Endpoint, %{})
+  end
+
+  defp json_from_id_query(build_id) do
+        from b in Build,
+       join: br in assoc(b, :branch),
+       join: p in assoc(br, :project),
+      where: b.id == ^build_id,
+    preload: [branch: {br, project: p}]
   end
 end

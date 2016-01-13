@@ -26,12 +26,13 @@ defmodule RabbitCICore.SSHKey do
   end
 
   def private_key_from_build_id(build_id) do
-    from(b in Build,
-         where: b.id == ^build_id,
-         join: br in assoc(b, :branch),
-         join: p in assoc(br, :project),
-         join: ssh in assoc(p, :ssh_key),
-         select: ssh.private_key)
-    |> Repo.one
+    query = from b in Build,
+          where: b.id == ^build_id,
+           join: br in assoc(b, :branch),
+           join: p in assoc(br, :project),
+           join: ssh in assoc(p, :ssh_key),
+         select: ssh.private_key
+
+    Repo.one(query)
   end
 end

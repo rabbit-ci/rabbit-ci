@@ -14,9 +14,8 @@ defmodule RabbitCICore.StepUpdaterChannel do
 
   def handle_info({:after_join, step_id}, socket) do
     Task.start fn ->
-      log =
-        Repo.get!(Step, step_id)
-        |> Step.log(:no_clean)
+      step = Repo.get!(Step, step_id)
+      log = Step.log(step, :no_clean)
       payload = %{step_id: step_id, log: log}
       broadcast socket, "set_log:step", payload
     end

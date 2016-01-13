@@ -1,9 +1,7 @@
 defmodule RabbitCICore.BuildController do
   use RabbitCICore.Web, :controller
   import Ecto.Query
-  alias RabbitCICore.Build
-  alias RabbitCICore.Step
-  alias RabbitCICore.Repo
+  alias RabbitCICore.{Build, Step, Repo}
   alias RabbitCICore.IncomingWebhooks, as: Webhooks
 
   # This gets all of the currently running builds.
@@ -35,14 +33,18 @@ defmodule RabbitCICore.BuildController do
   end
 
   def start_build(conn, p = %{"name" => _, "commit" => _, "branch" => _}) do
-    case Map.take(p, ["name", "commit", "branch", "pr"])
-    |> atomize_keys
+    case p
+    |> Map.take(["name", "commit", "branch", "pr"])
+    |> atomize_keys!
     |> Webhooks.start_build do
       {:ok, build} ->
         conn
         |> assign(:build, build)
         |> render("index.json")
-      {:error, reason} -> conn |> put_status(:bad_request) |> json(reason)
+      {:error, reason} ->
+        conn
+        |> put_status(:bad_request)
+        |> json(reason)
     end
   end
   def start_build(conn, _) do
@@ -51,7 +53,11 @@ defmodule RabbitCICore.BuildController do
     |> json(%{message: "Missing params. Required: name, commit, branch."})
   end
 
-  defp atomize_keys(map) do
+  # WARNING: This function can be very dangerous.
+  #
+  # Do NOT atomize maps whose keys have not been filtered. Atoms are not garbage
+  # collected and this can lead to a DoS attack. Use carefully.
+  defp atomize_keys!(map) do
     for {key, val} <- map, into: %{}, do: {String.to_atom(key), val}
   end
 
@@ -61,16 +67,18 @@ defmodule RabbitCICore.BuildController do
                               "project" => project,
                               "page" => %{"offset" => page}}) do
     page = String.to_integer(page)
-    builds =
-      (from b in Build,
-       join: br in assoc(b, :branch),
-       join: p in assoc(br, :project),
-       where: br.name == ^branch
-       and p.name == ^project,
-       limit: 30,
-       offset: ^(page * 30),
+    query = from b in Build,
+           join: br in assoc(b, :branch),
+           join: p in assoc(br, :project),
+          where: br.name == ^branch
+             and p.name == ^project,
+          limit: 30,
+         offset: ^(page * 30),
        order_by: [desc: b.build_number],
-       preload: [branch: {br, project: p}])
+        preload: [branch: {br, project: p}]
+
+    builds =
+      query
       |> Repo.all
       |> Repo.preload(:steps)
 
@@ -80,35 +88,37 @@ defmodule RabbitCICore.BuildController do
     |> render
   end
 
-  def index(conn, _params = %{"build_number" => "latest", "branch" => branch,
-                              "project" => project}) do
-    build =
-      (from b in Build,
-       join: br in assoc(b, :branch),
-       join: p in assoc(br, :project),
-       where: br.name == ^branch
-       and p.name == ^project,
+  def index(conn, %{"build_number" => "latest",
+                    "branch" => branch,
+                    "project" => project}) do
+    query = from b in Build,
+           join: br in assoc(b, :branch),
+           join: p in assoc(br, :project),
+          where: br.name == ^branch
+             and p.name == ^project,
        order_by: [desc: b.build_number],
-       limit: 1,
-       preload: [branch: {br, project: p}])
-      |> Repo.one!
+          limit: 1,
+        preload: [branch: {br, project: p}]
+
+    build = Repo.one! query
 
     conn
     |> assign(:build, build)
     |> render
   end
 
-  def index(conn, _params = %{"build_number" => build_number, "branch" => branch,
-                              "project" => project}) do
-    build =
-    (from b in Build,
-     join: br in assoc(b, :branch),
-     join: p in assoc(br, :project),
-     where: br.name == ^branch
-     and p.name == ^project
-     and b.build_number == ^build_number,
-     preload: [branch: {br, project: p}])
-    |> Repo.one!
+  def index(conn, %{"build_number" => build_number,
+                    "branch" => branch,
+                    "project" => project}) do
+    query = from b in Build,
+           join: br in assoc(b, :branch),
+           join: p in assoc(br, :project),
+          where: br.name == ^branch
+             and p.name == ^project
+             and b.build_number == ^build_number,
+         preload: [branch: {br, project: p}]
+
+    build = Repo.one! query
 
     conn
     |> assign(:build, build)

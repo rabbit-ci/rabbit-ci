@@ -6,9 +6,7 @@ defmodule RabbitCICore.BranchController do
   alias RabbitCICore.Router.Helpers, as: RouterHelpers
 
   def index(conn, %{"project" => project_name, "branch" => branch_name}) do
-    branch =
-      from(b in branch_query(project_name), where: b.name == ^branch_name)
-      |> Repo.one!
+    branch = Repo.get_by!(branch_query(project_name), name: branch_name)
 
     conn
     |> assign(:branch, branch)
@@ -16,16 +14,16 @@ defmodule RabbitCICore.BranchController do
   end
 
   def index(conn, %{"project" => project_name}) do
-    branches = branch_query(project_name) |> Repo.all
+    branches = Repo.all branch_query(project_name)
 
     conn
     |> assign(:branches, branches)
     |> render
   end
 
-  defp branch_query(project_name) do
-    from(b in Branch,
-         join: p in assoc(b, :project),
-         where: p.name == ^project_name)
+  def branch_query(project_name) do
+      from b in Branch,
+     join: p in assoc(b, :project),
+    where: p.name == ^project_name
   end
 end
