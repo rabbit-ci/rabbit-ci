@@ -8,7 +8,7 @@ defmodule RabbitCICore.Build do
   alias RabbitCICore.Endpoint
 
   def set_build_number(changes) do
-    branch_id = Ecto.Changeset.get_field(changes, :branch_id)
+    branch_id = get_field(changes, :branch_id)
     query = (from b in Build,
            where: b.branch_id == ^branch_id,
         order_by: [desc: b.build_number],

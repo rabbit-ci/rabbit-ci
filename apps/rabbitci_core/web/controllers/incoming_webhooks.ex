@@ -22,7 +22,7 @@ defmodule RabbitCICore.IncomingWebhooks do
   defp do_start_build(branch, %{name: name, commit: commit, pr: pr}) do
     changeset =
       branch
-      |> Ecto.Model.build(:builds)
+      |> Ecto.build_assoc(:builds)
       |> Build.changeset(%{commit: commit})
 
     case Repo.insert(changeset) do
@@ -65,7 +65,7 @@ defmodule RabbitCICore.IncomingWebhooks do
       nil -> {:error, %{errors: "No project"}}
       project ->
         project
-        |> Ecto.Model.build(:branches)
+        |> Ecto.build_assoc(:branches)
         |> Branch.changeset(%{name: branch_name})
         |> Repo.insert
     end
