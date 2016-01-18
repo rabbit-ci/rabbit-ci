@@ -7,4 +7,9 @@ defmodule BuildMan.FileHelpers do
       :ok -> {:ok, tmp_path}
     end
   end
+
+  def unique_folder!(prefix \\ "") do
+    {:ok, tmp_path} = unique_folder(prefix)
+    tmp_path
+  end
 end

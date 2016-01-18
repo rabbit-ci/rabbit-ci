@@ -21,7 +21,7 @@ defmodule RabbitCICore.StepTest do
   end
 
   test "changeset with valid status" do
-    for status <- ["queued", "running", "failed", "finished"] do
+    for status <- ["queued", "running", "failed", "finished", "error"] do
       attrs = %{name: "step1", status: "queued", build_id: -1, status: status}
       changeset = Step.changeset(%Step{}, attrs)
       assert Ecto.Changeset.get_field(changeset, :status) == status
@@ -53,7 +53,7 @@ defmodule RabbitCICore.StepTest do
   end
 
   test "Step.update_status!/2 should update the status of a step" do
-    for status <- ["queued", "running", "failed", "finished"] do
+    for status <- ["queued", "running", "failed", "finished", "error"] do
       step = create(:step)
       updated_step = Step.update_status!(step.id, status)
       assert updated_step.status == status

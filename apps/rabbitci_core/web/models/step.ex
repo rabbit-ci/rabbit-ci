@@ -1,8 +1,6 @@
 defmodule RabbitCICore.Step do
   use RabbitCICore.Web, :model
-  alias RabbitCICore.Log
-  alias RabbitCICore.Build
-  alias RabbitCICore.Step
+  alias RabbitCICore.{Log, Build, Step, Repo}
 
   schema "steps" do
     field :status, :string
@@ -22,7 +20,7 @@ defmodule RabbitCICore.Step do
   def changeset(model, params \\ :empty) do
     model
     |> cast(params, ~w(build_id name status), ~w())
-    |> validate_inclusion(:status, ["queued", "running", "failed", "finished"])
+    |> validate_inclusion(:status, ["queued", "running", "failed", "finished", "error"])
     |> foreign_key_constraint(:build_id)
   end
 
@@ -41,7 +39,7 @@ defmodule RabbitCICore.Step do
     Regex.replace(~r/\x1b(\[[0-9;]*[mK])?/, raw_log, "")
   end
 
-  # This is for use in BuildMan.Vagrant. You can use it, but you probably
+  # This is for use in BuildMan. You can use it, but you probably
   # shouldn't as it uses step_id instead of a %Step{}.
   def update_status!(step_id, status) do
     Step
