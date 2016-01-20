@@ -9,6 +9,7 @@ defmodule BuildMan.Mixfile do
      deps_path: "../../deps",
      lockfile: "../../mix.lock",
      elixir: "~> 1.2",
+     elixirc_paths: elixirc_paths(Mix.env),
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
      build_path: "../../_build",
@@ -44,6 +45,11 @@ defmodule BuildMan.Mixfile do
      {:rabbitci_core, in_umbrella: true},
      {:yaml_elixir, "~> 1.0.0"},
      {:exec, github: "saleyn/erlexec"},
+     {:poison, "~> 1.0"},
      {:uuid, "~> 1.1.0"}]
   end
+
+  # Specifies which paths to compile per environment
+  defp elixirc_paths(:test), do: ["lib", "test/support"]
+  defp elixirc_paths(_),     do: ["lib"]
 end

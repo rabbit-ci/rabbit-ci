@@ -10,8 +10,6 @@ defmodule BuildMan.Worker do
   The BuildMan.Worker struct is used to configure a build, _a la_
   Ecto.Changeset. The goal is to better manage build files and Vagrantfile
   generation.
-
-
   """
 
   defstruct [build_id: nil,
@@ -22,9 +20,12 @@ defmodule BuildMan.Worker do
              callbacks: nil,
              log_handler: :not_implemented,
              provider: :not_implemented,
+             # Configuration to be passed to the provider.
+             # E.g. Vagrant box.
+             provider_config: nil,
              files: []]
 
-  def create(args), do: Map.merge create, Map.take(args, [:build_id, :step_id])
+  def create(args), do: Map.merge create, Map.drop(args, [:path])
   def create do
     %Worker{path: FileHelpers.unique_folder!("worker"),
             callbacks: default_callbacks}
