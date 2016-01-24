@@ -113,6 +113,7 @@ defmodule BuildMan.FileExtraction do
   require Logger
   alias BuildMan.ProjectConfig
 
+  # Payload includes pr/commit.
   def reply(name, contents, build_id, payload)
   when is_binary(name) and is_binary(contents) do
     Logger.debug """

@@ -34,7 +34,7 @@ defmodule BuildMan.Vagrant.Vagrantfile do
     "config.vm.box = #{Poison.encode!(box)}"
   end
   defp generate_lines({:begin}) do
-    """
+    ~S"""
     Vagrant.configure(2) do |config|
       config.vm.provision "fix-no-tty", type: "shell" do |s|
         s.privileged = false

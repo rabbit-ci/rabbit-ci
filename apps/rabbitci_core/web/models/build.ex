@@ -8,6 +8,13 @@ defmodule RabbitCICore.Build do
   alias RabbitCICore.Endpoint
 
   def set_build_number(changes) do
+    case get_field(changes, :build_number) do
+      nil -> do_set_build_number(changes)
+      _ -> changes
+    end
+  end
+
+  defp do_set_build_number(changes) do
     branch_id = get_field(changes, :branch_id)
     query = (from b in Build,
            where: b.branch_id == ^branch_id,
@@ -19,6 +26,7 @@ defmodule RabbitCICore.Build do
     build_number = (Repo.one(query) || 0) + 1
     put_change(changes, :build_number, build_number)
   end
+
 
   schema "builds" do
     field :build_number, :integer
@@ -82,5 +90,19 @@ defmodule RabbitCICore.Build do
        join: p in assoc(br, :project),
       where: b.id == ^build_id,
     preload: [branch: {br, project: p}]
+  end
+
+  def get_repo_from_id!(build_id) do
+    build_id
+    |> repo_from_id_query
+    |> Repo.one!
+  end
+
+  defp repo_from_id_query(build_id) do
+        from b in Build,
+       join: br in assoc(b, :branch),
+       join: p in assoc(br, :project),
+      where: b.id == ^build_id,
+     select: p.repo
   end
 end

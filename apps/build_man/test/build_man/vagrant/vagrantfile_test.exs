@@ -34,7 +34,7 @@ defmodule BuildMan.Vagrant.VagrantfileTest do
       Vagrant.configure(2) do |config|
         config.vm.provision "fix-no-tty", type: "shell" do |s|
           s.privileged = false
-          s.inline = "sudo sed -i '/tty/!s/mesg n/tty -s \&\& mesg n/' /root/.profile"
+          s.inline = "sudo sed -i '/tty/!s/mesg n/tty -s \\&\\& mesg n/' /root/.profile"
         end
 
         config.ssh.insert_key = false
@@ -52,16 +52,16 @@ defmodule BuildMan.Vagrant.VagrantfileTest do
   test "Worker with single file (default permissions)" do
     worker =
       Worker.create(%{provider_config: %{box: "test/box"}})
-      |> Worker.add_file("~/testing-file.txt", "This is a test")
+      |> Worker.add_file("testing-file.txt", "This is a test")
     cleanup_worker worker
 
     assert_lines Vagrantfile.generate(worker)
-      |> String.replace(~r/(source: \").*(\")/, "\\1source_file\\2") ==
+      |> String.replace(~r/(source: \").*(\",)/, "\\1source_file\\2") ==
     ~S"""
     Vagrant.configure(2) do |config|
       config.vm.provision "fix-no-tty", type: "shell" do |s|
         s.privileged = false
-        s.inline = "sudo sed -i '/tty/!s/mesg n/tty -s \&\& mesg n/' /root/.profile"
+        s.inline = "sudo sed -i '/tty/!s/mesg n/tty -s \\&\\& mesg n/' /root/.profile"
       end
 
       config.ssh.insert_key = false
@@ -73,7 +73,7 @@ defmodule BuildMan.Vagrant.VagrantfileTest do
 
     config.vm.box = "test/box"
 
-    config.vm.provision 'file', source: "source_file"
+    config.vm.provision 'file', source: "source_file", destination: "testing-file.txt"
     end
     """
   end
@@ -81,16 +81,16 @@ defmodule BuildMan.Vagrant.VagrantfileTest do
   test "Worker with single file (custom permissions)" do
     worker =
       Worker.create(%{provider_config: %{box: "test/box"}})
-      |> Worker.add_file("~/testing-file.txt", "This is a test", mode: 755)
+      |> Worker.add_file("testing-file.txt", "This is a test", mode: 755)
     cleanup_worker worker
 
     assert_lines Vagrantfile.generate(worker)
-      |> String.replace(~r/(source: \").*(\")/, "\\1source_file\\2") ==
+      |> String.replace(~r/(source: \").*(\",)/, "\\1source_file\\2") ==
     ~S"""
     Vagrant.configure(2) do |config|
       config.vm.provision "fix-no-tty", type: "shell" do |s|
         s.privileged = false
-        s.inline = "sudo sed -i '/tty/!s/mesg n/tty -s \&\& mesg n/' /root/.profile"
+        s.inline = "sudo sed -i '/tty/!s/mesg n/tty -s \\&\\& mesg n/' /root/.profile"
       end
 
       config.ssh.insert_key = false
@@ -102,11 +102,11 @@ defmodule BuildMan.Vagrant.VagrantfileTest do
 
     config.vm.box = "test/box"
 
-    config.vm.provision 'file', source: "source_file"
+    config.vm.provision 'file', source: "source_file", destination: "testing-file.txt"
 
     config.vm.provision "shell" do |s|
       s.inline = "chmod $1 $2"
-      s.args   = [755,"~/testing-file.txt"]
+      s.args   = [755,"testing-file.txt"]
     end
     end
     """

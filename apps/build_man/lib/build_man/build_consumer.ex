@@ -47,7 +47,7 @@ defmodule BuildMan.BuildConsumer do
     Logger.debug("Starting build...")
 
     config = :erlang.binary_to_term(payload)
-    {:ok, _pid} = Supervisor.start_child(BuildMan.WorkerSup, [[routing_key, config, {chan, tag}]])
+    {:ok, _pid} = Supervisor.start_child(BuildMan.WorkerSup, [[config, {chan, tag}]])
 
     {:noreply, chan}
   end

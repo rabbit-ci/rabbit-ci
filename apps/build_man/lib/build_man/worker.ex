@@ -14,6 +14,7 @@ defmodule BuildMan.Worker do
 
   defstruct [build_id: nil,
              step_id: nil,
+             script: nil,
              # Path to working directory for worker.
              path: nil,
              # Callbacks are called through trigger_event/2
@@ -62,8 +63,9 @@ defmodule BuildMan.Worker do
   end
 
   @doc """
-  Adds a file to the worker struct. Files are stored in the format: `{vm_path,
-  path, permissions}` Opts:
+  Adds a file to the worker struct. `vm_path` is relative to the home
+  directory. Tilde (~) expansion does not work. Files are stored in the format:
+  `{vm_path, path, permissions}` Opts:
 
     * `mode`: File permission _inside_ the VM. This does not affect the
       permissions for the file on the host machine.
@@ -80,4 +82,6 @@ defmodule BuildMan.Worker do
   def get_build(%Worker{build_id: build_id}), do: Repo.get!(Build, build_id)
 
   def get_step(%Worker{step_id: step_id}), do: Repo.get!(Step, step_id)
+
+  def get_repo(%Worker{build_id: build_id}), do: Build.get_repo_from_id!(build_id)
 end
