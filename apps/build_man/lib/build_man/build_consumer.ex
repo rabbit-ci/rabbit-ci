@@ -46,15 +46,8 @@ defmodule BuildMan.BuildConsumer do
                    %{delivery_tag: tag, routing_key: routing_key}}, chan) do
     Logger.debug("Starting build...")
 
-    Task.start_link fn ->
-      Process.flag(:trap_exit, true)
-      config = :erlang.binary_to_term(payload)
-      {:ok, _pid} = Vagrant.start_link([routing_key, config])
-
-      receive do
-        {:EXIT, _pid, _} -> if Process.alive?(chan.pid), do: Basic.ack(chan, tag)
-      end
-    end
+    config = :erlang.binary_to_term(payload)
+    {:ok, _pid} = Supervisor.start_child(BuildMan.WorkerSup, [[routing_key, config, {chan, tag}]])
 
     {:noreply, chan}
   end

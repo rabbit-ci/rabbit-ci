@@ -21,7 +21,7 @@ defmodule BuildMan.Vagrant do
   end
 
   # Server callbacks
-  def init([build_identifier, config]) do
+  def init([build_identifier, config, {chan, tag}]) do
     Process.flag(:trap_exit, true)
     {:ok, count_agent} = Agent.start_link(fn -> 0 end)
     send(self, :start_build)
@@ -34,7 +34,7 @@ defmodule BuildMan.Vagrant do
     {:ok, path} = FileHelpers.unique_folder("builder")
     {:ok,
      %{path: path, build: build_identifier,
-       config: config, cmd: nil, counter: count_agent, success: true}}
+       config: config, cmd: nil, counter: count_agent, success: true, chan: chan, tag: tag}}
   end
 
   # Exit status is set when the command finished due to a non-zero exit status.
@@ -91,15 +91,15 @@ defmodule BuildMan.Vagrant do
   def terminate(_reason, state = %{path: path, success: success, build: build,
                                   config: config, cmd: {_, cmd_pid}}) do
     Logger.debug("Vagrant build cleaning up!")
+
     :exec.stop(cmd_pid)
 
     Task.async(fn -> command(["destroy", "-f"], state, [:sync]) end)
     |> Task.await(30_000)
 
-    case File.rm_rf(path) do
-      {:ok, _} -> :ok
-      {:error, err} -> Logger.error("Could not delete: #{path}. #{inspect err}")
-    end
+    File.rm_rf!(path)
+
+    AMQP.Basic.ack(state.chan, state.tag)
 
     case success do
       true -> Step.update_status!(config.step_id, "finished")
@@ -107,6 +107,7 @@ defmodule BuildMan.Vagrant do
     end
 
     Logger.info("Vagrant build finished. #{inspect build}")
+    :ok
   end
 
   defp ssh_key_string(nil, path), do: %{ssh_key_string: ""}
