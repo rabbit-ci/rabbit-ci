@@ -1,17 +1,12 @@
 defmodule BuildMan.Vagrant do
   @moduledoc """
-  GenServer for Vagrant worker. Start opts should be in the format:
-
-      [config, {chan, tag}]
-
-  All Vagrant output is sent to the LogStreamer.
+  GenServer for Vagrant worker.
   """
 
   use GenServer
   require Logger
   require EEx
   alias BuildMan.FileHelpers
-  alias BuildMan.LogStreamer
   alias BuildMan.Worker
   alias BuildMan.GitHelpers
   alias BuildMan.Vagrant.Vagrantfile
@@ -29,20 +24,17 @@ defmodule BuildMan.Vagrant do
               build_id: build_id,
               step_id: step_id,
               git: git}, {chan, tag}]) do
-
     Process.flag(:trap_exit, true)
     {:ok, count_agent} = Agent.start_link(fn -> 0 end)
     send(self, :start_build)
-
-    start_msg = "Starting: #{build_id}.#{step_id}.\n\n"
-    LogStreamer.log_string(start_msg, "stdout",
-                           increment_counter(count_agent),
-                           step_id)
 
     worker = Worker.create(%{build_id: build_id,
                              step_id: step_id,
                              provider_config: %{box: box, git: git},
                              script: script})
+
+    Worker.log(worker, "Starting: #{worker.build_id}.#{worker.step_id}.\n\n",
+               :stdout, increment_counter(count_agent))
 
     {:ok, %{worker: worker,
             cmd: nil,
@@ -111,7 +103,7 @@ defmodule BuildMan.Vagrant do
   end
 
   def terminate(_reason, state = %{worker: worker, success: success, cmd: {_, cmd_pid}}) do
-    Logger.debug("Vagrant build cleaning up!")
+    log_debug(state.worker, "Vagrant build cleaning up.")
 
     :exec.stop(cmd_pid)
 
@@ -148,8 +140,8 @@ defmodule BuildMan.Vagrant do
     ExExec.run(
       [vagrant_cmd | args],
       [
-        {:stdout, handle_log(worker, counter, "stdout")},
-        {:stderr, handle_log(worker, counter, "stderr")},
+        {:stdout, handle_log(worker, counter, :stdout)},
+        {:stderr, handle_log(worker, counter, :stderr)},
         # Running commands in a PTY gives us colors!
         :pty,
         # We need to kill the entire Vagrant process group because Vagrant does
@@ -175,9 +167,9 @@ defmodule BuildMan.Vagrant do
     end)
   end
 
-  defp handle_log(%{step_id: step_id}, counter, type) do
+  defp handle_log(worker, counter, type) do
     fn _, _, str ->
-      LogStreamer.log_string(str, type, increment_counter(counter), step_id)
+      Worker.log(worker, str, type, increment_counter(counter))
     end
   end
 

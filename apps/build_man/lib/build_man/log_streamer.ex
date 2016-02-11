@@ -22,9 +22,11 @@ defmodule BuildMan.LogStreamer do
   @log_streamer_limit Application.get_env(:build_man, :log_streamer_limit)
 
   def log_string(str, type, order, step_id) do
-    map = %LogOutput{text: str, order: order, step_id: step_id, type: type}
     RabbitMQ.publish(@exchange, "#{type}.#{step_id}",
-                     :erlang.term_to_binary(map))
+                     :erlang.term_to_binary(%LogOutput{text: str,
+                                                       order: order,
+                                                       step_id: step_id,
+                                                       type: to_string(type)}))
   end
 
   # Server callbacks

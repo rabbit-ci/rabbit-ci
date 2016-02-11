@@ -1,6 +1,7 @@
 defmodule BuildMan.Worker do
   alias BuildMan.FileHelpers
   alias BuildMan.Worker
+  alias BuildMan.LogStreamer
   alias RabbitCICore.{Repo, Build, Step}
 
   @moduledoc """
@@ -26,14 +27,28 @@ defmodule BuildMan.Worker do
              provider_config: nil,
              files: []]
 
+  @doc """
+  Create a %Worker{}. Args is a map that will be merged with the default worker
+  values. The worker's path field may not be overridden.
+  """
   def create(args), do: Map.merge create, Map.drop(args, [:path])
   def create do
     %Worker{path: FileHelpers.unique_folder!("worker"),
             callbacks: default_callbacks}
   end
 
+  @doc """
+  Deletes the Worker directory.
+  """
+  def cleanup!(worker) do
+    with {:ok, _files} = File.rm_rf(worker.path) do
+      :ok
+    end
+  end
+
   @events [:running, :finished, :failed, :error]
 
+  # Generates the default callbacks for workers. This is used in create/0.
   defp default_callbacks do
     for event <- @events, into: %{} do
       {event, fn worker ->
@@ -57,9 +72,10 @@ defmodule BuildMan.Worker do
 
     * `io` is the log output.
     * `type` should be :stdout or :stderr.
+    * `order` is used for ordering the log messages.
   """
-  def log(worker, io, type) do
-    :not_implemented
+  def log(worker, io, type, order) do
+    LogStreamer.log_string(io, type, order, worker.step_id)
   end
 
   @doc """
