@@ -30,4 +30,17 @@ Then, in `psql postgres`, run `CREATE USER postgres SUPERUSER PASSWORD
 anything other than development. Be careful if you have ports open. You have
 been warned.**
 
-NOTE: This will start PostgreSQL and RabbitMQ using `brew services`.
+Note: This will start PostgreSQL and RabbitMQ using `brew services`.
+
+The server can be started with:
+
+```
+make migrate
+make server
+```
+
+Tests can be run with:
+
+```
+make check
+```
