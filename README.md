@@ -10,11 +10,19 @@ things to do.
 The backend depends on:
 
 - Elixir
-- Erlang
-- Postgres (username: postgres, password: postgres, databases:
-  rabbitci_test, rabbitci_dev)
+- Postgres
+  - Dev/Test: username: postgres, password: postgres, databases: rabbitci_test,
+    rabbitci_dev. User can be created by running `CREATE USER postgres SUPERUSER
+    PASSWORD 'postgres';` in `psql postgres`; Never do this in
+    production. Databases will be automatically created by the Makefile.
 - RabbitMQ
 - Vagrant
+- Git
 
-All other dependencies should be installed by running `mix cmd mix
-deps.get, compile` in the project root.
+## Getting started
+
+### OS X
+
+Install homebrew then run `make setup_osx`.
+
+NOTE: This will start PostgreSQL and RabbitMQ using `brew services`.
