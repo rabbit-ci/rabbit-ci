@@ -12,7 +12,7 @@ setup_osx: BREW-exists
 	brew cask install vagrant virtualbox
 	brew services start postgresql
 	brew services start rabbitmq
-	mix local.hex
+	mix local.hex --force
 	mix local.rebar
 	mix deps.get
 
