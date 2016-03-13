@@ -94,7 +94,7 @@ defmodule BuildMan.Vagrant do
       GitHelpers.clone_repo("workdir", git, false)
       |> Enum.join("\n")
     script = ~s"""
-    set -x
+    set -v
     set -e
     #{before_scr}
     #{git_cmd}
