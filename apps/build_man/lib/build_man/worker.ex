@@ -16,6 +16,7 @@ defmodule BuildMan.Worker do
   defstruct [build_id: nil,
              step_id: nil,
              script: nil,
+             before_script: nil,
              # Path to working directory for worker.
              path: nil,
              # Callbacks are called through trigger_event/2

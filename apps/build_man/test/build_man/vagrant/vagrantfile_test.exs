@@ -32,11 +32,6 @@ defmodule BuildMan.Vagrant.VagrantfileTest do
     assert_lines Vagrantfile.generate(worker) ==
       ~S"""
       Vagrant.configure(2) do |config|
-        config.vm.provision "fix-no-tty", type: "shell" do |s|
-          s.privileged = false
-          s.inline = "sudo sed -i '/tty/!s/mesg n/tty -s \\&\\& mesg n/' /root/.profile"
-        end
-
         config.ssh.insert_key = false
         config.vm.synced_folder ".", "/vagrant", disabled: true
 
@@ -59,11 +54,6 @@ defmodule BuildMan.Vagrant.VagrantfileTest do
       |> String.replace(~r/(source: \").*(\",)/, "\\1source_file\\2") ==
     ~S"""
     Vagrant.configure(2) do |config|
-      config.vm.provision "fix-no-tty", type: "shell" do |s|
-        s.privileged = false
-        s.inline = "sudo sed -i '/tty/!s/mesg n/tty -s \\&\\& mesg n/' /root/.profile"
-      end
-
       config.ssh.insert_key = false
       config.vm.synced_folder ".", "/vagrant", disabled: true
 
@@ -88,11 +78,6 @@ defmodule BuildMan.Vagrant.VagrantfileTest do
       |> String.replace(~r/(source: \").*(\",)/, "\\1source_file\\2") ==
     ~S"""
     Vagrant.configure(2) do |config|
-      config.vm.provision "fix-no-tty", type: "shell" do |s|
-        s.privileged = false
-        s.inline = "sudo sed -i '/tty/!s/mesg n/tty -s \\&\\& mesg n/' /root/.profile"
-      end
-
       config.ssh.insert_key = false
       config.vm.synced_folder ".", "/vagrant", disabled: true
 

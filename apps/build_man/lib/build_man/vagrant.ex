@@ -21,6 +21,7 @@ defmodule BuildMan.Vagrant do
   # Server callbacks
   def init([%{box: box,
               script: script,
+              before_script: before_script,
               build_id: build_id,
               step_id: step_id,
               git: git}, {chan, tag}]) do
@@ -31,7 +32,8 @@ defmodule BuildMan.Vagrant do
     worker = Worker.create(%{build_id: build_id,
                              step_id: step_id,
                              provider_config: %{box: box, git: git},
-                             script: script})
+                             script: script,
+                             before_script: before_script})
 
     Worker.log(worker, "Starting: #{worker.build_id}.#{worker.step_id}.\n\n",
                :stdout, increment_counter(count_agent))
@@ -85,6 +87,7 @@ defmodule BuildMan.Vagrant do
 
   def handle_info(:run_build_script,
                   state = %{worker: worker = %{script: scr,
+                                               before_script: before_scr,
                                                provider_config: %{git: git}}}) do
     git = put_in(git[:repo], Worker.get_repo(worker))
     git_cmd =
@@ -93,6 +96,7 @@ defmodule BuildMan.Vagrant do
     script = ~s"""
     set -x
     set -e
+    #{before_scr}
     #{git_cmd}
     cd workdir
     #{scr}

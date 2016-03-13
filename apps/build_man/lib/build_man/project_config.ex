@@ -1,7 +1,6 @@
 defmodule BuildMan.ProjectConfig do
   alias RabbitCICore.Repo
   alias RabbitCICore.Build
-  alias BuildMan.GitHelpers
 
   @moduledoc """
   Module for processing configs.
@@ -30,7 +29,8 @@ defmodule BuildMan.ProjectConfig do
 
         config = %{
           box: box,
-          script: step_config["command"],
+          script: step_config["script"],
+          before_script: step_config["before_script"],
           build_id: build.id,
           step_id: step.id,
           git: Map.take(pr_or_commit, [:pr, :commit])
