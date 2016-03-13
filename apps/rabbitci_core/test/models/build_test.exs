@@ -59,7 +59,7 @@ defmodule RabbitCICore.BuildTest do
       |> Repo.insert
   end
 
-  test "build_number must be unique in the scope of branch" do
+  test "build_number is incremented in the scope of a branch" do
     p1 =
       Project.changeset(%Project{}, %{name: "project1", repo: "repo123"})
       |> Repo.insert!
@@ -91,6 +91,42 @@ defmodule RabbitCICore.BuildTest do
 
     assert build1.build_number == 1
     assert build2.build_number == 2
+    assert build3.build_number == 1
+  end
+
+  test "build_number must be unique in the scope of branch" do
+    p1 =
+      Project.changeset(%Project{}, %{name: "project1", repo: "repo123"})
+      |> Repo.insert!
+
+    b1 =
+      Model.build(p1, :branches)
+      |> Branch.changeset(%{name: "branch1"})
+      |> Repo.insert!
+
+    b2 =
+      Model.build(p1, :branches)
+      |> Branch.changeset(%{name: "branch2"})
+      |> Repo.insert!
+
+    build1 =
+      Model.build(b1, :builds)
+      |> Build.changeset(%{commit: "xyz", build_number: 1})
+      |> Repo.insert!
+
+    assert {:error, build2} =
+      Model.build(b1, :builds)
+      |> Build.changeset(%{commit: "xyz", build_number: 1})
+      |> Repo.insert
+
+    assert {:build_number, "has already been taken"} in build2.errors
+
+    build3 =
+      Model.build(b2, :builds)
+      |> Build.changeset(%{commit: "xyz", build_number: 1})
+      |> Repo.insert!
+
+    assert build1.build_number == 1
     assert build3.build_number == 1
   end
 

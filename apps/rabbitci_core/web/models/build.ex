@@ -55,6 +55,7 @@ defmodule RabbitCICore.Build do
     |> cast(params, @required_params, @optional_params)
     |> validate_inclusion(:config_extracted, ["false", "true", "error"])
     |> foreign_key_constraint(:branch_id)
+    |> unique_constraint(:build_number, name: :builds_branch_id_build_number_index)
     |> prepare_changes(&set_build_number/1)
   end
 
