@@ -42,7 +42,7 @@ defmodule RabbitCICore.LogController do
   def show(conn, %{"format" => "text"}) do
     # We're cleaning it _after_ we concat all the logs because the step name
     # could possibly include some ANSI codes.
-    log = Step.clean do_log(conn)
+    log = Step.clean_log do_log(conn)
     text(conn, log)
   end
   def show(conn, params) do
