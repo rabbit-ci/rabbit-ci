@@ -7,6 +7,7 @@ export default DS.Model.extend({
   log: DS.attr('string'),
   build: DS.belongsTo('build'),
   htmlLog: Ember.computed(function() {
+    if (!this.get('log')) return "loading...";
     return ansi_up.ansi_to_html(this.get('log'), {use_classes: true});
   }).property('log'),
 

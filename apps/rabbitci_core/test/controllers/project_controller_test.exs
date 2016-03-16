@@ -20,19 +20,23 @@ defmodule RabbitCICore.ProjectControllerTest do
     assert length(body["data"]) == 2
   end
 
-  test "show page for non existing project", %{conn: conn} do
+  test "index page for non existing project", %{conn: conn} do
     assert_raise Ecto.NoResultsError, fn ->
-      get conn, project_path(conn, :show, "fake")
+      get conn, project_path(conn, :index, "fake", [])
     end
   end
 
-  test "show page for real project", %{conn: conn} do
+  test "index page for real project", %{conn: conn} do
     project =
       %Project{name: "project1", repo: "git@example.com:user/project1"}
       |> Repo.insert!
 
-    conn = get conn, project_path(conn, :show, project.name)
+    conn = get conn, project_path(conn, :index, [name: project.name])
     body = json_response(conn, 200)
+    conn_alt = get conn, project_path(conn, :index, project.name, [])
+    body_alt = json_response(conn, 200)
+
+    assert body == body_alt
     resp_project = body["data"]
 
     assert resp_project["id"] != nil

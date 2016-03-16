@@ -7,7 +7,7 @@ defmodule RabbitCICore.ProjectView do
     ProjectSerializer.format(projects, conn, %{})
   end
 
-  def render("show.json", %{conn: conn, project: project}) do
+  def render("index.json", %{conn: conn, project: project}) do
     ProjectSerializer.format(project, conn, %{})
   end
 end

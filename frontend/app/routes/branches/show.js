@@ -3,9 +3,17 @@ import Ember from 'ember';
 export default Ember.Route.extend({
   model(params) {
     return this.store.queryRecord("branch", {
-      branch: params.branch_name,
-      project: params.project_name
+      branch: decodeURIComponent(params.branch_name),
+      project: this.modelFor('projects.show').get('name')
     });
+  },
+
+  serialize(model, params) {
+    return {
+      owner: model.get("project.owner"),
+      repo: model.get("project.repo"),
+      branch_name: encodeURIComponent(model.get("name"))
+    };
   },
 
   afterModel(branch) {

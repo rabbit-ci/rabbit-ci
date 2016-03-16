@@ -13,7 +13,7 @@ defmodule RabbitCICore.Router do
 
     scope "projects" do
       get "/", ProjectController, :index
-      get "/:name", ProjectController, :show
+      get "/:name", ProjectController, :index
     end
 
     scope "/branches" do

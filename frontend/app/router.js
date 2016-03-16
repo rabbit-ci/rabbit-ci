@@ -8,15 +8,12 @@ const Router = Ember.Router.extend({
 Router.map(function() {
   this.route('projects', {path: '/'}, function() {
     this.route('index', {path: '/'});
-    this.route('show', {path: '/:project_name'});
+    this.route('show', {path: '/:owner/:repo'}, function() {
+      this.route('branches.index', {resetNamespace: true, path: '/'});
+      this.route('branches.show', {resetNamespace: true, path: '/:branch_name'});
+      this.route('builds.show', {resetNamespace: true, path: '/:branch_name/:build_number'});
+    });
   });
-
-  this.route('branches', {path: ''}, function() {
-    this.route('index', {path: '/:project_name/branches'});
-    this.route('show', {path: '/:project_name/b/:branch_name'});
-  });
-
-  this.route('builds.show', {path: '/:project_name/b/:branch_name/b/:build_number'});
 });
 
 export default Router;

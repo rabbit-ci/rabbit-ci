@@ -1,0 +1,10 @@
+<h3>Branches</h3>
+<ul>
+  {{#each model.branches as |branch|}}
+    <li>
+      {{#link-to "branches.show" branch}}
+        {{branch.name}}
+      {{/link-to}}
+    </li>
+  {{/each}}
+</ul>
