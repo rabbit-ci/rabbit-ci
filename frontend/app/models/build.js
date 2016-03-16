@@ -10,6 +10,10 @@ export default DS.Model.extend({
   steps: DS.hasMany('steps'),
 
   connectToChan() {
+    if (this.get('leaving')) {
+      this.set('queuedConnect', true);
+      return;
+    }
     if (this.get('channel')) return;
 
     let socket = this.get('phoenix');
@@ -25,9 +29,20 @@ export default DS.Model.extend({
     this.set('channel', chan);
   },
 
+  connectQueued: Ember.observer('leaving', function() {
+    if (!this.get('leaving') && this.get('queuedConnect')) {
+      this.connectToChan();
+      this.set('queuedConnect', false);
+    }
+  }),
+
   disconnectFromChan() {
     let chan = this.get('channel');
-    if (chan) chan.leave();
+    if (chan) {
+      this.set('leaving', true);
+      chan.onClose(() => {this.set('leaving', false);});
+      chan.leave();
+    }
     this.set('channel', null);
   }
 });
