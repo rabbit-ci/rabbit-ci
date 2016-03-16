@@ -27,6 +27,7 @@ defmodule RabbitCICore.Project do
   def changeset(model, params \\ :empty) do
     model
     |> cast(params, ~w(name repo), ~w(webhook_secret))
+    |> validate_format(:name, ~r/^[^\/]+\/[^\/]+$/)
     |> unique_constraint(:name)
     |> unique_constraint(:repo)
   end

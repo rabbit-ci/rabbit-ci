@@ -28,6 +28,23 @@ defmodule RabbitCICore.ProjectTest do
     assert {:name, "has already been taken"} in new_changeset.errors
   end
 
+  test "name must be in the owner/repo format" do
+    changeset = Project.changeset(%Project{}, %{name: "foo"})
+    assert {:name, "has invalid format"} in changeset.errors
+
+    changeset = Project.changeset(%Project{}, %{name: "foo/bar/baz"})
+    assert {:name, "has invalid format"} in changeset.errors
+
+    changeset = Project.changeset(%Project{}, %{name: "foo/"})
+    assert {:name, "has invalid format"} in changeset.errors
+
+    changeset = Project.changeset(%Project{}, %{name: "/bar"})
+    assert {:name, "has invalid format"} in changeset.errors
+
+    changeset = Project.changeset(%Project{}, %{name: "foo/bar"})
+    refute {:name, "has invalid format"} in changeset.errors
+  end
+
   test "repo must be unique" do
     changeset_valid = Project.changeset(%Project{}, @valid_attrs)
     assert changeset_valid.valid?
