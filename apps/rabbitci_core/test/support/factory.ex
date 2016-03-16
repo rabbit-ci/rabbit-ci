@@ -5,7 +5,7 @@ defmodule RabbitCICore.Factory do
 
   def factory(:project) do
     %Project{
-      name: sequence(:name, &"my#{&1}project"),
+      name: sequence(:name, &"my/#{&1}project"),
       repo: sequence(:repo, &"my#{&1}@repo.git")
     }
   end

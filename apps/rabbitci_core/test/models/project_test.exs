@@ -3,7 +3,7 @@ defmodule RabbitCICore.ProjectTest do
 
   alias RabbitCICore.Project
 
-  @valid_attrs %{name: "project1", repo: "my@repo.git", webhook_secret: "foo"}
+  @valid_attrs %{name: "a/project1", repo: "my@repo.git", webhook_secret: "foo"}
   @invalid_attrs %{}
 
   test "changeset with valid attributes" do
@@ -50,7 +50,7 @@ defmodule RabbitCICore.ProjectTest do
     assert changeset_valid.valid?
     assert {:ok, _} = Repo.insert changeset_valid
 
-    duplicate_repo_attrs = put_in(@valid_attrs.name, "Other name")
+    duplicate_repo_attrs = put_in(@valid_attrs.name, "a/other_name")
     changeset_invalid = Project.changeset(%Project{}, duplicate_repo_attrs)
     assert {:error, changeset_dup_repo} = Repo.insert changeset_invalid
     assert {:repo, "has already been taken"} in changeset_dup_repo.errors

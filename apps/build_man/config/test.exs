@@ -8,4 +8,6 @@ config :build_man, :config_extraction_exchange, "rabbitci.config_extraction.test
 config :rabbitci_core, :config_extraction_exchange, "rabbitci.config_extraction.test"
 config :build_man, :config_extraction_queue, "rabbitci.config_extraction.test"
 
+config :build_man, :config_extraction_processor, BuildMan.TestExtractionProcessor
+
 config :logger, level: :warn

@@ -27,7 +27,7 @@ defmodule RabbitCICore.BranchTest do
   end
 
   test "name must be unique in the scope of project" do
-    p1 = Repo.insert! Project.changeset(%Project{}, %{name: "project1", repo: "repo123"})
+    p1 = Repo.insert! Project.changeset(%Project{}, %{name: "a/project1", repo: "repo123"})
 
     p1
     |> Ecto.Model.build(:branches)
@@ -44,7 +44,7 @@ defmodule RabbitCICore.BranchTest do
     assert {:name, "has already been taken"} in b2.errors
 
     assert {:ok, _} =
-      Project.changeset(%Project{}, %{name: "project2", repo: "another_repo"})
+      Project.changeset(%Project{}, %{name: "a/project2", repo: "another_repo"})
       |> Repo.insert!
       |> Ecto.Model.build(:branches)
       |> Branch.changeset(%{name: "branch1"})

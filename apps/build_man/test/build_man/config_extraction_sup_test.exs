@@ -45,7 +45,7 @@ defmodule BuildMan.ConfigExtractionSupTest do
 
   defp create_models do
     project =
-      Project.changeset(%Project{}, %{name: "project1", repo: "repo123"})
+      Project.changeset(%Project{}, %{name: "a/project1", repo: "repo123"})
       |> Repo.insert!
 
     branch =
@@ -62,19 +62,26 @@ defmodule BuildMan.ConfigExtractionSupTest do
   end
 
   defp do_test(term, content) do
+    Application.put_env(:build_man, :config_extraction_processor_pid, self)
     {:ok, conn} = AMQP.Connection.open
     {:ok, chan} = AMQP.Channel.open(conn)
+    AMQP.Basic.publish(chan, @exchange, "", term)
 
-    pid = self()
-    with_mock BuildMan.FileExtraction,
-    [reply: fn(_, content, _, _) -> send(pid, {:replied, content}) end,
-      finish: fn -> send(pid, :finished) end] do
-      AMQP.Basic.publish(chan, @exchange, "", term)
+    # We're not using `assert called` here because we need to wait
+    # on the process in case it hasn't finished.
+    assert_receive {:replied, ^content}, 1000
+    assert_receive :finished, 1000
+  end
+end
 
-      # We're not using `assert called` here because we need to wait
-      # on the process in case it hasn't finished.
-      assert_receive {:replied, ^content}, 1000
-      assert_receive :finished, 1000
-    end
+defmodule BuildMan.TestExtractionProcessor do
+  def process_config(_, content, _, _) do
+    pid = Application.get_env(:build_man, :config_extraction_processor_pid)
+    send(pid, {:replied, content})
+  end
+
+  def done do
+    pid = Application.get_env(:build_man, :config_extraction_processor_pid)
+    send(pid, :finished)
   end
 end

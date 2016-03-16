@@ -47,9 +47,9 @@ defmodule RabbitCICore.BuildTest do
     assert {:branch_id, "does not exist"} in changeset.errors
   end
 
-  test "changset with branch is valid" do
+  test "changeset with branch is valid" do
     assert {:ok, _model} =
-      Project.changeset(%Project{}, %{name: "project1", repo: "repo123"})
+      Project.changeset(%Project{}, %{name: "a/project1", repo: "repo123"})
       |> Repo.insert!
       |> Model.build(:branches)
       |> Branch.changeset(%{name: "branch1"})
@@ -61,7 +61,7 @@ defmodule RabbitCICore.BuildTest do
 
   test "build_number is incremented in the scope of a branch" do
     p1 =
-      Project.changeset(%Project{}, %{name: "project1", repo: "repo123"})
+      Project.changeset(%Project{}, %{name: "a/project1", repo: "repo123"})
       |> Repo.insert!
 
     b1 =
@@ -96,7 +96,7 @@ defmodule RabbitCICore.BuildTest do
 
   test "build_number must be unique in the scope of branch" do
     p1 =
-      Project.changeset(%Project{}, %{name: "project1", repo: "repo123"})
+      Project.changeset(%Project{}, %{name: "a/project1", repo: "repo123"})
       |> Repo.insert!
 
     b1 =
@@ -142,7 +142,7 @@ defmodule RabbitCICore.BuildTest do
 
   test "status/1 for build" do
     build =
-      Project.changeset(%Project{}, %{name: "project1", repo: "repo123"})
+      Project.changeset(%Project{}, %{name: "a/project1", repo: "repo123"})
       |> Repo.insert!
       |> Model.build(:branches)
       |> Branch.changeset(%{name: "branch1"})
@@ -162,7 +162,7 @@ defmodule RabbitCICore.BuildTest do
 
   test "status/1 for build with no steps" do
     build =
-      Project.changeset(%Project{}, %{name: "project1", repo: "repo123"})
+      Project.changeset(%Project{}, %{name: "a/project1", repo: "repo123"})
       |> Repo.insert!
       |> Model.build(:branches)
       |> Branch.changeset(%{name: "branch1"})

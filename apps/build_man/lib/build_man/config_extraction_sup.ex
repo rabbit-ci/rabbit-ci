@@ -4,6 +4,7 @@ defmodule BuildMan.ConfigExtractionSup do
   alias RabbitCICore.Repo
   alias RabbitCICore.Build
   alias RabbitCICore.SSHKey
+  alias BuildMan.ProjectConfig
   require Logger
   use GenServer
   use AMQP
@@ -12,6 +13,7 @@ defmodule BuildMan.ConfigExtractionSup do
     GenServer.start_link(__MODULE__, :ok, name: __MODULE__)
   end
 
+  @processor Application.get_env(:build_man, :config_extraction_processor, __MODULE__)
   @exchange Application.get_env(:build_man, :config_extraction_exchange)
   @queue Application.get_env(:build_man, :config_extraction_queue)
   @worker_limit Application.get_env(:build_man, :config_extraction_limit)
@@ -62,7 +64,7 @@ defmodule BuildMan.ConfigExtractionSup do
       receive do
         {:EXIT, _pid, _reason} ->
           if Process.alive?(chan.pid), do: Basic.ack(chan, tag)
-          BuildMan.FileExtraction.finish
+          @processor.done
       end
     end
     {:noreply, chan}
@@ -83,8 +85,7 @@ defmodule BuildMan.ConfigExtractionSup do
         Path.join([path, payload.file])
         |> File.read!
 
-      BuildMan.FileExtraction.reply(payload.file, contents, payload.build_id,
-                                    payload)
+      @processor.process_config(payload.file, contents, payload.build_id, payload)
     rescue
       e ->
         Repo.get(Build, payload.build_id)
@@ -107,14 +108,9 @@ defmodule BuildMan.ConfigExtractionSup do
   defp clone_repo(path, payload, ssh_key) do
     GitHelpers.clone_repo_with_ssh_key(path, payload, ssh_key)
   end
-end
-
-defmodule BuildMan.FileExtraction do
-  require Logger
-  alias BuildMan.ProjectConfig
 
   # Payload includes pr/commit.
-  def reply(name, contents, build_id, payload)
+  def process_config(name, contents, build_id, payload)
   when is_binary(name) and is_binary(contents) do
     Logger.debug """
     Got file #{name}, contents:\n\n    #{
@@ -127,7 +123,5 @@ defmodule BuildMan.FileExtraction do
     |> ProjectConfig.queue_builds(build_id, payload)
   end
 
-  def finish do
-    Logger.debug "Finished Extracting config"
-  end
+  def done, do: Logger.debug("Finished Extracting config")
 end
