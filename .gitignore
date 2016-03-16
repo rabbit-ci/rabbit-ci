@@ -3,3 +3,4 @@
 erl_crash.dump
 **/cover/
 *.ez
+config/prod.secret.exs

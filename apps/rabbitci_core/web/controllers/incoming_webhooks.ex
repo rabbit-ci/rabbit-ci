@@ -5,8 +5,7 @@ defmodule RabbitCICore.IncomingWebhooks do
   alias RabbitCICore.Project
   alias RabbitCICore.Repo
 
-  @exchange Application.get_env(:rabbitci_core, :config_extraction_exchange,
-                                "fake_exchange")
+  @exchange Application.get_env(:build_man, :config_extraction_exchange)
 
   # Project name, commit, pr #, branch name.
   def start_build(p = %{name: _, commit: _, pr: _, branch: _}) do
