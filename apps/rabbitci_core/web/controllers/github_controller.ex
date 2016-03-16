@@ -58,13 +58,13 @@ defmodule RabbitCICore.GitHubController do
                                           "pull_request" =>
                                             %{"head" =>
                                                %{"sha" => commit,
-                                                 "ref" => branch}},
+                                                 "ref" => _branch}},
                                           "repository" =>
                                             %{"full_name" => name}}},
                                @pull_request_event)
   when action in ["opened", "synchronize"] do
     assign(conn, :fixed_params, %{pr: number,
-                                  branch: branch,
+                                  branch: "^pr/#{number}",
                                   commit: commit,
                                   name: name})
   end
