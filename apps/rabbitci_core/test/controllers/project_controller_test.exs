@@ -34,7 +34,7 @@ defmodule RabbitCICore.ProjectControllerTest do
     conn = get conn, project_path(conn, :index, [name: project.name])
     body = json_response(conn, 200)
     conn_alt = get conn, project_path(conn, :index, project.name, [])
-    body_alt = json_response(conn, 200)
+    body_alt = json_response(conn_alt, 200)
 
     assert body == body_alt
     resp_project = body["data"]

@@ -1,6 +1,5 @@
 defmodule BuildMan.ConfigExtractionSupTest do
   use RabbitCICore.ModelCase
-  import Mock
   alias RabbitCICore.Project
   alias RabbitCICore.Branch
   alias RabbitCICore.Build
