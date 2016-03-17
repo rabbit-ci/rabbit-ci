@@ -28,12 +28,12 @@ defmodule BuildMan.ProjectConfig do
             |> Repo.insert!
 
         config = %{
-          box: box,
           script: step_config["script"],
           before_script: step_config["before_script"],
           build_id: build.id,
           step_id: step.id,
-          git: Map.take(pr_or_commit, [:pr, :commit])
+          provider_config: %{git: Map.take(pr_or_commit, [:pr, :commit]),
+                             box: box}
         }
 
         RabbitMQ.publish(@exchange, "#{build.id}.#{step.id}", :erlang.term_to_binary(config))

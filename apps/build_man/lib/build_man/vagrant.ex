@@ -19,21 +19,12 @@ defmodule BuildMan.Vagrant do
   end
 
   # Server callbacks
-  def init([%{box: box,
-              script: script,
-              before_script: before_script,
-              build_id: build_id,
-              step_id: step_id,
-              git: git}, {chan, tag}]) do
+  def init([config, {chan, tag}]) do
     Process.flag(:trap_exit, true)
     {:ok, count_agent} = Agent.start_link(fn -> 0 end)
     send(self, :start_build)
 
-    worker = Worker.create(%{build_id: build_id,
-                             step_id: step_id,
-                             provider_config: %{box: box, git: git},
-                             script: script,
-                             before_script: before_script})
+    worker = Worker.create(config)
 
     Worker.log(worker, "Starting: #{worker.build_id}.#{worker.step_id}.\n\n",
                :stdout, increment_counter(count_agent))
