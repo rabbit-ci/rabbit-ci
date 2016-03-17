@@ -33,24 +33,5 @@ export default Ember.Route.extend({
     builds.forEach((build) => {
       build.connectToChan();
     });
-  },
-
-  _disconnectBuildsFromChan(builds) {
-    builds.forEach((build) => {
-      build.disconnectFromChan();
-    });
-  },
-
-  actions: {
-    willTransition() {
-      Ember.removeObserver(this, 'currentModel.builds', this, 'buildsChanged');
-      if (this.get('currentModel.builds')) {
-        this.get('currentModel.builds')
-          .then((builds) => this._disconnectBuildsFromChan(builds));
-      }
-
-      this.currentModel.disconnectFromChan();
-      return true;
-    }
   }
 });

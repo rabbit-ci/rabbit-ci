@@ -29,15 +29,6 @@ export default Ember.Route.extend({
   actions: {
     reloadModel() {
       this.refresh();
-    },
-
-    willTransition() {
-      this.currentModel.get('steps').forEach((step) => {
-        step.disconnectFromChan();
-      });
-
-      this.currentModel.disconnectFromChan();
-      return true;
     }
   }
 });

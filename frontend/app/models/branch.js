@@ -22,11 +22,5 @@ export default DS.Model.extend({
     });
 
     this.set('channel', chan);
-  },
-
-  disconnectFromChan() {
-    let chan = this.get('channel');
-    if (chan) chan.leave();
-    this.set('channel', null);
   }
 });
