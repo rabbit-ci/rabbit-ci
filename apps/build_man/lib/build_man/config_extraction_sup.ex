@@ -71,7 +71,7 @@ defmodule BuildMan.ConfigExtractionSup do
   end
 
   defp consume(channel, _tag, _redelivered, packed_payload) do
-    payload = Map.merge(%{file: ".rabbitci.yaml"},
+    payload = Map.merge(%{file: ".rabbitci.json"},
                         :erlang.binary_to_term(packed_payload))
 
     Logger.debug "Extracting config. Payload: #{inspect payload}"
@@ -119,7 +119,7 @@ defmodule BuildMan.ConfigExtractionSup do
     """
 
     contents
-    |> ProjectConfig.parse_from_yaml
+    |> ProjectConfig.parse_from_json
     |> ProjectConfig.queue_builds(build_id, payload)
   end
 

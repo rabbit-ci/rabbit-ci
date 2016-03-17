@@ -8,8 +8,8 @@ defmodule BuildMan.ProjectConfig do
 
   @exchange Application.get_env(:build_man, :build_exchange)
 
-  def parse_from_yaml(content) do
-    YamlElixir.read_from_string(content)
+  def parse_from_json(content) do
+    Poison.decode!(content)
   end
 
   @doc """
