@@ -1,13 +1,15 @@
 defmodule RabbitCICore.ProjectView do
   use RabbitCICore.Web, :view
+  use JaSerializer.PhoenixView
 
-  alias RabbitCICore.ProjectSerializer
+  alias RabbitCICore.Router.Helpers, as: RouterHelpers
 
-  def render("index.json", %{conn: conn, projects: projects}) do
-    ProjectSerializer.format(projects, conn, %{})
-  end
+  attributes [:name, :repo, :inserted_at, :updated_at]
+  has_many :branches , link: :branches_link
 
-  def render("index.json", %{conn: conn, project: project}) do
-    ProjectSerializer.format(project, conn, %{})
+  def type, do: "projects"
+
+  def branches_link(record, conn) do
+    RouterHelpers.branch_path(conn, :index, %{project: record.name})
   end
 end

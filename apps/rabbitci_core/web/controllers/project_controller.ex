@@ -6,13 +6,11 @@ defmodule RabbitCICore.ProjectController do
   def index(conn, %{"name" => name}) do
     project = Repo.get_by!(Project, name: name)
     conn
-    |> assign(:project, project)
-    |> render
+    |> render(data: project)
   end
 
   def index(conn, _params) do # TODO: Paginate
     conn
-    |> assign(:projects, Repo.all(Project))
-    |> render
+    |> render(data: Repo.all(Project))
   end
 end

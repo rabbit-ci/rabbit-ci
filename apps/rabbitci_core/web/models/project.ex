@@ -5,7 +5,6 @@ defmodule RabbitCICore.Project do
   alias RabbitCICore.Branch
   alias RabbitCICore.Build
   alias RabbitCICore.SSHKey
-  alias RabbitCICore.Project
 
   schema "projects" do
     field :name, :string
@@ -36,6 +35,7 @@ defmodule RabbitCICore.Project do
     query = from b in Build,
            join: br in assoc(b, :branch),
            join: p in assoc(br, :project),
+          where: p.id == ^project.id,
        order_by: [desc: b.inserted_at],
           limit: 1,
         preload: [branch: br]

@@ -1,15 +1,7 @@
-defimpl JaSerializer.Formatter, for: [Task] do
-  alias JaSerializer.Formatter
+defmodule RabbitCICore.StepView do
+  use RabbitCICore.Web, :view
+  use JaSerializer.PhoenixView
 
-  def format(task) do
-    task
-    |> Task.await
-    |> Formatter.format
-  end
-end
-
-defmodule RabbitCICore.StepSerializer do
-  use JaSerializer
   alias RabbitCICore.Step
 
   attributes [:name, :status, :log, :start_time, :finish_time]

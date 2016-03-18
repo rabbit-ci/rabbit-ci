@@ -4,7 +4,7 @@ defmodule RabbitCICore.Build do
   alias RabbitCICore.Branch
   alias RabbitCICore.Step
   alias RabbitCICore.Build
-  alias RabbitCICore.BuildSerializer
+  alias RabbitCICore.BuildView
   alias RabbitCICore.Endpoint
 
   def set_build_number(changes) do
@@ -80,7 +80,7 @@ defmodule RabbitCICore.Build do
     build_id
     |> json_from_id_query
     |> Repo.one!
-    |> BuildSerializer.format(Endpoint, %{})
+    |> BuildView.format(Endpoint, %{})
   end
 
   defp json_from_id_query(build_id) do

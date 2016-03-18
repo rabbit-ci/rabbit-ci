@@ -1,9 +1,9 @@
 defmodule RabbitCICore.GitHubView do
   use RabbitCICore.Web, :view
 
-  alias RabbitCICore.BuildSerializer
+  alias RabbitCICore.BuildView
 
   def render("create.json", %{conn: conn, build: build}) do
-    BuildSerializer.format(build, conn, %{})
+    BuildView.format(build, conn, %{})
   end
 end

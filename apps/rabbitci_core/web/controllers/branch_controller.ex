@@ -3,22 +3,19 @@ defmodule RabbitCICore.BranchController do
 
   import Ecto.Query
   alias RabbitCICore.Branch
-  alias RabbitCICore.Router.Helpers, as: RouterHelpers
 
   def index(conn, %{"project" => project_name, "branch" => branch_name}) do
     branch = Repo.get_by!(branch_query(project_name), name: branch_name)
 
     conn
-    |> assign(:branch, branch)
-    |> render
+    |> render(data: branch)
   end
 
   def index(conn, %{"project" => project_name}) do
     branches = Repo.all branch_query(project_name)
 
     conn
-    |> assign(:branches, branches)
-    |> render
+    |> render(data: branches)
   end
 
   def branch_query(project_name) do

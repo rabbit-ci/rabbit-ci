@@ -1,7 +1,6 @@
 defmodule RabbitCICore.Log do
   use RabbitCICore.Web, :model
   alias RabbitCICore.Step
-  alias RabbitCICore.Repo
 
   schema "logs" do
     field :stdio, :string

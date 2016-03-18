@@ -28,8 +28,7 @@ defmodule RabbitCICore.BuildController do
                     preload: [steps: sa, branch: {br, project: p}])
 
     conn
-    |> assign(:builds, builds)
-    |> render
+    |> render(data: builds)
   end
 
   def start_build(conn, p = %{"name" => _, "commit" => _, "branch" => _}) do
@@ -39,8 +38,7 @@ defmodule RabbitCICore.BuildController do
     |> Webhooks.start_build do
       {:ok, build} ->
         conn
-        |> assign(:build, build)
-        |> render("index.json")
+        |> render(data: build)
       {:error, reason} ->
         conn
         |> put_status(:bad_request)
@@ -83,9 +81,8 @@ defmodule RabbitCICore.BuildController do
       |> Repo.preload(:steps)
 
     conn
-    |> assign(:builds, builds)
     |> assign(:no_logs, true)
-    |> render
+    |> render(data: builds)
   end
 
   def index(conn, %{"build_number" => "latest",
@@ -103,8 +100,7 @@ defmodule RabbitCICore.BuildController do
     build = Repo.one! query
 
     conn
-    |> assign(:build, build)
-    |> render
+    |> render(data: build)
   end
 
   def index(conn, %{"build_number" => build_number,
@@ -121,8 +117,7 @@ defmodule RabbitCICore.BuildController do
     build = Repo.one! query
 
     conn
-    |> assign(:build, build)
-    |> render
+    |> render(data: build)
   end
 
   def index(conn, params) do
