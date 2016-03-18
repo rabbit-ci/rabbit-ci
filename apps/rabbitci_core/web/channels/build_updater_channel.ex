@@ -18,11 +18,8 @@ defmodule RabbitCICore.BuildUpdaterChannel do
 
   def update_build(build_id) do
     Task.start fn ->
-      try do
-        payload = Build.json_from_id!(build_id)
-        Endpoint.broadcast("builds:#{build_id}", "update:build", payload)
-      rescue e -> :ok
-      end
+      payload = Build.json_from_id!(build_id)
+      Endpoint.broadcast("builds:#{build_id}", "update:build", payload)
     end
   end
 end
