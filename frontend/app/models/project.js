@@ -8,7 +8,7 @@ export default DS.Model.extend({
   owner: Ember.computed('name', function() {
     return this.get('name').split('/')[0];
   }),
-  repo: Ember.computed('name', function() {
+  repo_name: Ember.computed('name', function() {
     return this.get('name').split('/')[1];
   })
 });

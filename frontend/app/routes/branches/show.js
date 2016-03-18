@@ -11,7 +11,7 @@ export default Ember.Route.extend({
   serialize(model, params) {
     return {
       owner: model.get("project.owner"),
-      repo: model.get("project.repo"),
+      repo_name: model.get("project.repo_name"),
       branch_name: encodeURIComponent(model.get("name"))
     };
   },
