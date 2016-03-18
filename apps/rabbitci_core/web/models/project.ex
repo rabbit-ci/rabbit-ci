@@ -30,16 +30,4 @@ defmodule RabbitCICore.Project do
     |> unique_constraint(:name)
     |> unique_constraint(:repo)
   end
-
-  def latest_build(project) do
-    query = from b in Build,
-           join: br in assoc(b, :branch),
-           join: p in assoc(br, :project),
-          where: p.id == ^project.id,
-       order_by: [desc: b.inserted_at],
-          limit: 1,
-        preload: [branch: br]
-
-   Repo.one(query)
-  end
 end
