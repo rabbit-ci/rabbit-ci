@@ -19,11 +19,11 @@ setup_osx: BREW-exists
 check:
 	mix test
 
-apps/rabbitci_core/config/prod.secret.exs:
-	cp apps/rabbitci_core/config/prod.secret.exs.example apps/rabbitci_core/config/prod.secret.exs
+config/prod.secret.exs:
+	cp config/prod.secret.exs.example config/prod.secret.exs
 
 # Test env auto migrates
-migrate: apps/rabbitci_core/config/prod.secret.exs
+migrate: config/prod.secret.exs
 	MIX_ENV=dev mix ecto.create -r RabbitCICore.EctoRepo
 	MIX_ENV=dev mix ecto.migrate -r RabbitCICore.EctoRepo
 	MIX_ENV=prod mix ecto.create -r RabbitCICore.EctoRepo
