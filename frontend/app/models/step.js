@@ -9,7 +9,8 @@ export default DS.Model.extend({
   startTime: DS.attr('date'),
   finishTime: DS.attr('date'),
   duration: Ember.computed('startTime', 'finishTime', function() {
-    return this.get('finishTime') - this.get('startTime');
+    let time = this.get('finishTime') || new Date();
+    return time - this.get('startTime');
   }),
   htmlLog: Ember.computed('log', function() {
     if (!this.get('log')) return "loading...";

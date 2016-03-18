@@ -7,9 +7,15 @@
 
 {{#each model.steps as |step|}}
   <h3>{{step.name}} <span class="status-{{step.status}}">{{step.status}}</span></h3>
-  <p>Started: {{step.startTime}}</p>
-  <p>Finished: {{step.finishTime}}</p>
-  <p>Duration: {{moment-duration step.duration}}</p>
+  {{#if step.startTime}}
+    <p>Started: {{step.startTime}}</p>
+    <p>Finished: {{step.finishTime}}</p>
+    <p>Duration: {{#if step.finishTime}}
+      {{moment-duration step.duration}}
+    {{else}}
+      {{moment-from-now step.startTime interval=500}}
+    {{/if}}</p>
+  {{/if}}
   <pre class="log">{{{step.htmlLog}}}</pre>
 {{/each}}
 
