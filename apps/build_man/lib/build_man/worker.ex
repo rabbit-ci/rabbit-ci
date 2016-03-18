@@ -51,12 +51,28 @@ defmodule BuildMan.Worker do
 
   # Generates the default callbacks for workers. This is used in create/0.
   defp default_callbacks do
-    for event <- @events, into: %{} do
-      {event, fn worker ->
-        Step.update_status!(worker.step_id, to_string(event))
+    %{
+      running: (fn worker ->
+        Step.update_status!(worker.step_id, to_string(:running))
+        Repo.update! Step.changeset(Worker.get_step(worker), %{start_time: Ecto.DateTime.utc})
         {:ok, worker}
-      end}
-    end
+      end),
+      finished: (fn worker ->
+        Step.update_status!(worker.step_id, to_string(:finished))
+        Repo.update! Step.changeset(Worker.get_step(worker), %{finish_time: Ecto.DateTime.utc})
+        {:ok, worker}
+      end),
+      failed: (fn worker ->
+        Step.update_status!(worker.step_id, to_string(:failed))
+        Repo.update! Step.changeset(Worker.get_step(worker), %{finish_time: Ecto.DateTime.utc})
+        {:ok, worker}
+      end),
+      error: (fn worker ->
+        Step.update_status!(worker.step_id, to_string(:error))
+        Repo.update! Step.changeset(Worker.get_step(worker), %{finish_time: Ecto.DateTime.utc})
+        {:ok, worker}
+      end)
+     }
   end
 
   @doc """

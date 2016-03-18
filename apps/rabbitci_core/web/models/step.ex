@@ -5,6 +5,8 @@ defmodule RabbitCICore.Step do
   schema "steps" do
     field :status, :string
     field :name, :string
+    field :start_time, Ecto.DateTime
+    field :finish_time, Ecto.DateTime
     has_many :logs, Log
     # TODO: artifacts
     belongs_to :build, Build
@@ -19,7 +21,7 @@ defmodule RabbitCICore.Step do
   """
   def changeset(model, params \\ :empty) do
     model
-    |> cast(params, ~w(build_id name status), ~w())
+    |> cast(params, ~w(build_id name status), ~w(start_time finish_time))
     |> validate_inclusion(:status, ["queued", "running", "failed", "finished", "error"])
     |> foreign_key_constraint(:build_id)
   end

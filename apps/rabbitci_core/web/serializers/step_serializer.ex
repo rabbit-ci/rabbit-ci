@@ -14,7 +14,7 @@ defmodule RabbitCICore.StepSerializer do
   alias RabbitCICore.Step
   alias RabbitCICore.BuildSerializer
 
-  attributes [:name, :status, :log]
+  attributes [:name, :status, :log, :start_time, :finish_time]
 
   def type, do: "steps"
   def log(r, %Plug.Conn{assigns: %{no_logs: true}}), do: nil

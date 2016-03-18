@@ -30,8 +30,6 @@ defmodule RabbitCICore.Build do
 
   schema "builds" do
     field :build_number, :integer
-    field :start_time, Ecto.DateTime
-    field :finish_time, Ecto.DateTime
     field :commit, :string
     field :config_extracted, :string, default: "false"
 
@@ -42,7 +40,7 @@ defmodule RabbitCICore.Build do
   end
 
   @required_params ~w(branch_id commit config_extracted)
-  @optional_params ~w(start_time build_number finish_time)
+  @optional_params ~w(build_number)
 
   @doc """
   Creates a changeset based on the `model` and `params`.

@@ -6,10 +6,15 @@ export default DS.Model.extend({
   status: DS.attr('string'),
   log: DS.attr('string'),
   build: DS.belongsTo('build'),
-  htmlLog: Ember.computed(function() {
+  startTime: DS.attr('date'),
+  finishTime: DS.attr('date'),
+  duration: Ember.computed('startTime', 'finishTime', function() {
+    return this.get('finishTime') - this.get('startTime');
+  }),
+  htmlLog: Ember.computed('log', function() {
     if (!this.get('log')) return "loading...";
     return ansi_up.ansi_to_html(this.get('log'), {use_classes: true});
-  }).property('log'),
+  }),
 
   connectToChan() {
     if (this.get('channel')) return;
