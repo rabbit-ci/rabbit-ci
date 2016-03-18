@@ -117,4 +117,21 @@ defmodule BuildMan.Worker do
   def get_step(%Worker{step_id: step_id}), do: Repo.get!(Step, step_id)
 
   def get_repo(%Worker{build_id: build_id}), do: Build.get_repo_from_id!(build_id)
+
+  def env_vars(worker = %Worker{}) do
+    step = get_step(worker) |> Repo.preload([build: [branch: :project]])
+    build = step.build
+    branch = build.branch
+    project = branch.project
+
+    %{"RABBIT_CI_BUILD_NUMBER" => build.build_number,
+      "RABBIT_CI_STEP" => step.name,
+      "RABBIT_CI_BRANCH" => branch.name,
+      "RABBIT_CI_PROJECT" => project.name,
+      "RABBIT_CI_BOX" => worker.provider_config.box}
+    |> env_vars_git(worker.provider_config.git)
+  end
+
+  defp env_vars_git(vars, %{pr: pr}), do: Map.put(vars, "RABBIT_CI_PR", pr)
+  defp env_vars_git(vars, %{commit: commit}), do: Map.put(vars, "RABBIT_CI_COMMIT", commit)
 end

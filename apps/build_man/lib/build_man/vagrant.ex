@@ -8,7 +8,7 @@ defmodule BuildMan.Vagrant do
   require EEx
   alias BuildMan.FileHelpers
   alias BuildMan.Worker
-  alias BuildMan.GitHelpers
+  alias BuildMan.Vagrant.Script
   alias BuildMan.Vagrant.Vagrantfile
   alias RabbitCICore.Step
   alias RabbitCICore.SSHKey
@@ -20,7 +20,6 @@ defmodule BuildMan.Vagrant do
 
   # Server callbacks
   def init([config, {chan, tag}]) do
-    Process.flag(:trap_exit, true)
     {:ok, count_agent} = Agent.start_link(fn -> 0 end)
     send(self, :start_build)
 
@@ -76,24 +75,10 @@ defmodule BuildMan.Vagrant do
     {:noreply, %{state | cmd: {:up, pid}}}
   end
 
-  def handle_info(:run_build_script,
-                  state = %{worker: worker = %{script: scr,
-                                               before_script: before_scr,
-                                               provider_config: %{git: git}}}) do
-    git = put_in(git[:repo], Worker.get_repo(worker))
-    git_cmd =
-      GitHelpers.clone_repo("workdir", git, false)
-      |> Enum.join("\n")
-    script = ~s"""
-    set -v
-    set -e
-    #{before_scr}
-    #{git_cmd}
-    cd workdir
-    #{scr}
-    """
+  def handle_info(:run_build_script, state = %{worker: worker}) do
+    script = Script.generate(worker)
+    Logger.debug("Running script:\n#{script}")
     {_, pid, _} = command(["ssh", "-c", "sh", "-c", script], state)
-
     {:noreply, %{state | cmd: {:ssh, pid}}}
   end
 
