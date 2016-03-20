@@ -1,7 +1,7 @@
 defmodule RabbitCICore.BuildController do
   use RabbitCICore.Web, :controller
   import Ecto.Query
-  alias RabbitCICore.{Build, Step, Repo}
+  alias RabbitCICore.{Build, Step, Repo, Project}
   alias RabbitCICore.IncomingWebhooks, as: Webhooks
 
   # This gets all of the currently running builds.
@@ -31,8 +31,13 @@ defmodule RabbitCICore.BuildController do
     |> render(data: builds)
   end
 
-  def start_build(conn, p = %{"name" => _, "commit" => _, "branch" => _}) do
-    case p
+  def start_build(conn, params = %{"name" => name,
+                                   "commit" => _,
+                                   "branch" => _,
+                                   "webhook_secret" => secret}) do
+    # If the webhook secret is incorrect, this will return 404.
+    Repo.get_by!(Project, [name: name, webhook_secret: secret])
+    case params
     |> Map.take(["name", "commit", "branch", "pr"])
     |> atomize_keys!
     |> Webhooks.start_build do
@@ -48,7 +53,7 @@ defmodule RabbitCICore.BuildController do
   def start_build(conn, _) do
     conn
     |> put_status(:bad_request)
-    |> json(%{message: "Missing params. Required: name, commit, branch."})
+    |> json(%{message: "Missing params. Required: name, commit, branch, webhook_secret."})
   end
 
   # WARNING: This function can be very dangerous.
