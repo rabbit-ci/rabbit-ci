@@ -1,14 +1,12 @@
 defmodule RabbitCICore.Step do
   use RabbitCICore.Web, :model
-  alias RabbitCICore.Log
-  alias RabbitCICore.Build
-  alias RabbitCICore.Log
-  alias RabbitCICore.Repo
-  alias RabbitCICore.Step
+  alias RabbitCICore.{Log, Build, Step, Repo}
 
   schema "steps" do
     field :status, :string
     field :name, :string
+    field :start_time, Ecto.DateTime
+    field :finish_time, Ecto.DateTime
     has_many :logs, Log
     # TODO: artifacts
     belongs_to :build, Build
@@ -22,16 +20,19 @@ defmodule RabbitCICore.Step do
   with no validation performed.
   """
   def changeset(model, params \\ :empty) do
-    cast(model, params, ~w(build_id name status), ~w())
-    |> validate_inclusion(:status, ["queued", "running", "failed", "finished"])
+    model
+    |> cast(params, ~w(build_id name status), ~w(start_time finish_time))
+    |> validate_inclusion(:status, ["queued", "running", "failed", "finished", "error"])
+    |> foreign_key_constraint(:build_id)
   end
 
-  def log(_step, _clean \\ :clean)
+  def log(step, clean \\ :clean)
   def log(step, :clean), do: clean_log log(step, :no_clean)
   def log(step, :no_clean) do
-    from(l in assoc(step, :logs),
-         order_by: [asc: l.order],
-         select: l.stdio)
+    step
+    |> assoc(:logs)
+    |> order_by([l], asc: l.order)
+    |> select([l], l.stdio)
     |> Repo.all
     |> Enum.join
   end
@@ -40,10 +41,11 @@ defmodule RabbitCICore.Step do
     Regex.replace(~r/\x1b(\[[0-9;]*[mK])?/, raw_log, "")
   end
 
-  # This is for use in BuildMan.Vagrant. You can use it, but you probably
+  # This is for use in BuildMan. You can use it, but you probably
   # shouldn't as it uses step_id instead of a %Step{}.
   def update_status!(step_id, status) do
-    Repo.get!(Step, step_id)
+    Step
+    |> Repo.get!(step_id)
     |> Step.changeset(%{status: status})
     |> Repo.update!
   end

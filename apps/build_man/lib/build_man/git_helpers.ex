@@ -25,15 +25,16 @@ defmodule BuildMan.GitHelpers do
   def clone_repo(path, %{repo: repo, pr: pr}, should_run, exec_opts) do
     clone = git(["clone", repo, path], should_run)
 
-    cmds = [["fetch", "origin", "+refs/pull/#{pr}/merge:pr/#{pr}"],
-            ["checkout", "-qf", "pr/#{pr}"],
+    cmds = [["fetch", "origin", "+refs/pull/#{pr}/merge:"],
+            ["checkout", "-qf", "FETCH_HEAD"],
             ["rev-parse", "HEAD"]]
 
     [clone | (for cmd <- cmds, do: git(cmd, should_run,
                                        [path: path, exec_opts: exec_opts]))]
   end
 
-  def git(args, true, opts \\ []) when is_list(args) do
+  def git(args, should_run, opts \\ [])
+  def git(args, true, opts) when is_list(args) do
     args =
       case Keyword.get(opts, :path) do
         nil -> args

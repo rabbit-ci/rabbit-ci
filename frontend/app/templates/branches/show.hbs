@@ -1,0 +1,35 @@
+{{#link-to "projects.show" model.project}}&#171; All Branches{{/link-to}}
+
+<h1>{{model.project.name}}/{{model.name}}</h1>
+
+{{#link-to "builds.show" model.project.name model.name "latest"}}Latest{{/link-to}}
+
+<table>
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Commit</th>
+      <th>Status</th>
+      <th>Inserted at</th>
+      <th>Steps</th>
+    </tr>
+  </thead>
+  <tbody>
+    {{#each model.sortedBuilds as |build|}}
+      <tr>
+
+        <td>{{#link-to "builds.show" build}}{{build.buildNumber}}{{/link-to}}</td>
+        <td>{{build.commit}}</td>
+        <td class="status-{{build.status}}">{{build.status}}</td>
+        <td>{{moment-from-now build.insertedAt}}</td>
+        <td><ul>
+          {{#each build.steps as |step|}}
+            <li>{{step.name}}</li>
+          {{/each}}
+        </ul></td>
+      </tr>
+    {{/each}}
+  </tbody>
+</table>
+
+{{outlet}}

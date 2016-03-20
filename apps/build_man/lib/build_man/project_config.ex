@@ -1,7 +1,6 @@
 defmodule BuildMan.ProjectConfig do
   alias RabbitCICore.Repo
   alias RabbitCICore.Build
-  alias BuildMan.GitHelpers
 
   @moduledoc """
   Module for processing configs.
@@ -9,42 +8,35 @@ defmodule BuildMan.ProjectConfig do
 
   @exchange Application.get_env(:build_man, :build_exchange)
 
+  def parse_from_json(content) do
+    Poison.decode!(content)
+  end
+
   @doc """
-  Queue build from parsed config. See `parse_from_yaml/1` for parsing
+  Queue builds from parsed config. See `parse_from_yaml/1` for parsing
   the config.
   """
-  def queue_build(config, build_id, step_name) do
-    step =
-      Repo.get(Build, build_id)
-      |> Ecto.Model.build(:steps, %{status: "queued", name: step_name})
-      |> Repo.insert!
-
-    config = Map.merge(config, %{build_id: build_id, step_name: step_name,
-                                 step_id: step.id})
-
-    RabbitMQ.publish(@exchange, "#{build_id}.#{step_name}",
-                     :erlang.term_to_binary(config))
-  end
-
-  def parse_from_yaml(content) do
-    YamlElixir.read_from_string(content)
-  end
-
-  def queue_builds(%{"steps" => steps, "repo" => repo_url}, build_id, repo)
+  def queue_builds(%{"steps" => steps}, build_id, pr_or_commit)
   when is_list(steps) do
-    git_cmd =
-      GitHelpers.clone_repo("workdir", repo, false)
-      |> Enum.join("\n")
+    build = Repo.get(Build, build_id)
 
-    for step <- steps do
-      for box <- step["boxes"] do
-        %{
-          box: box,
-          script: step["command"],
-          name: step["name"],
-          repo: repo_url,
-          git_cmd: git_cmd
-        } |> queue_build(build_id, "#{step["name"]} #{box}")
+    for step_config <- steps do
+      for box <- step_config["boxes"] do
+        step =
+          build
+            |> Ecto.Model.build(:steps, %{status: "queued", name: "#{step_config["name"]} #{box}"})
+            |> Repo.insert!
+
+        config = %{
+          script: step_config["script"],
+          before_script: step_config["before_script"],
+          build_id: build.id,
+          step_id: step.id,
+          provider_config: %{git: Map.take(pr_or_commit, [:pr, :commit]),
+                             box: box}
+        }
+
+        RabbitMQ.publish(@exchange, "#{build.id}.#{step.id}", :erlang.term_to_binary(config))
       end
     end
   end

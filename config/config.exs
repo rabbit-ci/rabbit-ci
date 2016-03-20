@@ -2,39 +2,35 @@
 # and its dependencies with the aid of the Mix.Config module.
 use Mix.Config
 
-# This configuration is loaded before any dependency and is restricted
-# to this project. If another project depends on this project, this
-# file won't be loaded nor affect the parent project. For this reason,
-# if you want to provide default values for your application for third-
-# party users, it should be done in your mix.exs file.
+config :rabbitci_core, :app_namespace, RabbitCICore
 
-# Sample configuration:
-#
-#     config :logger, :console,
-#       level: :info,
-#       format: "$date $time [$level] $metadata$message\n",
-#       metadata: [:user_id]
+# Configures the endpoint
+config :rabbitci_core, RabbitCICore.Endpoint,
+  url: [host: "localhost"],
+  secret_key_base: "MOd1xikwYz0y3kr5GlBxA4pDUf5catrgRfANogH5PaCp4QcaJXKpnvorZLq6j6DH",
+  debug_errors: false,
+  root: Path.expand("..", __DIR__),
+  pubsub: [name: RabbitCICore.PubSub,
+           adapter: Phoenix.PubSub.PG2]
 
-# It is also possible to import configuration files, relative to this
-# directory. For example, you can emulate configuration per environment
-# by uncommenting the line below and defining dev.exs, test.exs and such.
-# Configuration from the imported file will override the ones defined
-# here (which is why it is important to import them last).
-#
-#     import_config "#{Mix.env}.exs"
-# This file is responsible for configuring your application
-# and its dependencies with the aid of the Mix.Config module.
-use Mix.Config
+# Configures Elixir's Logger
+config :logger, :console,
+  format: "$time $metadata[$level] $levelpad$message\n",
+  metadata: [:request_id]
 
-# The configuration defined here will only affect the dependencies
-# in the apps directory when commands are executed from the umbrella
-# project. For this reason, it is preferred to configure each child
-# application directly and import its configuration, as done below.
-import_config "../apps/*/config/config.exs"
+config :plug, :mimes, %{
+  "application/vnd.api+json" => ["json"]
+}
 
-# Sample configuration (overrides the imported configuration above):
-#
-#     config :logger, :console,
-#       level: :info,
-#       format: "$date $time [$level] $metadata$message\n",
-#       metadata: [:user_id]
+config :build_man, :worker_limit, 2
+config :build_man, :config_extraction_limit, 2
+config :build_man, :log_streamer_limit, 10
+
+config :build_man, :build_logs_exchange, "rabbitci.build_logs"
+config :build_man, :build_logs_queue, "rabbitci.build_logs"
+config :build_man, :build_exchange, "rabbitci.builds"
+config :build_man, :build_queue, "rabbitci.builds"
+config :build_man, :config_extraction_exchange, "rabbitci.config_extraction"
+config :build_man, :config_extraction_queue, "rabbitci.config_extraction"
+
+import_config "#{Mix.env}.exs"

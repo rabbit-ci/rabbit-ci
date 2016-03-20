@@ -1,9 +1,7 @@
 defmodule RabbitCICore.BuildController do
   use RabbitCICore.Web, :controller
   import Ecto.Query
-  alias RabbitCICore.Build
-  alias RabbitCICore.Step
-  alias RabbitCICore.Repo
+  alias RabbitCICore.{Build, Step, Repo, Project}
   alias RabbitCICore.IncomingWebhooks, as: Webhooks
 
   # This gets all of the currently running builds.
@@ -30,70 +28,107 @@ defmodule RabbitCICore.BuildController do
                     preload: [steps: sa, branch: {br, project: p}])
 
     conn
-    |> assign(:builds, builds)
-    |> render
+    |> render(data: builds)
   end
 
-  def start_build(conn, p = %{"name" => _, "commit" => _, "branch" => _}) do
-    case Map.take(p, ["name", "commit", "branch", "pr"])
-    |> atomize_keys
+  def start_build(conn, params = %{"name" => name,
+                                   "commit" => _,
+                                   "branch" => _,
+                                   "webhook_secret" => secret}) do
+    # If the webhook secret is incorrect, this will return 404.
+    Repo.get_by!(Project, [name: name, webhook_secret: secret])
+    case params
+    |> Map.take(["name", "commit", "branch", "pr"])
+    |> atomize_keys!
     |> Webhooks.start_build do
       {:ok, build} ->
         conn
-        |> assign(:build, build)
-        |> render("show.json")
-      {:error, reason} -> conn |> put_status(:bad_request) |> json(reason)
+        |> render(data: build)
+      {:error, reason} ->
+        conn
+        |> put_status(:bad_request)
+        |> json(reason)
     end
   end
   def start_build(conn, _) do
     conn
     |> put_status(:bad_request)
-    |> json(%{message: "Missing params. Required: name, commit, branch."})
+    |> json(%{message: "Missing params. Required: name, commit, branch, webhook_secret."})
   end
 
-  defp atomize_keys(map) do
+  # WARNING: This function can be very dangerous.
+  #
+  # Do NOT atomize maps whose keys have not been filtered. Atoms are not garbage
+  # collected and this can lead to a DoS attack. Use carefully.
+  defp atomize_keys!(map) do
     for {key, val} <- map, into: %{}, do: {String.to_atom(key), val}
   end
 
+  # This route will *NOT* provide log output. You must fetch a *SINGLE* build if
+  # you want the logs.
   def index(conn, _params = %{"branch" => branch,
                               "project" => project,
                               "page" => %{"offset" => page}}) do
     page = String.to_integer(page)
-    builds =
-      (from b in Build,
-       join: br in assoc(b, :branch),
-       join: p in assoc(br, :project),
-       where: br.name == ^branch
-       and p.name == ^project,
-       limit: 30,
-       offset: ^(page * 30),
+    query = from b in Build,
+           join: br in assoc(b, :branch),
+           join: p in assoc(br, :project),
+          where: br.name == ^branch
+             and p.name == ^project,
+          limit: 30,
+         offset: ^(page * 30),
        order_by: [desc: b.build_number],
-       preload: [branch: {br, project: p}])
+        preload: [branch: {br, project: p}]
+
+    builds =
+      query
       |> Repo.all
-      |> Repo.preload(steps: :logs)
+      |> Repo.preload(:steps)
 
     conn
-    |> assign(:builds, builds)
-    |> render("index.json")
+    |> assign(:no_logs, true)
+    |> render(data: builds)
   end
+
+  def index(conn, %{"build_number" => "latest",
+                    "branch" => branch,
+                    "project" => project}) do
+    query = from b in Build,
+           join: br in assoc(b, :branch),
+           join: p in assoc(br, :project),
+          where: br.name == ^branch
+             and p.name == ^project,
+       order_by: [desc: b.build_number],
+          limit: 1,
+        preload: [branch: {br, project: p}]
+
+    build = Repo.one! query
+
+    conn
+    |> render(data: build)
+  end
+
+  def index(conn, %{"build_number" => build_number,
+                    "branch" => branch,
+                    "project" => project}) do
+    query = from b in Build,
+           join: br in assoc(b, :branch),
+           join: p in assoc(br, :project),
+          where: br.name == ^branch
+             and p.name == ^project
+             and b.build_number == ^build_number,
+         preload: [branch: {br, project: p}]
+
+    build = Repo.one! query
+
+    conn
+    |> render(data: build)
+  end
+
   def index(conn, params) do
-    index(conn, Map.merge(params, %{"page" => %{"offset" => "0"}}))
-  end
-
-  def show(conn, _params = %{"build_number" => build_number, "branch" => branch,
-                             "project" => project}) do
-    build =
-      (from b in Build,
-       join: br in assoc(b, :branch),
-       join: p in assoc(br, :project),
-       where: br.name == ^branch
-       and p.name == ^project
-       and b.build_number == ^build_number,
-       preload: [branch: {br, project: p}])
-      |> Repo.one!
-
-    conn
-    |> assign(:build, build)
-    |> render("show.json")
+    case params["page"] do
+      nil -> index(conn, Map.merge(params, %{"page" => %{"offset" => "0"}}))
+      _ -> send_resp(conn, :not_found, "")
+    end
   end
 end

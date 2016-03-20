@@ -58,13 +58,13 @@ defmodule RabbitCICore.GitHubController do
                                           "pull_request" =>
                                             %{"head" =>
                                                %{"sha" => commit,
-                                                 "ref" => branch}},
+                                                 "ref" => _branch}},
                                           "repository" =>
                                             %{"full_name" => name}}},
                                @pull_request_event)
   when action in ["opened", "synchronize"] do
     assign(conn, :fixed_params, %{pr: number,
-                                  branch: branch,
+                                  branch: "^pr/#{number}",
                                   commit: commit,
                                   name: name})
   end
@@ -83,13 +83,13 @@ defmodule RabbitCICore.GitHubController do
                                 %{project:
                                   %Project{webhook_secret: secret}}}, []) do
     signature = get_req_header(conn, "x-hub-signature")
-    case do_check_signature(signature, conn.private.raw_body, secret) do
-      true -> conn
-      false ->
-        conn
-        |> put_status(:unauthorized)
-        |> json(%{message: "Invalid x-hub-signature."})
-        |> halt
+    if do_check_signature(signature, conn.private.raw_body, secret) do
+      conn
+    else
+      conn
+      |> put_status(:unauthorized)
+      |> json(%{message: "Invalid x-hub-signature."})
+      |> halt
     end
   end
 
@@ -97,7 +97,8 @@ defmodule RabbitCICore.GitHubController do
   # If a secret has not been set, we do not allow access.
   defp do_check_signature(_, _, nil), do: false
   defp do_check_signature("sha1=" <> signature, body, secret) do
-    :crypto.hmac(:sha, secret, body)
+    :sha
+    |> :crypto.hmac(secret, body)
     |> Base.encode16
     |> String.upcase == String.upcase(signature)
   end

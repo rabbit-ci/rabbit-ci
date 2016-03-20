@@ -22,7 +22,11 @@ defmodule RabbitCICore.LogController do
                  select: {p, br, b})
 
     case Repo.one(query) do
-      nil -> put_status(conn, 404) |> text("Not found!") |> halt
+      nil ->
+        conn
+        |> put_status(404)
+        |> text("Not found!")
+        |> halt
       {project, branch, build} ->
         conn
         |> assign(:project, project)
@@ -32,18 +36,20 @@ defmodule RabbitCICore.LogController do
   end
 
   def show(conn, %{"format" => "ansi"}) do
-    text(conn, _log(conn))
+    log = do_log(conn)
+    text(conn, log)
   end
   def show(conn, %{"format" => "text"}) do
     # We're cleaning it _after_ we concat all the logs because the step name
     # could possibly include some ANSI codes.
-    text(conn, _log(conn) |> Step.clean_log)
+    log = Step.clean_log do_log(conn)
+    text(conn, log)
   end
   def show(conn, params) do
     show(conn, Map.merge(params, %{"format" => "text"}))
   end
 
-  defp _log(%{assigns: %{project: project, branch: branch, build: build}}) do
+  defp do_log(%{assigns: %{project: project, branch: branch, build: build}}) do
     step_fn = fn step ->
      """
 ================================================================================

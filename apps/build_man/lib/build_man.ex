@@ -7,9 +7,10 @@ defmodule BuildMan do
     import Supervisor.Spec, warn: false
 
     children = [
+      worker(BuildMan.WorkerSup, []),
       worker(BuildMan.BuildConsumer, []),
       worker(BuildMan.ConfigExtractionSup, []),
-      worker(BuildMan.LogStreamer, []),
+      worker(BuildMan.LogStreamer, [])
     ]
 
     opts = [strategy: :one_for_one, name: BuildMan.Supervisor,

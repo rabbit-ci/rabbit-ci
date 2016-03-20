@@ -1,46 +1,48 @@
 defmodule RabbitCICore.ProjectControllerTest do
-  use RabbitCICore.Integration.Case
-  use RabbitCICore.TestHelper
+  use RabbitCICore.ConnCase
 
-  alias RabbitCICore.Repo
   alias RabbitCICore.Project
 
-  test "index page with no projects" do
-    response = get("/projects")
-    body = Poison.decode!(response.resp_body)
+  test "index page with no projects", %{conn: conn} do
+    conn = get conn, project_path(conn, :index)
+    body = json_response(conn, 200)
     assert length(body["data"]) == 0
-    assert response.status == 200
   end
 
-  test "index page with projects" do
+  test "index page with projects", %{conn: conn} do
     Repo.insert! %Project{name: "project1",
                          repo: "git@example.com:user/project1"}
     Repo.insert! %Project{name: "project2",
                          repo: "git@example.com:user/project2"}
-    response = get("/projects")
-    body = Poison.decode!(response.resp_body)
+
+    conn = get conn, project_path(conn, :index)
+    body = json_response(conn, 200)
     assert length(body["data"]) == 2
-    assert response.status == 200
   end
 
-  test "show page for non existing project" do
-    response = get("/projects/fakeproject")
-    assert response.status == 404
+  test "index page for non existing project", %{conn: conn} do
+    assert_raise Ecto.NoResultsError, fn ->
+      get conn, project_path(conn, :index, "fake", [])
+    end
   end
 
-  test "show page for real project" do
-    Repo.insert! %Project{name: "project1",
-                         repo: "git@example.com:user/project1"}
-    response = get("/projects/project1")
-    body = Poison.decode!(response.resp_body)
-    assert response.status == 200
-    assert is_map(body["data"])
+  test "index page for real project", %{conn: conn} do
+    project =
+      %Project{name: "project1", repo: "git@example.com:user/project1"}
+      |> Repo.insert!
 
-    project = body["data"]
-    assert project["id"] != nil
-    assert project["attributes"]["name"] != nil
-    assert project["attributes"]["repo"] != nil
-    assert is_binary(project["attributes"]["inserted-at"])
-    assert is_binary(project["attributes"]["updated-at"])
+    conn = get conn, project_path(conn, :index, [name: project.name])
+    body = json_response(conn, 200)
+    conn_alt = get conn, project_path(conn, :index, project.name, [])
+    body_alt = json_response(conn_alt, 200)
+
+    assert body == body_alt
+    resp_project = body["data"]
+
+    assert resp_project["id"] != nil
+    assert resp_project["attributes"]["name"] != nil
+    assert resp_project["attributes"]["repo"] != nil
+    assert is_binary(resp_project["attributes"]["inserted-at"])
+    assert is_binary(resp_project["attributes"]["updated-at"])
   end
 end

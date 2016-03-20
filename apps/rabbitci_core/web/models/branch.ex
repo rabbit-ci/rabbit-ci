@@ -20,14 +20,17 @@ defmodule RabbitCICore.Branch do
   with no validation performed.
   """
   def changeset(model, params \\ :empty) do
-    cast(model, params, ~w(name project_id), ~w())
+    model
+    |> cast(params, ~w(name project_id), ~w())
     |> unique_constraint(:name, name: :branches_name_project_id_index)
+    |> foreign_key_constraint(:project_id)
   end
 
   def latest_build(branch = %Branch{}) do
-    query = (from b in assoc(branch, :builds),
-             limit: 1,
-             order_by: [desc: b.build_number], preload: :branch)
+    query = from b in assoc(branch, :builds),
+          limit: 1,
+       order_by: [desc: b.build_number],
+        preload: :branch
 
     Repo.one(query)
   end

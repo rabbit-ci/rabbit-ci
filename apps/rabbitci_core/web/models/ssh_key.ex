@@ -10,7 +10,7 @@ defmodule RabbitCICore.SSHKey do
     timestamps
   end
 
-  @required_fields ~w(private_key)
+  @required_fields ~w(private_key project_id)
   @optional_fields ~w()
 
   @doc """
@@ -22,15 +22,17 @@ defmodule RabbitCICore.SSHKey do
   def changeset(model, params \\ :empty) do
     model
     |> cast(params, @required_fields, @optional_fields)
+    |> foreign_key_constraint(:project_id)
   end
 
   def private_key_from_build_id(build_id) do
-    from(b in Build,
-         where: b.id == ^build_id,
-         join: br in assoc(b, :branch),
-         join: p in assoc(br, :project),
-         join: ssh in assoc(p, :ssh_key),
-         select: ssh.private_key)
-    |> Repo.one
+    query = from b in Build,
+          where: b.id == ^build_id,
+           join: br in assoc(b, :branch),
+           join: p in assoc(br, :project),
+           join: ssh in assoc(p, :ssh_key),
+         select: ssh.private_key
+
+    Repo.one(query)
   end
 end

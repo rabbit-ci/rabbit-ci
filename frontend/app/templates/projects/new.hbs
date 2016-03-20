@@ -1,0 +1,11 @@
+{{#link-to "projects.index"}}&#171; All Projects{{/link-to}}
+<form {{action 'save' model on="submit"}}>
+  <ul>
+    {{#each model.errors as |error|}}
+      <li>{{error.message}}</li>
+    {{/each}}
+  </ul>
+  name: {{input value=model.name}}<br/>
+  repo: {{input value=model.repo}}<br/>
+  <button type="submit">Submit</button>
+</form>

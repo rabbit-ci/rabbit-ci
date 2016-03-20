@@ -6,14 +6,16 @@ defmodule RabbitCICore.Mixfile do
   def project do
     [app: :rabbitci_core,
      version: "0.0.1",
-     elixir: "~> 1.1",
+     elixir: "~> 1.2",
      elixirc_paths: elixirc_paths(Mix.env),
      deps_path: "../../deps",
      lockfile: "../../mix.lock",
      compilers: [:phoenix] ++ Mix.compilers,
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
-     test_coverage: [tool: ExCoveralls],
+     build_path: "../../_build",
+     config_path: "../../config/config.exs",
+     test_coverage: [tool: Coverex.Task],
      deps: Shared.deps ++ deps]
   end
 
@@ -30,13 +32,15 @@ defmodule RabbitCICore.Mixfile do
   #
   # Type `mix help deps` for examples and options
   defp deps do
-    [{:phoenix, "~> 1.0.0"},
-     {:phoenix_ecto, "~> 1.2.0"},
+    [{:phoenix, "~> 1.1"},
+     {:phoenix_ecto, "~> 2.0"},
      {:postgrex, ">= 0.0.0"},
      {:cowboy, "~> 1.0"},
      {:rabbitmq, in_umbrella: true},
-     {:ecto, "~> 1.0.0"},
-     {:ja_serializer, github: "AgilionApps/ja_serializers"}]
+     {:ecto, "~> 1.1.1"},
+     {:ex_machina, "~> 0.6.0", only: :test, github: "thoughtbot/ex_machina"},
+     {:ja_serializer, github: "AgilionApps/ja_serializers"},
+     {:corsica, "~> 0.4"}]
   end
 
   # Specifies which paths to compile per environment

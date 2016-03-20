@@ -2,4 +2,3 @@ deps/
 tmp/
 erl_crash.dump
 _build/
-config/prod.secret.exs

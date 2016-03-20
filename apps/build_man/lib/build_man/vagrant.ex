@@ -1,17 +1,15 @@
 defmodule BuildMan.Vagrant do
   @moduledoc """
-  GenServer for Vagrant worker. Start opts should be in the format:
-
-      [build_identifier, config]
-
-  All Vagrant output is sent to the LogStreamer.
+  GenServer for Vagrant worker.
   """
 
   use GenServer
   require Logger
   require EEx
   alias BuildMan.FileHelpers
-  alias BuildMan.LogStreamer
+  alias BuildMan.Worker
+  alias BuildMan.Vagrant.Script
+  alias BuildMan.Vagrant.Vagrantfile
   alias RabbitCICore.Step
   alias RabbitCICore.SSHKey
 
@@ -21,20 +19,25 @@ defmodule BuildMan.Vagrant do
   end
 
   # Server callbacks
-  def init([build_identifier, config]) do
-    Process.flag(:trap_exit, true)
+  def init([config, {chan, tag}]) do
     {:ok, count_agent} = Agent.start_link(fn -> 0 end)
     send(self, :start_build)
 
-    start_msg = "Starting: #{build_identifier}. Box: #{config.box}\n\n"
-    LogStreamer.log_string(start_msg, "stdout",
-                           increment_counter(count_agent),
-                           config.step_id)
+    worker = Worker.create(config)
 
-    {:ok, path} = FileHelpers.unique_folder("builder")
-    {:ok,
-     %{path: path, build: build_identifier,
-       config: config, cmd: nil, counter: count_agent, success: true}}
+    Worker.log(worker, "Starting: #{worker.build_id}.#{worker.step_id}.\n\n",
+               :stdout, increment_counter(count_agent))
+
+    {:ok, %{worker: worker,
+            cmd: nil,
+            counter: count_agent,
+            success: true,
+            chan: chan,
+            tag: tag}}
+  end
+
+  defp log_debug(worker, str) do
+    Logger.debug("#{str} #{worker.build_id}.#{worker.step_id}")
   end
 
   # Exit status is set when the command finished due to a non-zero exit status.
@@ -45,97 +48,80 @@ defmodule BuildMan.Vagrant do
 
   # This is called when "vagrant up" is done.
   def handle_info({:DOWN, _ref, :process, pid, :normal},
-                  state = %{build: build, cmd: {:up, cmd_pid}})
+                  state = %{cmd: {:up, cmd_pid}})
   when pid == cmd_pid do
-    Logger.debug("'vagrant up' finished. #{inspect build}")
+    log_debug(state.worker, "'vagrant up' finished.")
     send(self, :run_build_script)
     {:noreply, state}
   end
 
   # This is called when "vagrant ssh" is done.
   def handle_info({:DOWN, _ref, :process, pid, :normal},
-                  state = %{build: build, cmd: {:ssh, cmd_pid}})
+                  state = %{cmd: {:ssh, cmd_pid}})
   when pid == cmd_pid do
-    Logger.debug("'vagrant ssh' finished. #{inspect build}")
+    log_debug(state.worker, "'vagrant ssh' finished.")
     {:stop, :normal, state}
   end
 
-  def handle_info(:start_build, state =
-        %{build: build, config: config, path: path}) do
-    Logger.info("Starting vagrant build. #{inspect build}")
-    Step.update_status!(config.step_id, "running")
-    config =
-      SSHKey.private_key_from_build_id(config.build_id)
-      |> ssh_key_string(path)
-      |> Map.merge(config)
-    File.write(Path.join(path, "Vagrantfile"), vagrantfile(config))
+  def handle_info(:start_build, state = %{worker: worker}) do
+    log_debug(state.worker, "Vagrant build starting.")
+    Worker.trigger_event(worker, :running)
+
+    worker = add_ssh_key(worker, SSHKey.private_key_from_build_id(worker.build_id))
+    state = put_in(state.worker, worker)
+
+    File.write(Path.join(worker.path, "Vagrantfile"), Vagrantfile.generate(worker))
     {_, pid, _} = command(["up", "--provider", "virtualbox"], state)
     {:noreply, %{state | cmd: {:up, pid}}}
   end
 
-  defp ssh_key_string(nil, path), do: %{ssh_key_string: ""}
-  defp ssh_key_string(secret_key, path) do
-    key_path = Path.join([path, "git-ssh-secret-key"])
-    File.write!(key_path, secret_key)
-    File.chmod!(key_path, 0o600)
-    ssh_config = """
-    Host *
-        StrictHostKeyChecking no
-    """
-    ssh_config_path = Path.join([path, "ssh-config-file"])
-    File.write!(ssh_config_path, ssh_config)
-    str = """
-      config.vm.provision "file", source: "ssh-config-file", destination: "~/.ssh/config"
-      config.vm.provision "file", source: "git-ssh-secret-key", destination: "~/.ssh/id_rsa"
-    """
-    %{ssh_key_string: str}
-  end
-
-  def handle_info(:run_build_script, state =
-        %{config: %{repo: _repo, script: scr, git_cmd: git_cmd}})
-  do
-    script = ~s"""
-    set -x
-    set -e
-    #{git_cmd}
-    cd workdir
-    #{scr}
-    """
+  def handle_info(:run_build_script, state = %{worker: worker}) do
+    script = Script.generate(worker)
+    Logger.debug("Running script:\n#{script}")
     {_, pid, _} = command(["ssh", "-c", "sh", "-c", script], state)
-
     {:noreply, %{state | cmd: {:ssh, pid}}}
   end
 
-  def terminate(_reason, state = %{path: path, success: success, build: build,
-                                  config: config, cmd: {_, cmd_pid}}) do
-    Logger.debug("Vagrant build cleaning up!")
+  def terminate(_reason, state = %{worker: worker, success: success, cmd: {_, cmd_pid}}) do
+    log_debug(state.worker, "Vagrant build cleaning up.")
+
     :exec.stop(cmd_pid)
 
     Task.async(fn -> command(["destroy", "-f"], state, [:sync]) end)
     |> Task.await(30_000)
 
-    case File.rm_rf(path) do
-      {:ok, _} -> :ok
-      {:error, err} -> Logger.error("Could not delete: #{path}. #{inspect err}")
-    end
+    File.rm_rf!(worker.path)
+
+    AMQP.Basic.ack(state.chan, state.tag)
 
     case success do
-      true -> Step.update_status!(config.step_id, "finished")
-      false -> Step.update_status!(config.step_id, "failed")
+      true -> Worker.trigger_event(worker, :finished)
+      false -> Worker.trigger_event(worker, :failed)
     end
 
-    Logger.info("Vagrant build finished. #{inspect build}")
+    log_debug(worker, "Vagrant build finished.")
+    :ok
   end
 
-  defp command(args, %{config: config, build: _build, path: path,
-                       counter: counter}, opts \\ [])
+  defp add_ssh_key(worker, nil), do: worker
+  defp add_ssh_key(worker, secret_key) do
+    ssh_config = """
+    Host *
+        StrictHostKeyChecking no
+    """
+    worker
+    |> Worker.add_file(".ssh/config", ssh_config)
+    |> Worker.add_file(".ssh/id_rsa", secret_key, mode: 600)
+  end
+
+  defp command(args, %{worker: worker, counter: counter}, opts \\ [])
   when is_list(opts) do
     vagrant_cmd = System.find_executable("vagrant")
     ExExec.run(
       [vagrant_cmd | args],
       [
-        {:stdout, handle_log(config, counter, "stdout")},
-        {:stderr, handle_log(config, counter, "stderr")},
+        {:stdout, handle_log(worker, counter, :stdout)},
+        {:stderr, handle_log(worker, counter, :stderr)},
         # Running commands in a PTY gives us colors!
         :pty,
         # We need to kill the entire Vagrant process group because Vagrant does
@@ -145,7 +131,7 @@ defmodule BuildMan.Vagrant do
         :kill_group,
         :monitor,
         # Run all commands inside our temporary directory.
-        cd: path,
+        cd: worker.path,
       ] |> unique_merge(opts)
     )
    end
@@ -153,17 +139,17 @@ defmodule BuildMan.Vagrant do
   # opts2 will override duplicate keys in opts1.
   defp unique_merge(opts1, opts2) do
     opts2 ++ opts1
-    |> Enum.uniq fn x ->
+    |> Enum.uniq(fn x ->
       case x do
         {y, _} -> y
         z -> z
       end
-    end
+    end)
   end
 
-  defp handle_log(%{step_id: step_id}, counter, type) do
+  defp handle_log(worker, counter, type) do
     fn _, _, str ->
-      LogStreamer.log_string(str, type, increment_counter(counter), step_id)
+      Worker.log(worker, str, type, increment_counter(counter))
     end
   end
 
@@ -173,11 +159,4 @@ defmodule BuildMan.Vagrant do
       {y, y}
     end
   end
-
-  # Templates
-
-  @template_path Path.join([__DIR__, "templates", "Vagrantfile.eex"])
-  EEx.function_from_file(:def, :do_vagrantfile, @template_path, [:assigns])
-
-  def vagrantfile(config), do: do_vagrantfile(config: config)
 end

@@ -22,9 +22,11 @@ defmodule BuildMan.LogStreamer do
   @log_streamer_limit Application.get_env(:build_man, :log_streamer_limit)
 
   def log_string(str, type, order, step_id) do
-    map = %LogOutput{text: str, order: order, step_id: step_id, type: type}
     RabbitMQ.publish(@exchange, "#{type}.#{step_id}",
-                     :erlang.term_to_binary(map))
+                     :erlang.term_to_binary(%LogOutput{text: str,
+                                                       order: order,
+                                                       step_id: step_id,
+                                                       type: to_string(type)}))
   end
 
   # Server callbacks
@@ -49,30 +51,26 @@ defmodule BuildMan.LogStreamer do
     end
   end
 
-  def handle_info({:basic_consume_ok, _}, state) do
-    Logger.info("#{__MODULE__} connected to RabbitMQ.")
-    {:noreply, state}
-  end
-  def handle_info({:basic_deliver, raw_payload,
-                   %{delivery_tag: tag, routing_key: _routing_key}},
-                  state = %{chan: chan, queue: _queue})
-  do
-    Task.start fn ->
-      try do
-        payload = %LogOutput{} = :erlang.binary_to_term(raw_payload)
-        LogProcessor.process(payload)
-      after
-        Basic.ack(chan, tag)
-      end
+  def handle_info({:basic_deliver, raw_payload, %{delivery_tag: tag}},
+                  state = %{chan: chan}) do
+    try do
+      payload = %LogOutput{} = :erlang.binary_to_term(raw_payload)
+      LogProcessor.process(payload)
+    after
+      Basic.ack(chan, tag)
     end
 
     {:noreply, state}
   end
+
   # Channel died.
-  def handle_info({:DOWN, _ref, :process, _pid, reason}, state) do
+  def handle_info({:DOWN, _ref, :process, pid, reason},
+                  state = %{chan: %{pid: chan_pid}}) when pid == chan_pid do
     Logger.warn("RabbitMQ Channel died! #{inspect reason}")
     shut_down(state)
   end
+
+  def handle_info({:basic_consume_ok, _}, state), do: {:noreply, state}
   def handle_info({:basic_cancel, _}, state), do: {:stop, :normal, state}
   def handle_info({:basic_cancel_ok, _}, state), do: {:noreply, state}
   def handle_info(_msg, state), do: {:noreply, state}

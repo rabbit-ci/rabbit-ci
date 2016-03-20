@@ -5,7 +5,6 @@ defmodule RabbitCICore.Project do
   alias RabbitCICore.Branch
   alias RabbitCICore.Build
   alias RabbitCICore.SSHKey
-  alias RabbitCICore.Project
 
   schema "projects" do
     field :name, :string
@@ -25,19 +24,10 @@ defmodule RabbitCICore.Project do
   with no validation performed.
   """
   def changeset(model, params \\ :empty) do
-    cast(model, params, ~w(name repo), ~w())
+    model
+    |> cast(params, ~w(name repo), ~w(webhook_secret))
+    |> validate_format(:name, ~r/^[^\/]+\/[^\/]+$/)
     |> unique_constraint(:name)
     |> unique_constraint(:repo)
-  end
-
-  def latest_build(project) do
-   (from b in Build,
-    join:     g in Branch,
-    on:       b.branch_id == g.id,
-    join:     p in Project,
-    on:       g.project_id == ^project.id,
-    order_by: [desc: b.inserted_at],
-    limit:    1,
-    preload:  [branch: g]) |> Repo.one
   end
 end

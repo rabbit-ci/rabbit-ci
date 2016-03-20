@@ -1,0 +1,22 @@
+{{#link-to "branches.show" model.branch}}&#171; All Builds{{/link-to}}
+
+<h1>{{model.branch.project.name}}/{{model.branch.name}} #{{model.buildNumber}}
+  <span class="status-{{model.status}}">{{model.status}}</span>
+</h1>
+<button {{action "reloadModel"}}>Refresh</button>
+
+{{#each model.steps as |step|}}
+  <h3>{{step.name}} <span class="status-{{step.status}}">{{step.status}}</span></h3>
+  {{#if step.startTime}}
+    <p>Started: {{step.startTime}}</p>
+    <p>Finished: {{step.finishTime}}</p>
+    <p>Duration: {{#if step.finishTime}}
+      {{moment-duration step.duration}}
+    {{else}}
+      {{moment-from-now step.startTime interval=500}}
+    {{/if}}</p>
+  {{/if}}
+  <pre class="log">{{{step.htmlLog}}}</pre>
+{{/each}}
+
+{{outlet}}

@@ -30,14 +30,28 @@ defmodule RabbitCICore.Web do
 
       # Import URL helpers from the router
       import RabbitCICore.Router.Helpers
+
+      import Ecto
+      import Ecto.Query, only: [from: 1, from: 2]
     end
   end
 
   def model do
     quote do
-      use Ecto.Model
-      use Ecto.Model.Callbacks
-      import RabbitCICore.ModelHelpers
+      use Ecto.Schema
+
+      import Ecto
+      import Ecto.Changeset
+      import Ecto.Query
+    end
+  end
+
+  def channel do
+    quote do
+      use Phoenix.Channel
+      alias RabbitCICore.Repo
+      import Ecto
+      import Ecto.Query, only: [from: 1, from: 2]
     end
   end
 

@@ -1,0 +1,24 @@
+<h1>Projects</h1>
+
+{{#link-to "projects.new"}}New Project{{/link-to}}
+
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Repo</th>
+    </tr>
+  </thead>
+  <tbody>
+    {{#each model as |project|}}
+      <tr>
+        <td>
+          {{#link-to "projects.show" project}}
+            {{project.name}}
+          {{/link-to}}
+        </td>
+        <td>{{project.repo}}</td>
+      </tr>
+    {{/each}}
+  </tbody>
+</table>

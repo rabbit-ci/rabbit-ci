@@ -1,20 +1,33 @@
 default:
 	echo Run a task...
 
-.PHONY: default test clean server repl server-prod migrate
+.PHONY: setup_osx default check clean server repl server-prod migrate
 
-test:
+BREW-exists: ; @which brew > /dev/null
+
+setup_osx: BREW-exists
+	brew update
+	brew install elixir postgresql rabbitmq git
+	brew tap caskroom/cask
+	brew cask install vagrant virtualbox
+	brew services start postgresql
+	brew services start rabbitmq
+	mix local.hex --force
+	mix local.rebar
+	mix deps.get
+
+check:
 	mix test
 
-apps/rabbitci_core/config/prod.secret.exs:
-	cp apps/rabbitci_core/config/prod.secret.exs.example apps/rabbitci_core/config/prod.secret.exs
+config/prod.secret.exs:
+	cp config/prod.secret.exs.example config/prod.secret.exs
 
 # Test env auto migrates
-migrate: apps/rabbitci_core/config/prod.secret.exs
-	MIX_ENV=dev mix ecto.create -r RabbitCICore.Repo
-	MIX_ENV=dev mix ecto.migrate -r RabbitCICore.Repo
-	MIX_ENV=prod mix ecto.create -r RabbitCICore.Repo
-	MIX_ENV=prod mix ecto.migrate -r RabbitCICore.Repo
+migrate: config/prod.secret.exs
+	MIX_ENV=dev mix ecto.create -r RabbitCICore.EctoRepo
+	MIX_ENV=dev mix ecto.migrate -r RabbitCICore.EctoRepo
+	MIX_ENV=prod mix ecto.create -r RabbitCICore.EctoRepo
+	MIX_ENV=prod mix ecto.migrate -r RabbitCICore.EctoRepo
 
 clean:
 	mix clean --deps

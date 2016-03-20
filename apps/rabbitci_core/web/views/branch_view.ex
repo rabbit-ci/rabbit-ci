@@ -1,13 +1,20 @@
 defmodule RabbitCICore.BranchView do
   use RabbitCICore.Web, :view
+  use JaSerializer.PhoenixView
+  alias RabbitCICore.Repo
+  alias RabbitCICore.ProjectView
+  alias RabbitCICore.Router.Helpers, as: RouterHelpers
 
-  alias RabbitCICore.BranchSerializer
+  attributes [:updated_at, :inserted_at, :name]
+  has_one :project, include: true, serializer: ProjectView
+  has_many :builds, link: :builds_link
 
-  def render("index.json", %{conn: conn, branches: branches}) do
-    BranchSerializer.format(branches, conn, %{})
-  end
+  def type, do: "branches"
+  def project(r, _), do: Repo.preload(r, :project).project
 
-  def render("show.json", %{conn: conn, branch: branch}) do
-    BranchSerializer.format(branch, conn, %{})
+  def builds_link(record, conn) do
+    record = Repo.preload(record, :project)
+    RouterHelpers.build_path(conn, :index, %{branch: record.name,
+                                             project: record.project.name})
   end
 end
