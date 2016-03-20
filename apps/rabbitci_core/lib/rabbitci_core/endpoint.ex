@@ -1,6 +1,8 @@
 defmodule RabbitCICore.Endpoint do
   use Phoenix.Endpoint, otp_app: :rabbitci_core
 
+  plug Corsica, origins: "*", allow_headers: ["accept", "content-type"]
+
   socket "/socket", RabbitCICore.UserSocket
 
   plug Plug.Logger

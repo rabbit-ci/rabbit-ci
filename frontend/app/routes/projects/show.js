@@ -10,5 +10,15 @@ export default Ember.Route.extend({
       owner: model.get("owner"),
       repo_name: model.get("repo_name")
     };
+  },
+
+  actions: {
+    destroy(project) {
+      if (confirm("You sure?")) {
+        project.destroyRecord().then(() => {
+          this.transitionTo('projects.index');
+        });
+      }
+    }
   }
 });

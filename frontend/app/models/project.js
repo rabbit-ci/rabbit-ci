@@ -6,9 +6,13 @@ export default DS.Model.extend({
   branches: DS.hasMany('branch'),
 
   owner: Ember.computed('name', function() {
-    return this.get('name').split('/')[0];
+    if (this.get('name')) {
+      return this.get('name').split('/')[0];
+    } else return undefined;
   }),
   repo_name: Ember.computed('name', function() {
-    return this.get('name').split('/')[1];
+    if (this.get('name')) {
+      return this.get('name').split('/')[1];
+    } else return undefined;
   })
 });

@@ -39,7 +39,8 @@ defmodule RabbitCICore.Mixfile do
      {:rabbitmq, in_umbrella: true},
      {:ecto, "~> 1.1.1"},
      {:ex_machina, "~> 0.6.0", only: :test, github: "thoughtbot/ex_machina"},
-     {:ja_serializer, github: "AgilionApps/ja_serializers"}]
+     {:ja_serializer, github: "AgilionApps/ja_serializers"},
+     {:corsica, "~> 0.4"}]
   end
 
   # Specifies which paths to compile per environment

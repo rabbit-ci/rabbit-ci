@@ -2,8 +2,8 @@ defmodule RabbitCICore.Router do
   use Phoenix.Router
 
   pipeline :api do
-    plug :allow_origin
     plug :accepts, ["json"]
+    plug JaSerializer.Deserializer
   end
 
   scope "/", RabbitCICore do
@@ -11,9 +11,11 @@ defmodule RabbitCICore.Router do
 
     get "/", IndexController, :index
 
-    scope "projects" do
+    scope "/projects" do
       get "/", ProjectController, :index
       get "/:name", ProjectController, :index
+      delete "/:id", ProjectController, :delete
+      post "/", ProjectController, :create
     end
 
     scope "/branches" do
@@ -33,19 +35,5 @@ defmodule RabbitCICore.Router do
     end
 
     post "/github", GitHubController, :create
-  end
-
-  # This should be changed in production.
-  defp allow_origin(conn, _opts) do
-    headers =
-      conn
-      |> get_req_header("access-control-request-headers")
-      |> Enum.join(", ")
-
-    conn
-    |> put_resp_header("access-control-allow-origin", "*")
-    |> put_resp_header("access-control-allow-headers", headers)
-    |> put_resp_header("access-control-allow-methods", "GET, POST, OPTIONS")
-    |> put_resp_header("access-control-max-age", "3600")
   end
 end
