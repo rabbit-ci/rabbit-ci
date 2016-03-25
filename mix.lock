@@ -19,7 +19,7 @@
   "httpoison": {:hex, :httpoison, "0.8.0"},
   "idna": {:hex, :idna, "1.0.2"},
   "inflex": {:hex, :inflex, "1.5.0"},
-  "ja_serializer": {:git, "https://github.com/AgilionApps/ja_serializers.git", "8b7c5346b75a404e45c02c9b9a2e80b94788530b", []},
+  "ja_serializer": {:git, "https://github.com/AgilionApps/ja_serializers.git", "dde21047df7284aec18725154027abfc3b24f6f7", []},
   "jsx": {:hex, :jsx, "2.6.2"},
   "mimerl": {:hex, :mimerl, "1.0.0"},
   "phoenix": {:hex, :phoenix, "1.1.4"},

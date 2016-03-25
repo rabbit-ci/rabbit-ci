@@ -28,7 +28,7 @@ defmodule RabbitCICore.BuildController do
                     preload: [steps: sa, branch: {br, project: p}])
 
     conn
-    |> render(data: builds)
+    |> render("index.json", data: builds)
   end
 
   def start_build(conn, params = %{"name" => name,
@@ -85,9 +85,7 @@ defmodule RabbitCICore.BuildController do
       |> Repo.all
       |> Repo.preload(:steps)
 
-    conn
-    |> assign(:no_logs, true)
-    |> render(data: builds)
+    render(conn, data: builds, no_logs: true)
   end
 
   def index(conn, %{"build_number" => "latest",
@@ -103,9 +101,7 @@ defmodule RabbitCICore.BuildController do
         preload: [branch: {br, project: p}]
 
     build = Repo.one! query
-
-    conn
-    |> render(data: build)
+    render(conn, data: build)
   end
 
   def index(conn, %{"build_number" => build_number,
@@ -120,9 +116,7 @@ defmodule RabbitCICore.BuildController do
          preload: [branch: {br, project: p}]
 
     build = Repo.one! query
-
-    conn
-    |> render(data: build)
+    render(conn, data: build)
   end
 
   def index(conn, params) do

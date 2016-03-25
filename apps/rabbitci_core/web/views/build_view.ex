@@ -2,10 +2,6 @@ defmodule RabbitCICore.BuildView do
   use RabbitCICore.Web, :view
   use JaSerializer.PhoenixView
 
-  def render("running_builds.json", %{conn: conn, data: builds}) do
-    format(builds, conn, %{})
-  end
-
   alias RabbitCICore.Repo
   alias RabbitCICore.Build
   alias RabbitCICore.BranchView
