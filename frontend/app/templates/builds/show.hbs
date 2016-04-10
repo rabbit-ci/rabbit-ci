@@ -16,7 +16,8 @@
       {{moment-from-now step.startTime interval=500}}
     {{/if}}</p>
   {{/if}}
-  <pre class="log">{{{step.htmlLog}}}</pre>
+
+  {{ansi-log rawLog=step.log}}
 {{/each}}
 
 {{outlet}}

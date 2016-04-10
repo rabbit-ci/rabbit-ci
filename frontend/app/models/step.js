@@ -1,5 +1,4 @@
 import DS from 'ember-data';
-import ansi_up from 'ansi-up';
 
 export default DS.Model.extend({
   name: DS.attr('string'),
@@ -11,10 +10,6 @@ export default DS.Model.extend({
   duration: Ember.computed('startTime', 'finishTime', function() {
     let time = this.get('finishTime') || new Date();
     return time - this.get('startTime');
-  }),
-  htmlLog: Ember.computed('log', function() {
-    if (!this.get('log')) return "loading...";
-    return ansi_up.ansi_to_html(this.get('log'), {use_classes: true});
   }),
 
   connectToChan() {
