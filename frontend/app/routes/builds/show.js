@@ -24,11 +24,5 @@ export default Ember.Route.extend({
     });
 
     build.connectToChan();
-  },
-
-  actions: {
-    reloadModel() {
-      this.refresh();
-    }
   }
 });

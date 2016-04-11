@@ -38,6 +38,7 @@
     "ember-disable-proxy-controllers": "^1.0.1",
     "ember-export-application-global": "^1.0.4",
     "ember-moment": "4.2.1",
-    "ember-resolver": "^2.0.3"
+    "ember-resolver": "^2.0.3",
+    "semantic-ui-ember": "0.9.3"
   }
 }

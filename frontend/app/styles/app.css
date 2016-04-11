@@ -43,12 +43,9 @@
 
 .log {
   counter-reset: line-numbers;
-  padding: 20px 20px 20px 55px;
-  border: 5px solid #505050;
+  padding-left: 50px;
   font-family: "Source Code Pro", "Courier New";
-  font-size: 13px;
-  color: #d0d0d0;
-  background-color: #151515;
+  font-size: 12px;
 }
 /* Tomorrow Night Ansi Colour Scheme */
 .ansi-black-fg { color: #3A3A3A; }

@@ -1,35 +1,40 @@
-{{#link-to "projects.show" model.project}}&#171; All Branches{{/link-to}}
+<div class="ui container">
+  <div class="ui breadcrumb">
+    {{#link-to "application" class="section"}}Home{{/link-to}}
+    <div class="divider">/</div>
+    {{#link-to "branches.index" model.project}}{{model.project.name}}{{/link-to}}
+    <div class="divider">/</div>
+    <div class="active section">{{model.name}}</div>
+  </div>
 
-<h1>{{model.project.name}}/{{model.name}}</h1>
+  <br/>{{#link-to "builds.show" model.project.name model.name "latest"}}Latest{{/link-to}}
 
-{{#link-to "builds.show" model.project.name model.name "latest"}}Latest{{/link-to}}
-
-<table>
-  <thead>
-    <tr>
-      <th>#</th>
-      <th>Commit</th>
-      <th>Status</th>
-      <th>Inserted at</th>
-      <th>Steps</th>
-    </tr>
-  </thead>
-  <tbody>
-    {{#each model.sortedBuilds as |build|}}
+  <table class="ui celled table">
+    <thead>
       <tr>
-
-        <td>{{#link-to "builds.show" build}}{{build.buildNumber}}{{/link-to}}</td>
-        <td>{{build.commit}}</td>
-        <td class="status-{{build.status}}">{{build.status}}</td>
-        <td>{{moment-from-now build.insertedAt}}</td>
-        <td><ul>
-          {{#each build.steps as |step|}}
-            <li>{{step.name}}</li>
-          {{/each}}
-        </ul></td>
+        <th>#</th>
+        <th>Commit</th>
+        <th>Status</th>
+        <th>Inserted at</th>
+        <th>Steps</th>
       </tr>
-    {{/each}}
-  </tbody>
-</table>
+    </thead>
+    <tbody>
+      {{#each model.sortedBuilds as |build|}}
+        <tr class="{{build.statusClass}}">
+          <td class="selectable">{{#link-to "builds.show" build}}{{build.buildNumber}}{{/link-to}}</td>
+          <td>{{build.commit}}</td>
+          <td>{{build.status}}</td>
+          <td>{{moment-from-now build.insertedAt}}</td>
+          <td><ul>
+            {{#each build.steps as |step|}}
+              <li>{{step.name}}</li>
+            {{/each}}
+          </ul></td>
+        </tr>
+      {{/each}}
+    </tbody>
+  </table>
 
-{{outlet}}
+  {{outlet}}
+</div>

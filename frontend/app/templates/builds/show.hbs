@@ -1,23 +1,35 @@
-{{#link-to "branches.show" model.branch}}&#171; All Builds{{/link-to}}
+<div class="ui container">
+  <div class="ui breadcrumb">
+    {{#link-to "application" class="section"}}Home{{/link-to}}
+    <div class="divider">/</div>
+    {{#link-to "branches.index" model.branch.project}}{{model.branch.project.name}}{{/link-to}}
+    <div class="divider">/</div>
+    {{#link-to "branches.show" model.branch}}{{model.branch.name}}{{/link-to}}
+    <div class="divider">/</div>
+    <div class="active section">#{{model.buildNumber}} <div class="ui label {{model.statusColor}}">{{model.status}}</div></div>
+  </div>
 
-<h1>{{model.branch.project.name}}/{{model.branch.name}} #{{model.buildNumber}}
-  <span class="status-{{model.status}}">{{model.status}}</span>
-</h1>
-<button {{action "reloadModel"}}>Refresh</button>
+  {{#each model.steps as |step|}}
+    <div class="ui segments">
+      <div class="ui segment">
+        <h2><div class="ui ribbon label {{step.statusColor}}">{{step.status}}</div>{{step.name}}</h2>
+      </div>
+      <div class="ui segment {{step.statusColor}}">
+        {{#if step.startTime}}
+          <p>Started: {{step.startTime}}</p>
+          <p>Finished: {{step.finishTime}}</p>
+          <p>Duration: {{#if step.finishTime}}
+            {{moment-duration step.duration}}
+          {{else}}
+            {{moment-from-now step.startTime interval=500}}
+          {{/if}}</p>
+        {{/if}}
+      </div>
+      <div class="ui segment inverted">
+        {{ansi-log rawLog=step.log}}
+      </div>
+    </div>
+  {{/each}}
 
-{{#each model.steps as |step|}}
-  <h3>{{step.name}} <span class="status-{{step.status}}">{{step.status}}</span></h3>
-  {{#if step.startTime}}
-    <p>Started: {{step.startTime}}</p>
-    <p>Finished: {{step.finishTime}}</p>
-    <p>Duration: {{#if step.finishTime}}
-      {{moment-duration step.duration}}
-    {{else}}
-      {{moment-from-now step.startTime interval=500}}
-    {{/if}}</p>
-  {{/if}}
-
-  {{ansi-log rawLog=step.log}}
-{{/each}}
-
-{{outlet}}
+  {{outlet}}
+</div>

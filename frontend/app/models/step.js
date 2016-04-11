@@ -12,6 +12,17 @@ export default DS.Model.extend({
     return time - this.get('startTime');
   }),
 
+  statusColor: Ember.computed("status", function() {
+    switch(this.get('status')) {
+    case "failed": return "red";
+    case "errored": return "red";
+    case "queued": return "yellow";
+    case "running": return "yellow";
+    case "finished": return "green";
+    default: return "";
+    }
+  }),
+
   connectToChan() {
     if (this.get('channel')) return;
 

@@ -9,6 +9,28 @@ export default DS.Model.extend({
   configExtracted: DS.attr('string'),
   steps: DS.hasMany('steps'),
 
+  statusClass: Ember.computed("status", function() {
+    switch(this.get('status')) {
+    case "failed": return "error";
+    case "errored": return "error";
+    case "queued": return "warning";
+    case "running": return "warning";
+    case "finished": return "positive";
+    default: return "";
+    }
+  }),
+
+  statusColor: Ember.computed("status", function() {
+    switch(this.get('status')) {
+    case "failed": return "red";
+    case "errored": return "red";
+    case "queued": return "yellow";
+    case "running": return "yellow";
+    case "finished": return "green";
+    default: return "";
+    }
+  }),
+
   connectToChan() {
     if (this.get('channel')) return;
 
