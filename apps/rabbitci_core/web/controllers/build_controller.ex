@@ -43,7 +43,7 @@ defmodule RabbitCICore.BuildController do
     |> Webhooks.start_build do
       {:ok, build} ->
         conn
-        |> render(data: build)
+        |> render("show.json", data: build)
       {:error, reason} ->
         conn
         |> put_status(:bad_request)
