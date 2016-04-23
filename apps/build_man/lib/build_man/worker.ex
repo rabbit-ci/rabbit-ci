@@ -25,7 +25,6 @@ defmodule BuildMan.Worker do
              log_handler: :not_implemented,
              provider: :not_implemented,
              # Configuration to be passed to the provider.
-             # E.g. Vagrant box.
              provider_config: nil,
              files: []]
 

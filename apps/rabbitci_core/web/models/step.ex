@@ -4,7 +4,7 @@ defmodule RabbitCICore.Step do
 
   schema "steps" do
     field :name, :string
-    field :raw_config, :string
+    field :raw_config, :map
     field :script, :string
     field :before_script, :string
     belongs_to :build, Build

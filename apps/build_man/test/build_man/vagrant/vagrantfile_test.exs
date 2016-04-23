@@ -2,6 +2,7 @@ defmodule BuildMan.Vagrant.VagrantfileTest do
   use ExUnit.Case
   alias BuildMan.Vagrant.Vagrantfile
   alias BuildMan.Worker
+  alias RabbitCICore.Factory
   import BuildMan.WorkerSupport, only: [cleanup_worker: 1]
 
   defmacrop assert_lines({op, _meta, [left, right]}) do
@@ -27,7 +28,8 @@ defmodule BuildMan.Vagrant.VagrantfileTest do
   end
 
   test "Minimal Vagrantfile" do
-    worker = Worker.create(%{provider_config: %{box: "test/box"}})
+    job = Factory.create(:job, box: "test/box")
+    worker = Worker.create(%{job_id: job.id})
     cleanup_worker worker
     assert_lines Vagrantfile.generate(worker) ==
       ~S"""
@@ -45,8 +47,9 @@ defmodule BuildMan.Vagrant.VagrantfileTest do
   end
 
   test "Worker with single file (default permissions)" do
+    job = Factory.create(:job, box: "test/box")
     worker =
-      Worker.create(%{provider_config: %{box: "test/box"}})
+      Worker.create(%{job_id: job.id})
       |> Worker.add_file("testing-file.txt", "This is a test")
     cleanup_worker worker
 
@@ -69,8 +72,9 @@ defmodule BuildMan.Vagrant.VagrantfileTest do
   end
 
   test "Worker with single file (custom permissions)" do
+    job = Factory.create(:job, box: "test/box")
     worker =
-      Worker.create(%{provider_config: %{box: "test/box"}})
+      Worker.create(%{job_id: job.id})
       |> Worker.add_file("testing-file.txt", "This is a test", mode: 755)
     cleanup_worker worker
 

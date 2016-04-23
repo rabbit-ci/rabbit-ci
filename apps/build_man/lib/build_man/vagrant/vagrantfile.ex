@@ -5,8 +5,9 @@ defmodule BuildMan.Vagrant.Vagrantfile do
   Responsible for generating a Vagrantfile from a worker definition.
   """
 
-  def generate(%Worker{provider_config: %{box: box},
-                       files: files}) do
+  def generate(worker = %Worker{files: files, job_id: job_id})
+  when not is_nil(job_id) do
+    box = Worker.get_job(worker).box
     instructions = List.flatten [{:begin}, parse_box(box), parse_files(files), {:end}]
     for instruction <- instructions do
       List.wrap generate_lines(instruction)
