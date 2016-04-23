@@ -1,31 +1,31 @@
 defmodule RabbitCICore.BuildController do
   use RabbitCICore.Web, :controller
   import Ecto.Query
-  alias RabbitCICore.{Build, Step, Repo, Project}
+  alias RabbitCICore.{Build, Job, Repo, Project}
   alias RabbitCICore.IncomingWebhooks, as: Webhooks
 
   # This gets all of the currently running builds.
   # A running build is defined as:
   #   - A build that has not yet extracted its config
-  #   - A build that has steps which are in the "queued" or "running" state
+  #   - A build that has jobs which are in the "queued" or "running" state
   #
   # The response will include the builds that are running and _all_ of its
-  # steps, even the ones that are finished/failed.
+  # jobs, even the ones that are finished/failed.
   def running_builds(conn, _params) do
     builds =
       Repo.all from(b in Build,
-                    join: s in assoc(b, :steps),
-                    # We want to get all of the steps for all of the builds that
-                    # have steps which have statuses that are either "queued" or
+                    join: s in assoc(b, :jobs),
+                    # We want to get all of the jobs for all of the builds that
+                    # have jobs which have statuses that are either "queued" or
                     # "running". Instead of doing two queries, we load all of
-                    # the steps (for preloading) here. The other join on steps
+                    # the jobs (for preloading) here. The other join on jobs
                     # is used to filter the builds that we will be loading.
-                    join: sa in assoc(b, :steps),
+                    join: sa in assoc(b, :jobs),
                     join: br in assoc(b, :branch),
                     join: p in assoc(br, :project),
                     where: s.status in ["queued", "running"]
                     or b.config_extracted == "false",
-                    preload: [steps: sa, branch: {br, project: p}])
+                    preload: [jobs: sa, branch: {br, project: p}])
 
     conn
     |> render("index.json", data: builds)
@@ -83,7 +83,7 @@ defmodule RabbitCICore.BuildController do
     builds =
       query
       |> Repo.all
-      |> Repo.preload(:steps)
+      |> Repo.preload(:jobs)
 
     render(conn, data: builds, no_logs: true)
   end

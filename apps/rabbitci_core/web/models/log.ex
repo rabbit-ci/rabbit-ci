@@ -1,13 +1,13 @@
 defmodule RabbitCICore.Log do
   use RabbitCICore.Web, :model
-  alias RabbitCICore.Step
+  alias RabbitCICore.Job
 
   schema "logs" do
     field :stdio, :string
     field :order, :integer
     field :type, :string
 
-    belongs_to :step, Step
+    belongs_to :job, Job
 
     timestamps
   end
@@ -20,8 +20,8 @@ defmodule RabbitCICore.Log do
   """
   def changeset(model, params \\ :empty) do
     model
-    |> cast(params, ~w(stdio step_id type order), ~w())
+    |> cast(params, ~w(stdio job_id type order), ~w())
     |> validate_inclusion(:type, ["stdout", "stderr"])
-    |> foreign_key_constraint(:step_id)
+    |> foreign_key_constraint(:job_id)
   end
 end

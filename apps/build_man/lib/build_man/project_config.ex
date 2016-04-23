@@ -16,27 +16,27 @@ defmodule BuildMan.ProjectConfig do
   Queue builds from parsed config. See `parse_from_yaml/1` for parsing
   the config.
   """
-  def queue_builds(%{"steps" => steps}, build_id, pr_or_commit)
-  when is_list(steps) do
+  def queue_builds(%{"jobs" => jobs}, build_id, pr_or_commit)
+  when is_list(jobs) do
     build = Repo.get(Build, build_id)
 
-    for step_config <- steps do
-      for box <- step_config["boxes"] do
-        step =
+    for job_config <- jobs do
+      for box <- job_config["boxes"] do
+        job =
           build
-            |> Ecto.Model.build(:steps, %{status: "queued", name: "#{step_config["name"]} #{box}"})
+            |> Ecto.Model.build(:jobs, %{status: "queued", name: "#{job_config["name"]} #{box}"})
             |> Repo.insert!
 
         config = %{
-          script: step_config["script"],
-          before_script: step_config["before_script"],
+          script: job_config["script"],
+          before_script: job_config["before_script"],
           build_id: build.id,
-          step_id: step.id,
+          job_id: job.id,
           provider_config: %{git: Map.take(pr_or_commit, [:pr, :commit]),
                              box: box}
         }
 
-        RabbitMQ.publish(@exchange, "#{build.id}.#{step.id}", :erlang.term_to_binary(config))
+        RabbitMQ.publish(@exchange, "#{build.id}.#{job.id}", :erlang.term_to_binary(config))
       end
     end
   end

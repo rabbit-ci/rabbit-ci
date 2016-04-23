@@ -1,8 +1,8 @@
 defmodule RabbitCICore.Repo do
   alias RabbitCICore.EctoRepo
-  alias RabbitCICore.{Build, Step, Log}
+  alias RabbitCICore.{Build, Job, Log}
   alias RabbitCICore.{BranchUpdaterChannel, BuildUpdaterChannel,
-                      StepUpdaterChannel}
+                      JobUpdaterChannel}
 
   # Delgate most stuff to EctoRepo
   def config(), do: EctoRepo.config()
@@ -56,13 +56,13 @@ defmodule RabbitCICore.Repo do
   end
 
   defp model_event(%Log{} = model, :insert) do
-    payload = %{log_append: model.stdio, step_id: model.step_id}
-    StepUpdaterChannel.publish_log(model.step_id, payload)
+    payload = %{log_append: model.stdio, job_id: model.job_id}
+    JobUpdaterChannel.publish_log(model.job_id, payload)
   end
-  defp model_event(%Step{} = model, :insert) do
+  defp model_event(%Job{} = model, :insert) do
     BuildUpdaterChannel.update_build(model.build_id)
   end
-  defp model_event(%Step{} = model, :update) do
+  defp model_event(%Job{} = model, :update) do
     BuildUpdaterChannel.update_build(model.build_id)
   end
   defp model_event(%Build{} = model, :insert) do

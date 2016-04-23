@@ -1,7 +1,7 @@
 defmodule RabbitCICore.UserSocket do
   use Phoenix.Socket
 
-  channel "steps:*", RabbitCICore.StepUpdaterChannel
+  channel "jobs:*", RabbitCICore.JobUpdaterChannel
   channel "builds:*", RabbitCICore.BuildUpdaterChannel
   channel "branches:*", RabbitCICore.BranchUpdaterChannel
 

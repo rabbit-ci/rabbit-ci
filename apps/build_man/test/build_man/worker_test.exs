@@ -27,25 +27,25 @@ defmodule BuildMan.WorkerTest do
     refute host_path == host_path2
   end
 
-  test "Build and Step can be set in create/1" do
-    worker = Worker.create %{build_id: -1, step_id: -2}
+  test "Build and Job can be set in create/1" do
+    worker = Worker.create %{build_id: -1, job_id: -2}
     cleanup_worker worker
     assert worker.build_id == -1
-    assert worker.step_id == -2
+    assert worker.job_id == -2
   end
 
   test "Worker get_build/1" do
-    step = Factory.create(:step)
-    worker = Worker.create %{build_id: step.build.id, step_id: step.id}
+    job = Factory.create(:job)
+    worker = Worker.create %{build_id: job.build.id, job_id: job.id}
     cleanup_worker worker
-    assert Worker.get_build(worker).id == step.build.id
+    assert Worker.get_build(worker).id == job.build.id
   end
 
-  test "Worker get_step/1" do
-    step = Factory.create(:step)
-    worker = Worker.create %{build_id: step.build.id, step_id: step.id}
+  test "Worker get_job/1" do
+    job = Factory.create(:job)
+    worker = Worker.create %{build_id: job.build.id, job_id: job.id}
     cleanup_worker worker
-    assert Worker.get_step(worker).id == step.id
+    assert Worker.get_job(worker).id == job.id
   end
 
   @events [:running, :finished, :failed, :error]
@@ -62,13 +62,13 @@ defmodule BuildMan.WorkerTest do
   end
 
   test "Default worker trigger_event/2 callbacks" do
-    step = Factory.create(:step)
-    worker = Worker.create %{build_id: step.build.id, step_id: step.id}
+    job = Factory.create(:job)
+    worker = Worker.create %{build_id: job.build.id, job_id: job.id}
     cleanup_worker worker
 
     for event <- @events do
       assert {:ok, ^worker} = Worker.trigger_event(worker, event)
-      assert Worker.get_step(worker).status == to_string(event)
+      assert Worker.get_job(worker).status == to_string(event)
     end
   end
 end

@@ -4,7 +4,7 @@ defmodule RabbitCICore.LogController do
   import Ecto.Query
   alias RabbitCICore.Project
   alias RabbitCICore.Repo
-  alias RabbitCICore.Step
+  alias RabbitCICore.Job
   alias RabbitCICore.Log
 
   plug :get_models
@@ -40,9 +40,9 @@ defmodule RabbitCICore.LogController do
     text(conn, log)
   end
   def show(conn, %{"format" => "text"}) do
-    # We're cleaning it _after_ we concat all the logs because the step name
+    # We're cleaning it _after_ we concat all the logs because the job name
     # could possibly include some ANSI codes.
-    log = Step.clean_log do_log(conn)
+    log = Job.clean_log do_log(conn)
     text(conn, log)
   end
   def show(conn, params) do
@@ -50,17 +50,17 @@ defmodule RabbitCICore.LogController do
   end
 
   defp do_log(%{assigns: %{project: project, branch: branch, build: build}}) do
-    step_fn = fn step ->
+    job_fn = fn job ->
      """
 ================================================================================
-"#{step.name}" -- #{project.name}/#{branch.name}##{build.build_number}
+"#{job.name}" -- #{project.name}/#{branch.name}##{build.build_number}
 
- #{Step.log(step, :no_clean)}
+ #{Job.log(job, :no_clean)}
  """
     end
 
-    Repo.preload(build, [steps: :logs]).steps
-    |> Enum.map(step_fn)
+    Repo.preload(build, [jobs: :logs]).jobs
+    |> Enum.map(job_fn)
     |> Enum.join
   end
 end

@@ -1,7 +1,7 @@
 defmodule BuildMan.LogProcessor do
   alias RabbitCICore.Repo
   alias RabbitCICore.Log
-  alias RabbitCICore.Step
+  alias RabbitCICore.Job
   alias BuildMan.LogOutput
   require Logger
 

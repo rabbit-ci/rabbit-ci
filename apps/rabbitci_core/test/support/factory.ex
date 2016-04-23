@@ -1,7 +1,7 @@
 defmodule RabbitCICore.Factory do
   use ExMachina.Ecto, repo: RabbitCICore.EctoRepo
 
-  alias RabbitCICore.{Project, Branch, Build, Step, Log}
+  alias RabbitCICore.{Project, Branch, Build, Job, Log}
 
   def factory(:project) do
     %Project{
@@ -26,9 +26,9 @@ defmodule RabbitCICore.Factory do
     }
   end
 
-  def factory(:step) do
-    %Step{
-      name: sequence(:name, &"my#{&1}step"),
+  def factory(:job) do
+    %Job{
+      name: sequence(:name, &"my#{&1}job"),
       build: build(:build)
     }
   end
@@ -38,7 +38,7 @@ defmodule RabbitCICore.Factory do
       order: sequence(:order, &(&1)),
       stdio: sequence(:stdio, &"log output line: #{&1}"),
       type: "stdout",
-      step: build(:step)
+      job: build(:job)
     }
   end
 end

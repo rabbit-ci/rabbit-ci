@@ -1,12 +1,12 @@
-defmodule RabbitCICore.StepUpdaterChannelTest do
+defmodule RabbitCICore.JobUpdaterChannelTest do
   use RabbitCICore.ChannelCase, async: false
 
-  # alias RabbitCICore.StepUpdaterChannel
+  # alias RabbitCICore.JobUpdaterChannel
 
   # setup do
   #   {:ok, _, socket} =
   #     socket("user_id", %{some: :assign})
-  #     |> subscribe_and_join(StepUpdaterChannel, "steps:lobby")
+  #     |> subscribe_and_join(JobUpdaterChannel, "jobs:lobby")
 
   #   {:ok, socket: socket}
   # end
@@ -16,7 +16,7 @@ defmodule RabbitCICore.StepUpdaterChannelTest do
   #   assert_reply ref, :ok, %{"hello" => "there"}
   # end
 
-  # test "shout broadcasts to steps:lobby", %{socket: socket} do
+  # test "shout broadcasts to jobs:lobby", %{socket: socket} do
   #   push socket, "shout", %{"hello" => "all"}
   #   assert_broadcast "shout", %{"hello" => "all"}
   # end

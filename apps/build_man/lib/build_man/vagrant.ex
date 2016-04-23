@@ -10,7 +10,7 @@ defmodule BuildMan.Vagrant do
   alias BuildMan.Worker
   alias BuildMan.Vagrant.Script
   alias BuildMan.Vagrant.Vagrantfile
-  alias RabbitCICore.Step
+  alias RabbitCICore.Job
   alias RabbitCICore.SSHKey
 
   # Client API
@@ -25,7 +25,7 @@ defmodule BuildMan.Vagrant do
 
     worker = Worker.create(config)
 
-    Worker.log(worker, "Starting: #{worker.build_id}.#{worker.step_id}.\n\n",
+    Worker.log(worker, "Starting: #{worker.build_id}.#{worker.job_id}.\n\n",
                :stdout, increment_counter(count_agent))
 
     {:ok, %{worker: worker,
@@ -37,7 +37,7 @@ defmodule BuildMan.Vagrant do
   end
 
   defp log_debug(worker, str) do
-    Logger.debug("#{str} #{worker.build_id}.#{worker.step_id}")
+    Logger.debug("#{str} #{worker.build_id}.#{worker.job_id}")
   end
 
   # Exit status is set when the command finished due to a non-zero exit status.

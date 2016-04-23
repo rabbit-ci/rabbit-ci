@@ -1,10 +1,10 @@
 defmodule RabbitCICore.LogTest do
   use RabbitCICore.ModelCase
 
-  alias RabbitCICore.{Log, Build, Branch, Project, Step}
+  alias RabbitCICore.{Log, Build, Branch, Project, Job}
 
   # Only valid _before_ calling Repo.insert
-  @valid_attrs %{stdio: "abc", order: 0, type: "stdout", step_id: -1}
+  @valid_attrs %{stdio: "abc", order: 0, type: "stdout", job_id: -1}
   @invalid_attrs %{}
 
   test "changeset with valid attributes" do
@@ -15,7 +15,7 @@ defmodule RabbitCICore.LogTest do
   test "changeset with invalid attributes" do
     changeset = Log.changeset(%Log{}, @invalid_attrs)
     refute changeset.valid?
-    assert {:step_id, "can't be blank"} in changeset.errors
+    assert {:job_id, "can't be blank"} in changeset.errors
     assert {:stdio, "can't be blank"} in changeset.errors
     assert {:order, "can't be blank"} in changeset.errors
     assert {:type, "can't be blank"} in changeset.errors
@@ -34,15 +34,15 @@ defmodule RabbitCICore.LogTest do
     end
   end
 
-  test "changeset without step is invalid" do
+  test "changeset without job is invalid" do
     changeset = Log.changeset(%Log{}, @valid_attrs)
     assert {:error, changeset} = Repo.insert changeset
     refute changeset.valid?
-    assert {:step_id, "does not exist"} in changeset.errors
+    assert {:job_id, "does not exist"} in changeset.errors
   end
 
-  test "changeset with step is valid" do
-    step =
+  test "changeset with job is valid" do
+    job =
       %Project{name: "Project", repo: "git@example.com:my/repo.git"}
       |> Repo.insert!
       |> Ecto.Model.build(:branches)
@@ -51,11 +51,11 @@ defmodule RabbitCICore.LogTest do
       |> Ecto.Model.build(:builds)
       |> Build.changeset(%{commit: "abc"})
       |> Repo.insert!
-      |> Ecto.Model.build(:steps)
-      |> Step.changeset(%{name: "step1", status: "queued"})
+      |> Ecto.Model.build(:jobs)
+      |> Job.changeset(%{name: "job1", status: "queued"})
       |> Repo.insert!
 
-    attrs = put_in(@valid_attrs.step_id, step.id)
+    attrs = put_in(@valid_attrs.job_id, job.id)
     changeset = Log.changeset(%Log{}, attrs)
     assert {:ok, _model} = Repo.insert changeset
   end

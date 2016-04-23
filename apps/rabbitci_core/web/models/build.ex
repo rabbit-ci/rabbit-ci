@@ -2,7 +2,7 @@ defmodule RabbitCICore.Build do
   use RabbitCICore.Web, :model
   alias RabbitCICore.Repo
   alias RabbitCICore.Branch
-  alias RabbitCICore.Step
+  alias RabbitCICore.Job
   alias RabbitCICore.Build
   alias RabbitCICore.BuildView
   alias RabbitCICore.Endpoint
@@ -34,7 +34,7 @@ defmodule RabbitCICore.Build do
     field :config_extracted, :string, default: "false"
 
     belongs_to :branch, Branch
-    has_many :steps, Step
+    has_many :jobs, Job
 
     timestamps
   end
@@ -71,7 +71,7 @@ defmodule RabbitCICore.Build do
   end
   def status(%Build{config_extracted: "error"}), do: "error"
   def status(build) do
-    Repo.preload(build, :steps).steps
+    Repo.preload(build, :jobs).jobs
     |> Enum.map(&(&1.status))
     |> status
   end

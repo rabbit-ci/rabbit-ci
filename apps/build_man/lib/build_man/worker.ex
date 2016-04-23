@@ -2,7 +2,7 @@ defmodule BuildMan.Worker do
   alias BuildMan.FileHelpers
   alias BuildMan.Worker
   alias BuildMan.LogStreamer
-  alias RabbitCICore.{Repo, Build, Step}
+  alias RabbitCICore.{Repo, Build, Job}
 
   @moduledoc """
   The BuildMan.Worker module provides functions to interact with the
@@ -14,7 +14,7 @@ defmodule BuildMan.Worker do
   """
 
   defstruct [build_id: nil,
-             step_id: nil,
+             job_id: nil,
              script: nil,
              before_script: nil,
              # Path to working directory for worker.
@@ -53,23 +53,23 @@ defmodule BuildMan.Worker do
   defp default_callbacks do
     %{
       running: (fn worker ->
-        Step.update_status!(worker.step_id, to_string(:running))
-        Repo.update! Step.changeset(Worker.get_step(worker), %{start_time: Ecto.DateTime.utc})
+        Job.update_status!(worker.job_id, to_string(:running))
+        Repo.update! Job.changeset(Worker.get_job(worker), %{start_time: Ecto.DateTime.utc})
         {:ok, worker}
       end),
       finished: (fn worker ->
-        Step.update_status!(worker.step_id, to_string(:finished))
-        Repo.update! Step.changeset(Worker.get_step(worker), %{finish_time: Ecto.DateTime.utc})
+        Job.update_status!(worker.job_id, to_string(:finished))
+        Repo.update! Job.changeset(Worker.get_job(worker), %{finish_time: Ecto.DateTime.utc})
         {:ok, worker}
       end),
       failed: (fn worker ->
-        Step.update_status!(worker.step_id, to_string(:failed))
-        Repo.update! Step.changeset(Worker.get_step(worker), %{finish_time: Ecto.DateTime.utc})
+        Job.update_status!(worker.job_id, to_string(:failed))
+        Repo.update! Job.changeset(Worker.get_job(worker), %{finish_time: Ecto.DateTime.utc})
         {:ok, worker}
       end),
       error: (fn worker ->
-        Step.update_status!(worker.step_id, to_string(:error))
-        Repo.update! Step.changeset(Worker.get_step(worker), %{finish_time: Ecto.DateTime.utc})
+        Job.update_status!(worker.job_id, to_string(:error))
+        Repo.update! Job.changeset(Worker.get_job(worker), %{finish_time: Ecto.DateTime.utc})
         {:ok, worker}
       end)
      }
@@ -92,7 +92,7 @@ defmodule BuildMan.Worker do
     * `order` is used for ordering the log messages.
   """
   def log(worker, io, type, order) do
-    LogStreamer.log_string(io, type, order, worker.step_id)
+    LogStreamer.log_string(io, type, order, worker.job_id)
   end
 
   @doc """
@@ -114,18 +114,18 @@ defmodule BuildMan.Worker do
 
   def get_build(%Worker{build_id: build_id}), do: Repo.get!(Build, build_id)
 
-  def get_step(%Worker{step_id: step_id}), do: Repo.get!(Step, step_id)
+  def get_job(%Worker{job_id: job_id}), do: Repo.get!(Job, job_id)
 
   def get_repo(%Worker{build_id: build_id}), do: Build.get_repo_from_id!(build_id)
 
   def env_vars(worker = %Worker{}) do
-    step = get_step(worker) |> Repo.preload([build: [branch: :project]])
-    build = step.build
+    job = get_job(worker) |> Repo.preload([build: [branch: :project]])
+    build = job.build
     branch = build.branch
     project = branch.project
 
     %{"RABBIT_CI_BUILD_NUMBER" => build.build_number,
-      "RABBIT_CI_STEP" => step.name,
+      "RABBIT_CI_JOB" => job.name,
       "RABBIT_CI_BRANCH" => branch.name,
       "RABBIT_CI_PROJECT" => project.name,
       "RABBIT_CI_BOX" => worker.provider_config.box}

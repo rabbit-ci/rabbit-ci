@@ -1,8 +1,8 @@
-defmodule RabbitCICore.Step do
+defmodule RabbitCICore.Job do
   use RabbitCICore.Web, :model
-  alias RabbitCICore.{Log, Build, Step, Repo}
+  alias RabbitCICore.{Log, Build, Job, Repo}
 
-  schema "steps" do
+  schema "jobs" do
     field :status, :string
     field :name, :string
     field :start_time, Ecto.DateTime
@@ -26,10 +26,10 @@ defmodule RabbitCICore.Step do
     |> foreign_key_constraint(:build_id)
   end
 
-  def log(step, clean \\ :clean)
-  def log(step, :clean), do: clean_log log(step, :no_clean)
-  def log(step, :no_clean) do
-    step
+  def log(job, clean \\ :clean)
+  def log(job, :clean), do: clean_log log(job, :no_clean)
+  def log(job, :no_clean) do
+    job
     |> assoc(:logs)
     |> order_by([l], asc: l.order)
     |> select([l], l.stdio)
@@ -42,11 +42,11 @@ defmodule RabbitCICore.Step do
   end
 
   # This is for use in BuildMan. You can use it, but you probably
-  # shouldn't as it uses step_id instead of a %Step{}.
-  def update_status!(step_id, status) do
-    Step
-    |> Repo.get!(step_id)
-    |> Step.changeset(%{status: status})
+  # shouldn't as it uses job_id instead of a %Job{}.
+  def update_status!(job_id, status) do
+    Job
+    |> Repo.get!(job_id)
+    |> Job.changeset(%{status: status})
     |> Repo.update!
   end
 end
