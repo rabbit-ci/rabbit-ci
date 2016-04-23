@@ -21,24 +21,8 @@
   padding-right: 1em;
 }
 
-.status-failed {
-  color: red;
-  font-weight: bold;
-}
-
-.status-finished {
-  color: green;
-  font-weight: bold;
-}
-
-.status-running {
-  color: yellow;
-  font-weight: bold;
-}
-
-.status-queued {
-  color: yellow;
-  font-weight: bold;
+.line-number:hover {
+  color: gray;
 }
 
 .log {

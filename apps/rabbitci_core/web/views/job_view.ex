@@ -4,7 +4,7 @@ defmodule RabbitCICore.JobView do
 
   alias RabbitCICore.Job
 
-  attributes [:name, :status, :log, :start_time, :finish_time]
+  attributes [:name, :status, :log, :start_time, :finish_time, :box]
 
   def attributes(job, %Plug.Conn{} = conn) do
     attrs = super(job, conn)
