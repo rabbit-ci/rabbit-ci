@@ -1,7 +1,8 @@
 defmodule RabbitCICore.LogTest do
   use RabbitCICore.ModelCase
+  import RabbitCICore.Factory
 
-  alias RabbitCICore.{Log, Build, Branch, Project, Job}
+  alias RabbitCICore.Log
 
   # Only valid _before_ calling Repo.insert
   @valid_attrs %{stdio: "abc", order: 0, type: "stdout", job_id: -1}
@@ -42,19 +43,7 @@ defmodule RabbitCICore.LogTest do
   end
 
   test "changeset with job is valid" do
-    job =
-      %Project{name: "Project", repo: "git@example.com:my/repo.git"}
-      |> Repo.insert!
-      |> Ecto.Model.build(:branches)
-      |> Branch.changeset(%{name: "branch1"})
-      |> Repo.insert!
-      |> Ecto.Model.build(:builds)
-      |> Build.changeset(%{commit: "abc"})
-      |> Repo.insert!
-      |> Ecto.Model.build(:jobs)
-      |> Job.changeset(%{name: "job1", status: "queued"})
-      |> Repo.insert!
-
+    job = create(:job)
     attrs = put_in(@valid_attrs.job_id, job.id)
     changeset = Log.changeset(%Log{}, attrs)
     assert {:ok, _model} = Repo.insert changeset

@@ -1,6 +1,6 @@
 defmodule RabbitCICore.Repo do
   alias RabbitCICore.EctoRepo
-  alias RabbitCICore.{Build, Job, Log}
+  alias RabbitCICore.{Build, Job, Log, Repo, Step}
   alias RabbitCICore.{BranchUpdaterChannel, BuildUpdaterChannel,
                       JobUpdaterChannel}
 
@@ -60,10 +60,12 @@ defmodule RabbitCICore.Repo do
     JobUpdaterChannel.publish_log(model.job_id, payload)
   end
   defp model_event(%Job{} = model, :insert) do
-    BuildUpdaterChannel.update_build(model.build_id)
+    Repo.get(Step, model.step_id).build_id
+    |> BuildUpdaterChannel.update_build
   end
   defp model_event(%Job{} = model, :update) do
-    BuildUpdaterChannel.update_build(model.build_id)
+    Repo.get(Step, model.step_id).build_id
+    |> BuildUpdaterChannel.update_build
   end
   defp model_event(%Build{} = model, :insert) do
     BranchUpdaterChannel.new_build(model.branch_id, model.id)

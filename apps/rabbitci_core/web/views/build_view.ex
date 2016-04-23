@@ -5,15 +5,15 @@ defmodule RabbitCICore.BuildView do
   alias RabbitCICore.Repo
   alias RabbitCICore.Build
   alias RabbitCICore.BranchView
-  alias RabbitCICore.JobView
+  alias RabbitCICore.StepView
 
   attributes [:build_number, :start_time, :finish_time, :updated_at,
               :inserted_at, :commit, :status, :config_extracted]
   has_one :branch, include: true, serializer: BranchView
-  has_many :jobs, include: true, serializer: JobView
+  has_many :steps, include: true, serializer: StepView
 
   def type, do: "builds"
   def branch(r, _), do: Repo.preload(r, :branch).branch
-  def jobs(r, _), do: Repo.preload(r, :jobs).jobs
+  def steps(r, _), do: Repo.preload(r, :steps).steps
   def status(record), do: Build.status(record)
 end

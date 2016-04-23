@@ -20,7 +20,7 @@ defmodule RabbitCICore.Log do
   """
   def changeset(model, params \\ :empty) do
     model
-    |> cast(params, ~w(stdio job_id type order), ~w())
+    |> cast(params, ~w(job_id stdio type order), ~w())
     |> validate_inclusion(:type, ["stdout", "stderr"])
     |> foreign_key_constraint(:job_id)
   end

@@ -2,7 +2,7 @@ defmodule BuildMan.Worker do
   alias BuildMan.FileHelpers
   alias BuildMan.Worker
   alias BuildMan.LogStreamer
-  alias RabbitCICore.{Repo, Build, Job}
+  alias RabbitCICore.{Repo, Build, Job, Step}
 
   @moduledoc """
   The BuildMan.Worker module provides functions to interact with the
@@ -14,6 +14,7 @@ defmodule BuildMan.Worker do
   """
 
   defstruct [build_id: nil,
+             step_id: nil,
              job_id: nil,
              script: nil,
              before_script: nil,
@@ -114,21 +115,25 @@ defmodule BuildMan.Worker do
 
   def get_build(%Worker{build_id: build_id}), do: Repo.get!(Build, build_id)
 
+  def get_step(%Worker{step_id: step_id}), do: Repo.get!(Step, step_id)
+
   def get_job(%Worker{job_id: job_id}), do: Repo.get!(Job, job_id)
 
   def get_repo(%Worker{build_id: build_id}), do: Build.get_repo_from_id!(build_id)
 
   def env_vars(worker = %Worker{}) do
-    job = get_job(worker) |> Repo.preload([build: [branch: :project]])
-    build = job.build
+    job = get_job(worker) |> Repo.preload([step: [build: [branch: :project]]])
+    step = job.step
+    build = step.build
     branch = build.branch
     project = branch.project
 
     %{"RABBIT_CI_BUILD_NUMBER" => build.build_number,
-      "RABBIT_CI_JOB" => job.name,
+      "RABBIT_CI_STEP" => step.name,
       "RABBIT_CI_BRANCH" => branch.name,
       "RABBIT_CI_PROJECT" => project.name,
-      "RABBIT_CI_BOX" => worker.provider_config.box}
+      "RABBIT_CI_BOX" => job.box,
+      "RABBIT_CI_PROVIDER" => job.provider}
     |> env_vars_git(worker.provider_config.git)
   end
 

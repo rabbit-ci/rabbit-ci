@@ -1,7 +1,8 @@
 defmodule RabbitCICore.BuildTest do
   use RabbitCICore.ModelCase
+  import RabbitCICore.Factory
 
-  alias RabbitCICore.{Project, Branch, Build, Job}
+  alias RabbitCICore.{Project, Branch, Build}
   alias Ecto.Model
 
   # Only valid _before_ calling Repo.insert.
@@ -141,35 +142,18 @@ defmodule RabbitCICore.BuildTest do
   end
 
   test "status/1 for build" do
-    build =
-      Project.changeset(%Project{}, %{name: "a/project1", repo: "repo123"})
-      |> Repo.insert!
-      |> Model.build(:branches)
-      |> Branch.changeset(%{name: "branch1"})
-      |> Repo.insert!
-      |> Model.build(:builds)
-      |> Build.changeset(%{commit: "xyz"})
-      |> Repo.insert!
+    build = create(:build)
+    step = create(:step, build: build)
 
-    for {status, index} <- Enum.with_index ["queued", "running", "failed"] do
-      Model.build(build, :jobs)
-      |> Job.changeset(%{name: "Job ##{index}", status: status})
-      |> Repo.insert!
+    for status <- ["queued", "running", "failed"] do
+      create(:job, step: step, status: status)
     end
 
     assert Build.status(build) == "failed"
   end
 
   test "status/1 for build with no jobs" do
-    build =
-      Project.changeset(%Project{}, %{name: "a/project1", repo: "repo123"})
-      |> Repo.insert!
-      |> Model.build(:branches)
-      |> Branch.changeset(%{name: "branch1"})
-      |> Repo.insert!
-      |> Model.build(:builds)
-      |> Build.changeset(%{commit: "xyz"})
-      |> Repo.insert!
+    build = create(:build)
 
     assert Build.status(build) == "queued"
   end

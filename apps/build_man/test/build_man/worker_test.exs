@@ -36,14 +36,21 @@ defmodule BuildMan.WorkerTest do
 
   test "Worker get_build/1" do
     job = Factory.create(:job)
-    worker = Worker.create %{build_id: job.build.id, job_id: job.id}
+    worker = Worker.create %{build_id: job.step.build.id, step_id: job.step.id, job_id: job.id}
     cleanup_worker worker
-    assert Worker.get_build(worker).id == job.build.id
+    assert Worker.get_build(worker).id == job.step.build.id
+  end
+
+  test "Worker get_step/1" do
+    job = Factory.create(:job)
+    worker = Worker.create %{build_id: job.step.build.id, step_id: job.step.id, job_id: job.id}
+    cleanup_worker worker
+    assert Worker.get_step(worker).id == job.step.id
   end
 
   test "Worker get_job/1" do
     job = Factory.create(:job)
-    worker = Worker.create %{build_id: job.build.id, job_id: job.id}
+    worker = Worker.create %{build_id: job.step.build.id, step_id: job.step.id, job_id: job.id}
     cleanup_worker worker
     assert Worker.get_job(worker).id == job.id
   end
@@ -63,7 +70,7 @@ defmodule BuildMan.WorkerTest do
 
   test "Default worker trigger_event/2 callbacks" do
     job = Factory.create(:job)
-    worker = Worker.create %{build_id: job.build.id, job_id: job.id}
+    worker = Worker.create %{build_id: job.step.build.id, step_id: job.step.id, job_id: job.id}
     cleanup_worker worker
 
     for event <- @events do

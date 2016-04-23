@@ -83,7 +83,7 @@ defmodule RabbitCICore.BuildController do
     builds =
       query
       |> Repo.all
-      |> Repo.preload(:jobs)
+      |> Repo.preload(steps: [:jobs])
 
     render(conn, data: builds, no_logs: true)
   end

@@ -1,17 +1,21 @@
 defmodule RabbitCICore.Job do
   use RabbitCICore.Web, :model
-  alias RabbitCICore.{Log, Build, Job, Repo}
+  alias RabbitCICore.{Log, Build, Job, Repo, Step}
 
   schema "jobs" do
     field :status, :string
-    field :name, :string
     field :start_time, Ecto.DateTime
     field :finish_time, Ecto.DateTime
+    field :box, :string # TODO Make this required
+    field :provider, :string # TODO Make this required
     has_many :logs, Log
+    belongs_to :step, Step
     # TODO: artifacts
-    belongs_to :build, Build
     timestamps
   end
+
+  @required_fields ~w(status step_id)
+  @optional_fields ~w(start_time finish_time box provider)
 
   @doc """
   Creates a changeset based on the `model` and `params`.
@@ -21,9 +25,9 @@ defmodule RabbitCICore.Job do
   """
   def changeset(model, params \\ :empty) do
     model
-    |> cast(params, ~w(build_id name status), ~w(start_time finish_time))
+    |> cast(params, @required_fields, @optional_fields)
     |> validate_inclusion(:status, ["queued", "running", "failed", "finished", "error"])
-    |> foreign_key_constraint(:build_id)
+    |> foreign_key_constraint(:step_id)
   end
 
   def log(job, clean \\ :clean)
