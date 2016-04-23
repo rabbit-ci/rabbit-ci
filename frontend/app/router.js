@@ -12,7 +12,9 @@ Router.map(function() {
     this.route('show', {path: '/:owner/:repo_name'}, function() {
       this.route('branches.index', {resetNamespace: true, path: '/'});
       this.route('branches.show', {resetNamespace: true, path: '/:branch_name'});
-      this.route('builds.show', {resetNamespace: true, path: '/:branch_name/:build_number'});
+      this.route('builds.show', {resetNamespace: true, path: '/:branch_name/:build_number'}, function() {
+        this.route("jobs.show", {resetNamespace: true, path: '/:job_id'});
+      });
     });
   });
 });

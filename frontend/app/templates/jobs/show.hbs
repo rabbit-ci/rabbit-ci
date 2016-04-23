@@ -1,0 +1,19 @@
+<div class="ui segment">
+  <div class="ui ribbon label {{model.statusColor}}">{{model.status}}</div>
+  <span class="ui large header">{{model.step.name}}</span>
+  <span class="ui grey large right floated header">{{model.box}}</span>
+</div>
+<div class="ui segment {{model.statusColor}}">
+  {{#if model.startTime}}
+    <p>Started: {{model.startTime}}</p>
+    <p>Finished: {{model.finishTime}}</p>
+    <p>Duration: {{#if model.finishTime}}
+      {{moment-duration model.duration}}
+    {{else}}
+      {{moment-from-now model.startTime interval=500}}
+    {{/if}}</p>
+  {{/if}}
+</div>
+<div class="ui segment inverted">
+  {{ansi-log rawLog=model.log}}
+</div>

@@ -9,31 +9,19 @@
     <div class="active section">#{{model.buildNumber}} <div class="ui label {{model.statusColor}}">{{model.status}}</div></div>
   </div>
 
-  {{#each model.steps as |step|}}
-    {{#each step.jobs as |job|}}
-    <div class="ui segments">
-      <div class="ui segment">
-        <div class="ui ribbon label {{job.statusColor}}">{{job.status}}</div>
-        <span class="ui large header">{{step.name}}</span>
-        <span class="ui grey large right floated header">{{job.box}}</span>
+  <h4 class="ui header">Jobs</h4>
+  <div class="ui vertical text menu">
+    {{#each model.steps as |step|}}
+      <b class="active title">{{step.name}}</b>
+      <div class="content menu">
+        {{#each step.jobs as |job|}}
+          {{#link-to "jobs.show" job class="item"}}{{job.box}}{{/link-to}}
+        {{/each}}
       </div>
-      <div class="ui segment {{job.statusColor}}">
-        {{#if job.startTime}}
-          <p>Started: {{job.startTime}}</p>
-          <p>Finished: {{job.finishTime}}</p>
-          <p>Duration: {{#if job.finishTime}}
-            {{moment-duration job.duration}}
-          {{else}}
-            {{moment-from-now job.startTime interval=500}}
-          {{/if}}</p>
-        {{/if}}
-      </div>
-      <div class="ui segment inverted">
-        {{ansi-log rawLog=job.log}}
-      </div>
-    </div>
     {{/each}}
-  {{/each}}
+  </div>
 
-  {{outlet}}
+  <div class="ui segments">
+    {{outlet}}
+  </div>
 </div>
