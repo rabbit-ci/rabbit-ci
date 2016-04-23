@@ -14,13 +14,5 @@ export default Ember.Route.extend({
       build_number: model.get("step.build.buildNumber"),
       job_id: model.get("id")
     };
-  },
-
-  afterModel(job) {
-    job.connectToChan();
-
-    job.get('step.build').then((build) => {
-      build.connectToChan();
-    });
   }
 });
