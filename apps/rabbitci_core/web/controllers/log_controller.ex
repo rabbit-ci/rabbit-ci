@@ -50,17 +50,19 @@ defmodule RabbitCICore.LogController do
   end
 
   defp do_log(%{assigns: %{project: project, branch: branch, build: build}}) do
-    job_fn = fn job ->
+    job_fn = fn step, job ->
      """
 ================================================================================
-"#{job.name}" -- #{project.name}/#{branch.name}##{build.build_number}
+"#{step.name}" -- #{project.name}/#{branch.name}##{build.build_number}
 
  #{Job.log(job, :no_clean)}
  """
     end
 
-    Repo.preload(build, [jobs: :logs]).jobs
-    |> Enum.map(job_fn)
+    Repo.preload(build, [steps: [jobs: :logs]]).steps
+    |> Enum.map(fn step ->
+      for job <- step.jobs, do: job_fn.(step, job)
+    end)
     |> Enum.join
   end
 end
