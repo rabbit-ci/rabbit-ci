@@ -74,8 +74,7 @@ defmodule BuildMan.Vagrant.Vagrantfile do
       |> Path.basename
       |> Poison.encode!
 
-    ["ADD [#{safe_path}, #{safe_vm_path}]",
-     "RUN [\"chmod\", #{Poison.encode!(permissions)}, #{safe_vm_path}]"]
+    ["ADD [#{safe_path}, #{safe_vm_path}]", docker_chmod(safe_vm_path, permissions)]
   end
   defp generate_docker_lines({:box, box, "docker"}) when is_bitstring(box) do
     # Job changeset validates format.
@@ -125,6 +124,11 @@ defmodule BuildMan.Vagrant.Vagrantfile do
   defp chmod(vm_path, nil), do: []
   defp chmod(vm_path, permissions) do
     shell_provisioner(@chmod_script, [permissions, vm_path])
+  end
+
+  defp docker_chmod(safe_vm_path, nil), do: []
+  defp docker_chmod(safe_vm_path, permissions) do
+    "RUN [\"chmod\", #{Poison.encode!(to_string permissions)}, #{safe_vm_path}]"
   end
 
   defp shell_provisioner(inline, args)
