@@ -37,7 +37,7 @@ defmodule BuildMan.ProjectConfig do
         job =
           step
           |> Ecto.build_assoc(:jobs)
-          |> Job.changeset(%{status: "queued", box: box})
+          |> Job.changeset(%{status: "queued", box: box, provider: step_config["provider"]})
           |> Repo.insert!
 
         config = %{

@@ -70,17 +70,24 @@ defmodule BuildMan.Vagrant do
     worker = add_ssh_key(worker, SSHKey.private_key_from_build_id(worker.build_id))
     state = put_in(state.worker, worker)
 
-    File.write(Path.join(worker.path, "Vagrantfile"), Vagrantfile.generate(worker))
-    {_, pid, _} = command(["up", "--provider", "virtualbox"], state)
+    Vagrantfile.write_files!(worker)
+    # {_, pid, _} = command(["up", "--provider", "virtualbox"], state)
+    {_, pid, _} = command(["up"], state)
     {:noreply, %{state | cmd: {:up, pid}}}
   end
 
   def handle_info(:run_build_script, state = %{worker: worker}) do
     script = Script.generate(worker)
     Logger.debug("Running script:\n#{script}")
-    {_, pid, _} = command(["ssh", "-c", "sh", "-c", script], state)
+    {_, pid, _} =
+      Worker.get_job(worker).provider
+      |> script_command(script)
+      |> command(state)
     {:noreply, %{state | cmd: {:ssh, pid}}}
   end
+
+  defp script_command("virtualbox", script), do: ["ssh", "-c", "sh", "-c", script]
+  defp script_command("docker", script), do: ["docker-run", "--", "/bin/sh", "-c", script]
 
   def terminate(_reason, state = %{worker: worker, success: success, cmd: {_, cmd_pid}}) do
     log_debug(state.worker, "Vagrant build cleaning up.")

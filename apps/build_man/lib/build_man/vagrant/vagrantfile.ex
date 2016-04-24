@@ -1,14 +1,29 @@
 defmodule BuildMan.Vagrant.Vagrantfile do
   alias BuildMan.Worker
+  alias BuildMan.Vagrant.Vagrantfile
 
   @moduledoc """
   Responsible for generating a Vagrantfile from a worker definition.
   """
 
-  def generate(worker = %Worker{files: files, job_id: job_id})
+  def instructions(worker = %Worker{files: files, job_id: job_id})
   when not is_nil(job_id) do
-    box = Worker.get_job(worker).box
-    instructions = List.flatten [{:begin}, parse_box(box), parse_files(files), {:end}]
+    job = Worker.get_job(worker)
+    box = job.box
+    provider = job.provider
+    {:ok,
+      List.flatten([
+        {:begin},
+        {:provider, provider},
+        parse_box(box, provider),
+        parse_files(files, provider),
+        {:end}
+      ])
+    }
+  end
+  def instructions(_worker), do: {:error, :invalid_worker}
+
+  defp vagrantfile(instructions) do
     for instruction <- instructions do
       List.wrap generate_lines(instruction)
     end
@@ -16,14 +31,59 @@ defmodule BuildMan.Vagrant.Vagrantfile do
     |> Enum.intersperse("\n")
     |> to_string
   end
-  def generate(_worker), do: {:error, :invalid_worker}
 
-  defp parse_box(box), do: {:box, box}
-  defp parse_files(files) do
-    for file <- files, do: {:add_file, file}
+  defp dockerfile(instructions) do
+    for instruction <- instructions do
+      List.wrap generate_docker_lines(instruction)
+    end
+    |> List.flatten
+    |> Enum.intersperse("\n")
+    |> to_string
   end
 
-  defp generate_lines({:add_file, {vm_path, path, permissions}})
+  @b2d_vagrantfile_contents ~S"""
+  Vagrant.configure("2") do |config|
+    config.ssh.username = 'docker'
+    config.ssh.password = 'tcuser'
+    config.vm.box = "hashicorp/boot2docker"
+    config.ssh.insert_key = true
+    config.vm.define "rabbit-ci-boot2docker"
+  end
+  """
+
+  def write_files!(worker) do
+    {:ok, instructions} = Vagrantfile.instructions(worker)
+    File.write!(Path.join(worker.path, "Vagrantfile"), IO.inspect vagrantfile(instructions))
+
+    if Worker.get_job(worker).provider == "docker" do
+      File.write!(Path.join(worker.path, "Dockerfile"), IO.inspect dockerfile(instructions))
+      File.write!(Path.join(worker.path, "rabbit-ci-B2D-Vagrantfile"), @b2d_vagrantfile_contents)
+    end
+  end
+
+  defp parse_box(box, provider), do: {:box, box, provider}
+  defp parse_files(files, provider) do
+    for file <- files, do: {:add_file, file, provider}
+  end
+
+  defp generate_docker_lines({:add_file, {vm_path, path, permissions}, _provider})
+  when is_bitstring(vm_path) and is_bitstring(path) do
+    safe_vm_path = Poison.encode!(vm_path)
+    safe_path =
+      path
+      |> Path.basename
+      |> Poison.encode!
+
+    ["ADD [#{safe_path}, #{safe_vm_path}]",
+     "RUN [\"chmod\", #{Poison.encode!(permissions)}, #{safe_vm_path}]"]
+  end
+  defp generate_docker_lines({:box, box, "docker"}) when is_bitstring(box) do
+    # Job changeset validates format.
+    "FROM #{box}"
+  end
+  defp generate_docker_lines(_), do: []
+
+  defp generate_lines({:add_file, {vm_path, path, permissions}, _provider})
   when is_bitstring(vm_path) and is_bitstring(path) do
     safe_vm_path = Poison.encode!(vm_path)
     safe_path = Poison.encode!(path)
@@ -31,21 +91,35 @@ defmodule BuildMan.Vagrant.Vagrantfile do
     ["config.vm.provision 'file', source: #{safe_path}, destination: #{safe_vm_path}",
      chmod(vm_path, permissions)]
   end
-  defp generate_lines({:box, box}) when is_bitstring(box) do
+  defp generate_lines({:box, box, "virtualbox"}) when is_bitstring(box) do
     "config.vm.box = #{Poison.encode!(box)}"
   end
+  defp generate_lines({:box, _box, _provider}), do: []
   defp generate_lines({:begin}) do
     ~S"""
     Vagrant.configure(2) do |config|
       config.ssh.insert_key = false
       config.vm.synced_folder ".", "/vagrant", disabled: true
-
-      config.vm.provider "virtualbox" do |vb|
-        vb.linked_clone = true
-      end
     """
   end
   defp generate_lines({:end}), do: "end\n"
+  defp generate_lines({:provider, "virtualbox"}) do
+    ~S"""
+    config.vm.provider "virtualbox" do |vb|
+      vb.linked_clone = true
+    end
+    """
+  end
+  defp generate_lines({:provider, "docker"}) do
+    ~S"""
+    config.vm.provider "docker" do |d|
+      d.remains_running = false
+      d.vagrant_machine = "rabbit-ci-boot2docker"
+      d.vagrant_vagrantfile = "rabbit-ci-B2D-Vagrantfile"
+      d.build_dir = "."
+    end
+    """
+  end
 
   @chmod_script "chmod $1 $2"
   defp chmod(vm_path, nil), do: []

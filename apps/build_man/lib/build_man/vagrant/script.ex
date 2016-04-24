@@ -2,9 +2,8 @@ defmodule BuildMan.Vagrant.Script do
   alias BuildMan.Worker
   alias BuildMan.GitHelpers
 
-  def generate(worker = %Worker{script: scr,
-                                before_script: before_scr,
-                                provider_config: %{git: git}}) do
+  def generate(worker = %Worker{provider_config: %{git: git}}) do
+    step = Worker.get_step(worker)
     git = put_in(git[:repo], Worker.get_repo(worker))
     git_cmd =
       GitHelpers.clone_repo("workdir", git, false)
@@ -19,10 +18,10 @@ defmodule BuildMan.Vagrant.Script do
     set -v
     set -e
     #{env_vars}
-    #{before_scr}
+    #{step.before_script}
     #{git_cmd}
     cd workdir
-    #{scr}
+    #{step.script}
     """
   end
 

@@ -12,7 +12,7 @@ export default DS.Model.extend({
   statusClass: Ember.computed("status", function() {
     switch(this.get('status')) {
     case "failed": return "error";
-    case "errored": return "error";
+    case "error": return "error";
     case "queued": return "warning";
     case "running": return "warning";
     case "finished": return "positive";

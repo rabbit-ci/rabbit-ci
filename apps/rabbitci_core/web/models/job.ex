@@ -28,6 +28,7 @@ defmodule RabbitCICore.Job do
     |> cast(params, @required_fields, @optional_fields)
     |> validate_inclusion(:status, ["queued", "running", "failed", "finished", "error"])
     |> foreign_key_constraint(:step_id)
+    |> validate_format(:box, ~r/^[a-z0-9-_.:@\/]+$/) # TODO: Tests for this
   end
 
   def log(job, clean \\ :clean)

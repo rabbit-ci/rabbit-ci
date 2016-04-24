@@ -16,14 +16,11 @@ defmodule BuildMan.Worker do
   defstruct [build_id: nil,
              step_id: nil,
              job_id: nil,
-             script: nil,
-             before_script: nil,
              # Path to working directory for worker.
              path: nil,
              # Callbacks are called through trigger_event/2
              callbacks: nil,
              log_handler: :not_implemented,
-             provider: :not_implemented,
              # Configuration to be passed to the provider.
              provider_config: nil,
              files: []]
