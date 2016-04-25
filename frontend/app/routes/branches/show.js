@@ -32,6 +32,11 @@ export default Ember.Route.extend({
   _connectBuildsToChan(builds) {
     builds.forEach((build) => {
       build.connectToChan();
+      build.get('steps').forEach((step) => {
+        step.get('jobs').forEach((job) => {
+          job.connectToChan();
+        });
+      });
     });
   }
 });
