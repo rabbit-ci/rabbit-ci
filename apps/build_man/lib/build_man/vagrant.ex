@@ -6,11 +6,9 @@ defmodule BuildMan.Vagrant do
   use GenServer
   require Logger
   require EEx
-  alias BuildMan.FileHelpers
   alias BuildMan.Worker
   alias BuildMan.Vagrant.Script
   alias BuildMan.Vagrant.Vagrantfile
-  alias RabbitCICore.Job
   alias RabbitCICore.SSHKey
 
   # Client API
@@ -71,7 +69,6 @@ defmodule BuildMan.Vagrant do
     state = put_in(state.worker, worker)
 
     Vagrantfile.write_files!(worker)
-    # {_, pid, _} = command(["up", "--provider", "virtualbox"], state)
     {_, pid, _} = command(["up"], state)
     {:noreply, %{state | cmd: {:up, pid}}}
   end
@@ -89,6 +86,18 @@ defmodule BuildMan.Vagrant do
   defp script_command("virtualbox", script), do: ["ssh", "-c", "sh", "-c", script]
   defp script_command("docker", script), do: ["docker-run", "--", "/bin/sh", "-c", script]
 
+  defp destroy_boot2docker_machine(state, worker) do
+    [worker.path, ".vagrant", "machines", "rabbit-ci-boot2docker", "virtualbox", "index_uuid"]
+    |> Path.join
+    |> File.read
+    |> case do
+         {:ok, id} ->
+           Task.async(fn -> command(["destroy", "-f", id], state, [:sync]) end)
+           |> Task.await(30_000)
+         {:error, :enoent} -> :ok
+       end
+  end
+
   def terminate(_reason, state = %{worker: worker, success: success, cmd: {_, cmd_pid}}) do
     log_debug(state.worker, "Vagrant build cleaning up.")
 
@@ -97,8 +106,8 @@ defmodule BuildMan.Vagrant do
     Task.async(fn -> command(["destroy", "-f"], state, [:sync]) end)
     |> Task.await(30_000)
 
+    destroy_boot2docker_machine(state, worker)
     File.rm_rf!(worker.path)
-
     AMQP.Basic.ack(state.chan, state.tag)
 
     case success do

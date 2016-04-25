@@ -78,7 +78,7 @@ defmodule BuildMan.Vagrant.Vagrantfile do
   end
   defp generate_docker_lines({:box, box, "docker"}) when is_bitstring(box) do
     # Job changeset validates format.
-    "FROM #{box}"
+    ["FROM #{box}", "WORKDIR /root"]
   end
   defp generate_docker_lines(_), do: []
 
@@ -121,12 +121,12 @@ defmodule BuildMan.Vagrant.Vagrantfile do
   end
 
   @chmod_script "chmod $1 $2"
-  defp chmod(vm_path, nil), do: []
+  defp chmod(_vm_path, nil), do: []
   defp chmod(vm_path, permissions) do
     shell_provisioner(@chmod_script, [permissions, vm_path])
   end
 
-  defp docker_chmod(safe_vm_path, nil), do: []
+  defp docker_chmod(_safe_vm_path, nil), do: []
   defp docker_chmod(safe_vm_path, permissions) do
     "RUN [\"chmod\", #{Poison.encode!(to_string permissions)}, #{safe_vm_path}]"
   end
