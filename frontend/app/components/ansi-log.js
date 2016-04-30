@@ -1,5 +1,5 @@
 import Ember from 'ember';
-import ansi_up from 'ansi-up';
+import ansi_up from 'npm:ansi_up';
 
 export default Ember.Component.extend({
   logLines: Ember.computed('rawLog', function() {
