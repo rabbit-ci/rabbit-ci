@@ -116,6 +116,7 @@ defmodule BuildMan.Vagrant.Vagrantfile do
       d.vagrant_machine = "rabbit-ci-boot2docker"
       d.vagrant_vagrantfile = "rabbit-ci-B2D-Vagrantfile"
       d.build_dir = "."
+      d.build_args = ["--no-cache"]
     end
     """
   end
