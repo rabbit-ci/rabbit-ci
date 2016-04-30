@@ -8,9 +8,8 @@ defmodule BuildMan.Vagrant.Vagrantfile do
 
   def instructions(worker = %Worker{files: files, job_id: job_id})
   when not is_nil(job_id) do
-    job = Worker.get_job(worker)
-    box = job.box
-    provider = job.provider
+    box = Worker.get_job(worker).box
+    provider = Worker.provider(worker)
     {:ok,
       List.flatten([
         {:begin},
@@ -55,7 +54,7 @@ defmodule BuildMan.Vagrant.Vagrantfile do
     {:ok, instructions} = Vagrantfile.instructions(worker)
     File.write!(Path.join(worker.path, "Vagrantfile"), IO.inspect vagrantfile(instructions))
 
-    if Worker.get_job(worker).provider == "docker" do
+    if Worker.provider(worker) == "docker" do
       File.write!(Path.join(worker.path, "Dockerfile"), IO.inspect dockerfile(instructions))
       File.write!(Path.join(worker.path, "rabbit-ci-B2D-Vagrantfile"), @b2d_vagrantfile_contents)
     end

@@ -16,6 +16,7 @@ defmodule BuildMan.Worker do
   defstruct [build_id: nil,
              step_id: nil,
              job_id: nil,
+             provider: nil,
              # Path to working directory for worker.
              path: nil,
              # Callbacks are called through trigger_event/2
@@ -116,6 +117,9 @@ defmodule BuildMan.Worker do
   def get_job(%Worker{job_id: job_id}), do: Repo.get!(Job, job_id)
 
   def get_repo(%Worker{build_id: build_id}), do: Build.get_repo_from_id!(build_id)
+
+  def provider(worker = %Worker{provider: nil}), do: get_job(worker).provider
+  def provider(%Worker{provider: provider}), do: provider
 
   def env_vars(worker = %Worker{}) do
     job = get_job(worker) |> Repo.preload([step: [build: [branch: :project]]])

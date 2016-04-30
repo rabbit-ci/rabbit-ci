@@ -44,6 +44,7 @@ defmodule BuildMan.ProjectConfig do
           build_id: build.id,
           job_id: job.id,
           step_id: step.id,
+          provider: job.provider,
           provider_config: %{git: Map.take(pr_or_commit, [:pr, :commit])}
         }
 
