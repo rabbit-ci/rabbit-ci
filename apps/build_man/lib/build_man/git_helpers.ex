@@ -14,7 +14,7 @@ defmodule BuildMan.GitHelpers do
 
   def clone_repo(_, _, should_run \\ true, exec_opts \\ [])
   def clone_repo(path, %{repo: repo, commit: commit}, should_run, exec_opts) do
-    clone = git(["clone", repo, path], should_run)
+    clone = git(["clone", repo, path], should_run, [exec_opts: exec_opts])
 
     cmds = [["checkout", "-qf", commit],
             ["rev-parse", "HEAD"]]
@@ -23,7 +23,7 @@ defmodule BuildMan.GitHelpers do
                                        [path: path, exec_opts: exec_opts]))]
   end
   def clone_repo(path, %{repo: repo, pr: pr}, should_run, exec_opts) do
-    clone = git(["clone", repo, path], should_run)
+    clone = git(["clone", repo, path], should_run, [exec_opts: exec_opts])
 
     cmds = [["fetch", "origin", "+refs/pull/#{pr}/merge:"],
             ["checkout", "-qf", "FETCH_HEAD"],
