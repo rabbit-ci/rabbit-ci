@@ -67,7 +67,7 @@ defmodule BuildMan.LogStreamer do
   def handle_info({:DOWN, _ref, :process, pid, reason},
                   state = %{chan: %{pid: chan_pid}}) when pid == chan_pid do
     Logger.warn("RabbitMQ Channel died! #{inspect reason}")
-    shut_down(state)
+    shutdown(state)
   end
 
   def handle_info({:basic_consume_ok, _}, state), do: {:noreply, state}
@@ -75,7 +75,7 @@ defmodule BuildMan.LogStreamer do
   def handle_info({:basic_cancel_ok, _}, state), do: {:noreply, state}
   def handle_info(_msg, state), do: {:noreply, state}
 
-  defp shut_down(state) do
+  defp shutdown(state) do
     Logger.debug("Log streamer going down... #{inspect state}")
     {:stop, :normal, state}
   end

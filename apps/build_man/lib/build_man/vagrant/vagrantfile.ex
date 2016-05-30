@@ -22,7 +22,7 @@ defmodule BuildMan.Vagrant.Vagrantfile do
   end
   def instructions(_worker), do: {:error, :invalid_worker}
 
-  defp vagrantfile(instructions) do
+  def vagrantfile(instructions) do
     for instruction <- instructions do
       List.wrap generate_lines(instruction)
     end
@@ -31,7 +31,7 @@ defmodule BuildMan.Vagrant.Vagrantfile do
     |> to_string
   end
 
-  defp dockerfile(instructions) do
+  def dockerfile(instructions) do
     for instruction <- instructions do
       List.wrap generate_docker_lines(instruction)
     end

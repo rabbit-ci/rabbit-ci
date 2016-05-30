@@ -21,7 +21,6 @@ defmodule BuildMan.ConfigExtractionSup do
   def init(:ok) do
     open_chan = RabbitMQ.with_conn fn conn ->
       {:ok, chan} = Channel.open(conn)
-
       Basic.qos(chan, prefetch_count: @worker_limit)
       Queue.declare(chan, @queue, durable: true)
       Exchange.fanout(chan, @exchange, durable: true)
