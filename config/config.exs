@@ -33,4 +33,6 @@ config :build_man, :build_queue, "rabbitci.builds"
 config :build_man, :config_extraction_exchange, "rabbitci.config_extraction"
 config :build_man, :config_extraction_queue, "rabbitci.config_extraction"
 
+# config :rabbitmq, options: [host: "localhost"]
+
 import_config "#{Mix.env}.exs"

@@ -21,12 +21,13 @@ defmodule BuildMan.LogStreamer do
   @queue Application.get_env(:build_man, :build_logs_queue)
   @log_streamer_limit Application.get_env(:build_man, :log_streamer_limit)
 
-  def log_string(str, type, order, job_id) do
+  def log_string(str, type, order, job_id, colors) do
     RabbitMQ.publish(@exchange, "#{type}.#{job_id}",
                      :erlang.term_to_binary(%LogOutput{text: str,
                                                        order: order,
                                                        job_id: job_id,
-                                                       type: to_string(type)}))
+                                                       type: to_string(type),
+                                                       colors: colors}))
   end
 
   # Server callbacks

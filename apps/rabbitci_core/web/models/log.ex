@@ -1,11 +1,14 @@
 defmodule RabbitCICore.Log do
   use RabbitCICore.Web, :model
-  alias RabbitCICore.Job
+  alias RabbitCICore.{Job, Log}
 
   schema "logs" do
     field :stdio, :string
     field :order, :integer
     field :type, :string
+    field :fg, :string
+    field :bg, :string
+    field :style, :string
 
     belongs_to :job, Job
 
@@ -20,8 +23,15 @@ defmodule RabbitCICore.Log do
   """
   def changeset(model, params \\ :empty) do
     model
-    |> cast(params, ~w(job_id stdio type order), ~w())
+    |> cast(params, ~w(job_id stdio type order), ~w(fg bg style))
     |> validate_inclusion(:type, ["stdout", "stderr"])
     |> foreign_key_constraint(:job_id)
   end
+
+  def html(%Log{stdio: stdio, fg: fg, bg: bg, style: style}) do
+    "<span class='#{html_class(fg, bg, style)}'>#{stdio}</span>"
+  end
+
+  defp html_class(fg, "", style), do: "ansi #{fg} #{style}"
+  defp html_class(fg, bg, style), do: "ansi #{fg} #{bg}-bg #{style}"
 end

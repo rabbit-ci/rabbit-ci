@@ -13,23 +13,27 @@ defmodule BuildMan.BuildConsumer do
   @worker_limit Application.get_env(:build_man, :worker_limit)
 
   def init(:ok) do
-    open_chan = RabbitMQ.with_conn fn conn ->
-      {:ok, chan} = Channel.open(conn)
+    case @worker_limit do
+      0 -> {:ok, :disabled}
+      _ ->
+        open_chan = RabbitMQ.with_conn fn conn ->
+          {:ok, chan} = Channel.open(conn)
 
-      Basic.qos(chan, prefetch_count: @worker_limit)
-      Queue.declare(chan, @queue, durable: true)
-      Exchange.fanout(chan, @exchange, durable: true)
-      Queue.bind(chan, @queue, @exchange)
+          Basic.qos(chan, prefetch_count: @worker_limit)
+          Queue.declare(chan, @queue, durable: true)
+          Exchange.fanout(chan, @exchange, durable: true)
+          Queue.bind(chan, @queue, @exchange)
 
-      {:ok, _consumer_tag} = Basic.consume(chan, @queue)
-      {:ok, chan}
-    end
+          {:ok, _consumer_tag} = Basic.consume(chan, @queue)
+          {:ok, chan}
+        end
 
-    case open_chan do
-      {:ok, chan} ->
-        {:ok, chan}
-      {:error, :disconnected} ->
-        {:stop, :disconnected}
+        case open_chan do
+          {:ok, chan} ->
+            {:ok, chan}
+          {:error, :disconnected} ->
+            {:stop, :disconnected}
+        end
     end
   end
 
@@ -52,7 +56,7 @@ defmodule BuildMan.BuildConsumer do
     {:noreply, chan}
   end
 
-  def terminate(_reason, chan) do
+  def terminate(_reason, chan) when chan != :disabled do
     try do
       Channel.close(chan)
     catch

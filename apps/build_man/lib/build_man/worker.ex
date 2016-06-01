@@ -89,8 +89,8 @@ defmodule BuildMan.Worker do
     * `type` should be :stdout or :stderr.
     * `order` is used for ordering the log messages.
   """
-  def log(worker, io, type, order) do
-    LogStreamer.log_string(io, type, order, worker.job_id)
+  def log(worker, io, type, order, colors \\ {nil, nil, nil}) do
+    LogStreamer.log_string(io, type, order, worker.job_id, colors)
   end
 
   @doc """

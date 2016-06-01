@@ -24,14 +24,19 @@ defmodule BuildMan.Vagrant.VagrantfileTest do
   test "Worker missing config fields returns error" do
     worker = Worker.create
     cleanup_worker worker
-    assert {:error, :invalid_worker} = Vagrantfile.generate(worker)
+    assert {:error, :invalid_worker} = Vagrantfile.instructions(worker)
   end
 
   test "Minimal Vagrantfile" do
     job = Factory.create(:job, box: "test/box")
-    worker = Worker.create(%{job_id: job.id})
+    worker = Worker.create(%{job_id: job.id, provider: "virtualbox"})
     cleanup_worker worker
-    assert_lines Vagrantfile.generate(worker) ==
+
+    lines =
+      with {:ok, instructions} <- Vagrantfile.instructions(worker),
+      do: Vagrantfile.vagrantfile(instructions)
+
+    assert_lines lines ==
       ~S"""
       Vagrant.configure(2) do |config|
         config.ssh.insert_key = false
@@ -49,12 +54,16 @@ defmodule BuildMan.Vagrant.VagrantfileTest do
   test "Worker with single file (default permissions)" do
     job = Factory.create(:job, box: "test/box")
     worker =
-      Worker.create(%{job_id: job.id})
+      Worker.create(%{job_id: job.id, provider: "virtualbox"})
       |> Worker.add_file("testing-file.txt", "This is a test")
     cleanup_worker worker
 
-    assert_lines Vagrantfile.generate(worker)
-      |> String.replace(~r/(source: \").*(\",)/, "\\1source_file\\2") ==
+    lines =
+      with {:ok, instructions} <- Vagrantfile.instructions(worker),
+      do: Vagrantfile.vagrantfile(instructions)
+      |> String.replace(~r/(source: \").*(\",)/, "\\1source_file\\2")
+
+    assert_lines lines ==
     ~S"""
     Vagrant.configure(2) do |config|
       config.ssh.insert_key = false
@@ -74,12 +83,16 @@ defmodule BuildMan.Vagrant.VagrantfileTest do
   test "Worker with single file (custom permissions)" do
     job = Factory.create(:job, box: "test/box")
     worker =
-      Worker.create(%{job_id: job.id})
+      Worker.create(%{job_id: job.id, provider: "virtualbox"})
       |> Worker.add_file("testing-file.txt", "This is a test", mode: 755)
     cleanup_worker worker
 
-    assert_lines Vagrantfile.generate(worker)
-      |> String.replace(~r/(source: \").*(\",)/, "\\1source_file\\2") ==
+    lines =
+      with {:ok, instructions} <- Vagrantfile.instructions(worker),
+      do: Vagrantfile.vagrantfile(instructions)
+      |> String.replace(~r/(source: \").*(\",)/, "\\1source_file\\2")
+
+    assert_lines lines ==
     ~S"""
     Vagrant.configure(2) do |config|
       config.ssh.insert_key = false

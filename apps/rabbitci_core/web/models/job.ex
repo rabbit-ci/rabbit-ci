@@ -37,8 +37,8 @@ defmodule RabbitCICore.Job do
     job
     |> assoc(:logs)
     |> order_by([l], asc: l.order)
-    |> select([l], l.stdio)
     |> Repo.all
+    |> Enum.map(&Log.html/1)
     |> Enum.join
   end
 

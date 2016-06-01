@@ -7,6 +7,7 @@ defmodule BuildMan.Vagrant do
   require Logger
   require EEx
   alias BuildMan.Worker
+  alias BuildMan.LogProcessor
   alias BuildMan.Vagrant.Script
   alias BuildMan.Vagrant.Vagrantfile
   alias RabbitCICore.SSHKey
@@ -18,7 +19,7 @@ defmodule BuildMan.Vagrant do
 
   # Server callbacks
   def init([config, {chan, tag}]) do
-    {:ok, count_agent} = Agent.start_link(fn -> 0 end)
+    {:ok, count_agent} = Agent.start_link(fn -> {0, {nil, nil, nil}} end)
     send(self, :start_build)
 
     worker = Worker.create(config)
@@ -69,15 +70,22 @@ defmodule BuildMan.Vagrant do
     state = put_in(state.worker, worker)
 
     Vagrantfile.write_files!(worker)
-    {_, pid, _} = command(["up"], state)
-    {:noreply, %{state | cmd: {:up, pid}}}
+
+    case Worker.provider(worker) do
+      "docker" ->
+        send(self, :run_build_script)
+        {:noreply, state}
+      _ ->
+        {_, pid, _} = command(["up"], state)
+        {:noreply, %{state | cmd: {:up, pid}}}
+    end
   end
 
   def handle_info(:run_build_script, state = %{worker: worker}) do
     script = Script.generate(worker)
     Logger.debug("Running script:\n#{script}")
     {_, pid, _} =
-      Worker.get_job(worker).provider
+      Worker.provider(worker)
       |> script_command(script)
       |> command(state)
     {:noreply, %{state | cmd: {:ssh, pid}}}
@@ -165,14 +173,26 @@ defmodule BuildMan.Vagrant do
 
   defp handle_log(worker, counter, type) do
     fn _, _, str ->
-      Worker.log(worker, str, type, increment_counter(counter))
+      for {log_split, colors} <- update_colors(str, counter) do
+        Worker.log(worker, log_split, type, increment_counter(counter), colors)
+      end
+    end
+  end
+
+  defp update_colors(str, counter) do
+    Agent.get_and_update counter, fn {x, colors} ->
+      with logs = [{_, new_colors} | rest] <- LogProcessor.colors_backwards(str, colors) do
+        {Enum.reverse(logs), {x, new_colors}}
+      else
+        [] -> {[], {x, colors}}
+      end
     end
   end
 
   defp increment_counter(counter) do
-    Agent.get_and_update counter, fn x ->
+    Agent.get_and_update counter, fn {x, colors} ->
       y = x + 1
-      {y, y}
+      {y, {y, colors}}
     end
   end
 end

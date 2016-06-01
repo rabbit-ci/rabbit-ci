@@ -56,7 +56,7 @@ defmodule RabbitCICore.Repo do
   end
 
   defp model_event(%Log{} = model, :insert) do
-    payload = %{log_append: model.stdio, job_id: model.job_id}
+    payload = %{log_append: Log.html(model), job_id: model.job_id}
     JobUpdaterChannel.publish_log(model.job_id, payload)
   end
   defp model_event(%Job{} = model, :insert) do
