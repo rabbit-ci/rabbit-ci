@@ -35,18 +35,8 @@ defmodule RabbitCICore.LogController do
     end
   end
 
-  def show(conn, %{"format" => "ansi"}) do
-    log = do_log(conn)
-    text(conn, log)
-  end
-  def show(conn, %{"format" => "text"}) do
-    # We're cleaning it _after_ we concat all the logs because the job name
-    # could possibly include some ANSI codes.
-    log = Job.clean_log do_log(conn)
-    text(conn, log)
-  end
   def show(conn, params) do
-    show(conn, Map.merge(params, %{"format" => "text"}))
+    text(conn, do_log(conn))
   end
 
   defp do_log(%{assigns: %{project: project, branch: branch, build: build}}) do
@@ -55,7 +45,7 @@ defmodule RabbitCICore.LogController do
 ================================================================================
 "#{step.name}" -- #{project.name}/#{branch.name}##{build.build_number}
 
- #{Job.log(job, :no_clean)}
+ #{Job.log(job)}
  """
     end
 

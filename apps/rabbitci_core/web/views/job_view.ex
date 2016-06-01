@@ -19,7 +19,7 @@ defmodule RabbitCICore.JobView do
   def log(r, %Plug.Conn{assigns: %{no_logs: true}}), do: nil
   def log(r, _) do
     Task.async fn ->
-      Job.log(r, :no_clean)
+      Job.log(r)
     end
   end
 end

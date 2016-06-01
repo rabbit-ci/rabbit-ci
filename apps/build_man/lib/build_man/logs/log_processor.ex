@@ -32,24 +32,25 @@ defmodule BuildMan.LogProcessor do
                   {46, :cyan, :bg},
                   {47, :white, :bg}]
 
+  defmacrop bright_or_attr(:bright, a), do: :bright
+  defmacrop bright_or_attr(_, a), do: a
   defmacrop replace_triplet(current_style, atom, :bg, bright) do
     quote do
       {fg, _bg, attr} = unquote(current_style)
-      {fg, unquote(atom), unquote(bright) || attr}
+      {fg, unquote(atom), bright_or_attr(unquote(bright), attr)}
     end
   end
-
   defmacrop replace_triplet(current_style, atom, :fg, bright) do
     quote do
       {_fg, bg, attr} = unquote(current_style)
-      {unquote(atom), bg, unquote(bright) || attr}
+      {unquote(atom), bg, bright_or_attr(unquote(bright), attr)}
     end
   end
 
   for {dec, atom, fg_bg} <- color_values do
     for {code, bright} <- [{"\e[0;#{dec}m", nil},
-                         {"\e[#{dec}m", nil},
-                         {"\e[1;#{dec}m", :bright}] do
+                           {"\e[#{dec}m", nil},
+                           {"\e[1;#{dec}m", :bright}] do
       defp do_colors(<<unquote(code) :: utf8, rest :: binary>>,
             current = {_current_text, current_style}, acc) do
         do_colors(

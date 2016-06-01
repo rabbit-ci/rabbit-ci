@@ -6,9 +6,9 @@ defmodule RabbitCICore.Log do
     field :stdio, :string
     field :order, :integer
     field :type, :string
-    field :fg, :string
-    field :bg, :string
-    field :style, :string
+    field :fg, :string, default: ""
+    field :bg, :string, default: ""
+    field :style, :string, default: ""
 
     belongs_to :job, Job
 

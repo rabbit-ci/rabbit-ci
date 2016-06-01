@@ -58,30 +58,14 @@ defmodule RabbitCICore.JobTest do
     end
   end
 
-  test "Job.log/2 :no_clean" do
+  test "Job.log/1" do
     job = create(:job)
 
-    for str <- ~w(foo bar baz) do
-      stdio = IO.ANSI.format([:bright, :red, str]) |> to_string
-      # Make sure that the string we start with contains ANSI escape codes.
-      assert String.contains?(stdio, "\e[31m")
-      create(:log, %{stdio: stdio, job: job})
+    for str <- ~w(foo bar) do
+      create(:log, %{stdio: str, job: job, fg: "red", style: "bright"})
     end
 
-    assert Job.log(job, :no_clean) ==
-      "\e[1m\e[31mfoo\e[0m\e[1m\e[31mbar\e[0m\e[1m\e[31mbaz\e[0m"
-  end
-
-  test "Job.log/2 :clean" do
-    job = create(:job)
-
-    for str <- ~w(foo bar baz) do
-      stdio = IO.ANSI.format([:bright, :red, str]) |> to_string
-      # Make sure that the string we start with contains ANSI escape codes.
-      assert String.contains?(stdio, "\e[31m")
-      create(:log, %{stdio: stdio, job: job})
-    end
-
-    assert Job.log(job, :clean) == "foobarbaz"
+    assert Job.log(job) ==
+      "<span class='ansi red bright'>foo</span><span class='ansi red bright'>bar</span>"
   end
 end

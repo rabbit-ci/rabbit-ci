@@ -31,19 +31,13 @@ defmodule RabbitCICore.Job do
     |> validate_format(:box, ~r/^[a-z0-9-_.:@\/]+$/) # TODO: Tests for this
   end
 
-  def log(job, clean \\ :clean)
-  def log(job, :clean), do: clean_log log(job, :no_clean)
-  def log(job, :no_clean) do
+  def log(job) do
     job
     |> assoc(:logs)
     |> order_by([l], asc: l.order)
     |> Repo.all
     |> Enum.map(&Log.html/1)
     |> Enum.join
-  end
-
-  def clean_log(raw_log) do
-    Regex.replace(~r/\x1b(\[[0-9;]*[mK])?/, raw_log, "")
   end
 
   # This is for use in BuildMan. You can use it, but you probably

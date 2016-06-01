@@ -15,7 +15,7 @@ defmodule RabbitCICore.JobUpdaterChannel do
   def handle_info({:after_join, job_id}, socket) do
     Task.start fn ->
       job = Repo.get!(Job, job_id)
-      log = Job.log(job, :no_clean)
+      log = Job.log(job)
       payload = %{job_id: job_id, log: log}
       broadcast socket, "set_log:job", payload
     end
