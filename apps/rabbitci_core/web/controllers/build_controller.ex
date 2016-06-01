@@ -98,7 +98,7 @@ defmodule RabbitCICore.BuildController do
              and p.name == ^project,
        order_by: [desc: b.build_number],
           limit: 1,
-        preload: [branch: {br, project: p}]
+        preload: [steps: [:jobs], branch: {br, project: p}]
 
     build = Repo.one! query
     render(conn, data: build)
@@ -113,7 +113,7 @@ defmodule RabbitCICore.BuildController do
           where: br.name == ^branch
              and p.name == ^project
              and b.build_number == ^build_number,
-         preload: [branch: {br, project: p}]
+         preload: [steps: [:jobs], branch: {br, project: p}]
 
     build = Repo.one! query
     render(conn, data: build)
