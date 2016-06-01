@@ -60,22 +60,24 @@ defmodule BuildMan.LogProcessor do
       end
     end
   end
-
   # Reset
   defp do_colors(<<"\e[0m" :: utf8, rest :: binary>>, current, acc) do
     do_colors(rest, {"", {nil, nil, nil}}, append_formatted(current, acc))
   end
-
   # Bright
   defp do_colors(<<"\e[1m" :: utf8, rest :: binary>>,
         current = {_current_text, {fg, bg, _attrs}}, acc) do
     do_colors(rest, {"", {fg, bg, :bright}}, append_formatted(current, acc))
   end
-
   defp do_colors("", current, acc) do
     append_formatted(current, acc)
   end
-
+  defp do_colors(<<"<" :: utf8, rest :: binary>>, {current_text, current_colors}, acc) do
+    do_colors(rest, {current_text <> "&lt;", current_colors}, acc)
+  end
+  defp do_colors(<<">" :: utf8, rest :: binary>>, {current_text, current_colors}, acc) do
+    do_colors(rest, {current_text <> "&gt;", current_colors}, acc)
+  end
   defp do_colors(<<char :: utf8, rest :: binary>>, {current_text, current_colors}, acc) do
     do_colors(rest, {current_text <> <<char>>, current_colors}, acc)
   end
