@@ -29,21 +29,5 @@ export default DS.Model.extend({
     case "finished": return "green";
     default: return "";
     }
-  }),
-
-  connectToChan() {
-    if (this.get('channel')) return;
-
-    let socket = this.get('phoenix');
-    let chan = socket.channel("builds:" + this.get('id'), {});
-
-    chan.join().receive("ignore", () => console.log("auth error"));
-    chan.onError(e => console.log("something went wrong", e));
-
-    chan.on("update:build", payload => {
-      this.store.pushPayload(payload);
-    });
-
-    this.set('channel', chan);
-  }
+  })
 });

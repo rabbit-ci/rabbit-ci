@@ -24,7 +24,7 @@ defmodule BuildMan.Vagrant do
 
     worker = Worker.create(config)
 
-    Worker.log(worker, "Starting: #{worker.build_id}.#{worker.job_id}.\n\n",
+    Worker.log(worker, "Starting: #{worker.build_id}.#{worker.job_id}.\n",
                :stdout, increment_counter(count_agent))
 
     {:ok, %{worker: worker,

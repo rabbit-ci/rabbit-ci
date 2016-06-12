@@ -1,9 +1,10 @@
 defmodule RabbitCICore.UserSocket do
   use Phoenix.Socket
 
-  channel "jobs:*", RabbitCICore.JobUpdaterChannel
-  channel "builds:*", RabbitCICore.BuildUpdaterChannel
-  channel "branches:*", RabbitCICore.BranchUpdaterChannel
+  channel "jobs:*", RabbitCICore.RecordPubSubChannel
+  channel "builds:*", RabbitCICore.RecordPubSubChannel
+  channel "record_pubsub", RabbitCICore.RecordPubSubChannel
+  channel "branches:*", RabbitCICore.RecordPubSubChannel
 
   ## Transports
   transport :websocket, Phoenix.Transports.WebSocket

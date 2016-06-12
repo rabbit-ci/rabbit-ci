@@ -4,22 +4,7 @@ defmodule RabbitCICore.JobView do
 
   alias RabbitCICore.Job
 
-  attributes [:name, :status, :log, :start_time, :finish_time, :box]
-
-  def attributes(job, %Plug.Conn{} = conn) do
-    attrs = super(job, conn)
-    case conn.assigns[:no_logs] do
-      true -> Map.drop(attrs, [:log])
-      _ -> attrs
-    end
-  end
-  def attributes(job, kahn), do: super(job, kahn)
+  attributes [:name, :status, :start_time, :finish_time, :box]
 
   def type, do: "jobs"
-  def log(r, %Plug.Conn{assigns: %{no_logs: true}}), do: nil
-  def log(r, _) do
-    Task.async fn ->
-      Job.log(r)
-    end
-  end
 end

@@ -1,8 +1,7 @@
 defmodule RabbitCICore.Repo do
   alias RabbitCICore.EctoRepo
   alias RabbitCICore.{Build, Job, Log, Repo, Step}
-  alias RabbitCICore.{BranchUpdaterChannel, BuildUpdaterChannel,
-                      JobUpdaterChannel}
+  alias RabbitCICore.RecordPubSubChannel
 
   # Delgate most stuff to EctoRepo
   def config(), do: EctoRepo.config()
@@ -15,9 +14,6 @@ defmodule RabbitCICore.Repo do
   def get_by!(queryable, clauses, opts \\ []), do: EctoRepo.get_by!(queryable, clauses, opts)
   def one(queryable, opts \\ []), do: EctoRepo.one(queryable, opts)
   def one!(queryable, opts \\ []), do: EctoRepo.one!(queryable, opts)
-  def insert_all(schema, entries, opts \\ []), do: EctoRepo.insert_all(schema, entries, opts)
-  def update_all(queryable, updates, opts \\ []), do: EctoRepo.update_all(queryable, updates, opts)
-  def delete_all(queryable, opts \\ []), do: EctoRepo.delete_all(queryable, opts)
   def insert_or_update(changeset, opts \\ []), do: EctoRepo.insert_or_update(changeset, opts)
   def insert_or_update!(changeset, opts \\ []), do: EctoRepo.insert_or_update!(changeset, opts)
   def delete(record_struct, opts \\ []), do: EctoRepo.delete(record_struct, opts)
@@ -56,22 +52,21 @@ defmodule RabbitCICore.Repo do
   end
 
   defp model_event(%Log{} = model, :insert) do
-    payload = %{log_append: Log.html(model), job_id: model.job_id}
-    JobUpdaterChannel.publish_log(model.job_id, payload)
+    RecordPubSubChannel.new_log(model)
   end
   defp model_event(%Job{} = model, :insert) do
     Repo.get(Step, model.step_id).build_id
-    |> BuildUpdaterChannel.update_build
+    |> RecordPubSubChannel.update_build
   end
   defp model_event(%Job{} = model, :update) do
     Repo.get(Step, model.step_id).build_id
-    |> BuildUpdaterChannel.update_build
+    |> RecordPubSubChannel.update_build
   end
   defp model_event(%Build{} = model, :insert) do
-    BranchUpdaterChannel.new_build(model.branch_id, model.id)
+    RecordPubSubChannel.new_build(model.branch_id, model.id)
   end
   defp model_event(%Build{} = model, :update) do
-    BuildUpdaterChannel.update_build(model.id)
+    RecordPubSubChannel.update_build(model.id)
   end
   defp model_event(_model, :update), do: :nothing
   defp model_event(_model, :insert), do: :nothing

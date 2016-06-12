@@ -2,7 +2,7 @@ import DS from 'ember-data';
 
 export default DS.Model.extend({
   status: DS.attr('string'),
-  log: DS.attr('string'),
+  logs: DS.hasMany('logs'),
   box: DS.attr('string'),
   step: DS.belongsTo('step'),
   startTime: DS.attr('date'),
@@ -21,32 +21,5 @@ export default DS.Model.extend({
     case "finished": return "green";
     default: return "";
     }
-  }),
-
-  connectToChan() {
-    if (this.get('channel')) return;
-
-    let socket = this.get('phoenix');
-    let chan = socket.channel("jobs:" + this.get('id'), {});
-
-    chan.join().receive("ignore", () => console.log("auth error"));
-
-    chan.onError(e => console.log("something went wrong", e));
-
-    chan.on("set_log:job", payload => {
-      this.set('log', payload["log"]);
-    });
-
-    chan.on("append_log:job", payload => {
-      this.set('log', this.get('log') + payload["log_append"]);
-    });
-
-    this.set('channel', chan);
-  },
-
-  disconnectFromChan() {
-    let chan = this.get('channel');
-    if (chan) chan.leave();
-    this.set('channel', null);
-  }
+  })
 });

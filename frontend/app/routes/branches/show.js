@@ -18,25 +18,39 @@ export default Ember.Route.extend({
 
   afterModel(branch) {
     Ember.addObserver(branch, 'builds', this, 'buildsChanged');
-    branch.connectToChan();
-
+    this.set('idMap.branches', branch.get('id'));
+    this.get('phoenix').subscribe(this.get('idMap'));
     if (branch.get('builds').isFulfilled === true) {
       branch.get('builds').reload();
     }
   },
+
+  phoenix: Ember.inject.service(),
+  idMap: {branches: null, builds: [], jobs: []},
 
   buildsChanged() {
     this._connectBuildsToChan(this.get('currentModel.builds'));
   },
 
   _connectBuildsToChan(builds) {
+    let oldIds = Ember.copy(this.get('idMap'));
+    this.set('idMap.builds', []);
+    this.set('idMap.jobs', []);
+
     builds.forEach((build) => {
-      build.connectToChan();
+      this.set('idMap.builds', this.get('idMap.builds').concat(build.get('id')));
       build.get('steps').forEach((step) => {
         step.get('jobs').forEach((job) => {
-          job.connectToChan();
+          this.set('idMap.jobs', this.get('idMap.jobs').concat(job.get('id')));
         });
       });
     });
+
+    this.get('phoenix').subscribe(this.get('idMap'));
+    this.get('phoenix').unsubscribe(oldIds);
+  },
+
+  deactivate() {
+    this.get('phoenix').unsubscribe(this.get('idMap'));
   }
 });

@@ -18,13 +18,24 @@ export default Ember.Route.extend({
     };
   },
 
+  phoenix: Ember.inject.service(),
+  idMap: {builds: null, jobs: []},
+  // TODO: Handle new jobs being loaded.
   afterModel(build) {
+    this.set('idMap.jobs', []);
+    this.set('idMap.builds', build.get('id'));
+
     build.get('steps').forEach((step) => {
       step.get('jobs').forEach((job) => {
-        job.connectToChan();
+        this.set('idMap.jobs', this.get('idMap.jobs').concat(job.get('id')));
+        this.set('idMap.logs', this.get('idMap.jobs').concat(job.get('id')));
       });
     });
 
-    build.connectToChan();
+    this.get('phoenix').subscribe(this.get('idMap'));
+  },
+
+  deactivate() {
+    this.get('phoenix').unsubscribe(this.get('idMap'));
   }
 });
