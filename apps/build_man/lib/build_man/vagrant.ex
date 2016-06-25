@@ -181,7 +181,7 @@ defmodule BuildMan.Vagrant do
 
   defp update_colors(str, counter) do
     Agent.get_and_update counter, fn {x, colors} ->
-      with logs = [{_, new_colors} | rest] <- LogProcessor.colors_backwards(str, colors) do
+      with logs = [{_, new_colors} | _rest] <- LogProcessor.colors_backwards(str, colors) do
         {Enum.reverse(logs), {x, new_colors}}
       else
         [] -> {[], {x, colors}}
