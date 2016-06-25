@@ -141,6 +141,8 @@ defmodule BuildMan.Vagrant do
   defp command(args, %{worker: worker, counter: counter}, opts \\ [])
   when is_list(opts) do
     vagrant_cmd = System.find_executable("vagrant")
+    cmd_str = Enum.join([vagrant_cmd | args], " ")
+    handle_log(worker, counter, :stderr).(nil, nil, "$ #{cmd_str}")
     ExExec.run(
       [vagrant_cmd | args],
       [
