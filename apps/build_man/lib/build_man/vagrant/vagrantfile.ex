@@ -111,6 +111,7 @@ defmodule BuildMan.Vagrant.Vagrantfile do
   defp generate_lines({:provider, "docker"}) do
     ~S"""
     config.vm.provider "docker" do |d|
+      d.force_host_vm = false
       d.remains_running = false
       d.vagrant_machine = "rabbit-ci-boot2docker"
       d.vagrant_vagrantfile = "rabbit-ci-B2D-Vagrantfile"
