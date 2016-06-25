@@ -40,12 +40,12 @@ defmodule BuildMan.BuildConsumer do
   def handle_info({:basic_cancel_ok, _}, state), do: {:noreply, state}
 
   def handle_info({:basic_deliver, payload,
-                   %{delivery_tag: tag, routing_key: _routing_key}}, %{chan: chan}) do
+                   %{delivery_tag: tag, routing_key: _routing_key}}, state = %{chan: chan}) do
     Logger.debug("Starting build...")
 
     config = :erlang.binary_to_term(payload)
     {:ok, _pid} = Supervisor.start_child(BuildMan.WorkerSup, [[config, {chan, tag}]])
 
-    {:noreply, chan}
+    {:noreply, state}
   end
 end
