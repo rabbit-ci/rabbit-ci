@@ -115,7 +115,7 @@ defmodule BuildMan.Vagrant do
     |> Task.await(30_000)
 
     destroy_boot2docker_machine(state, worker)
-    File.rm_rf!(worker.path)
+    Worker.cleanup!(worker)
     AMQP.Basic.ack(state.chan, state.tag)
 
     case success do
