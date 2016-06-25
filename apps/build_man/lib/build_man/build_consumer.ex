@@ -1,7 +1,7 @@
 defmodule BuildMan.BuildConsumer do
   use AMQP
   use GenServer
-  alias BuildMan.Vagrant
+  use BuildMan.RabbitMQMacros
   require Logger
 
   def start_link do
@@ -12,11 +12,11 @@ defmodule BuildMan.BuildConsumer do
   @queue Application.get_env(:build_man, :build_queue)
   @worker_limit Application.get_env(:build_man, :worker_limit)
 
-  def init(:ok) do
+  def rabbitmq_connect(_opts) do
     case @worker_limit do
       0 -> {:ok, :disabled}
       _ ->
-        open_chan = RabbitMQ.with_conn fn conn ->
+        RabbitMQ.with_conn fn conn ->
           {:ok, chan} = Channel.open(conn)
 
           Basic.qos(chan, prefetch_count: @worker_limit)
@@ -25,14 +25,7 @@ defmodule BuildMan.BuildConsumer do
           Queue.bind(chan, @queue, @exchange)
 
           {:ok, _consumer_tag} = Basic.consume(chan, @queue)
-          {:ok, chan}
-        end
-
-        case open_chan do
-          {:ok, chan} ->
-            {:ok, chan}
-          {:error, :disconnected} ->
-            {:stop, :disconnected}
+          {:ok, %{chan: chan}}
         end
     end
   end
@@ -47,20 +40,12 @@ defmodule BuildMan.BuildConsumer do
   def handle_info({:basic_cancel_ok, _}, state), do: {:noreply, state}
 
   def handle_info({:basic_deliver, payload,
-                   %{delivery_tag: tag, routing_key: routing_key}}, chan) do
+                   %{delivery_tag: tag, routing_key: _routing_key}}, %{chan: chan}) do
     Logger.debug("Starting build...")
 
     config = :erlang.binary_to_term(payload)
     {:ok, _pid} = Supervisor.start_child(BuildMan.WorkerSup, [[config, {chan, tag}]])
 
     {:noreply, chan}
-  end
-
-  def terminate(_reason, chan) when chan != :disabled do
-    try do
-      Channel.close(chan)
-    catch
-      _, _ -> :ok
-    end
   end
 end

@@ -16,6 +16,12 @@ config :rabbitci_core, RabbitCICore.Endpoint,
 # Do not include metadata nor timestamps in development logs
 config :logger, :console, format: "[$level] $message\n"
 
+# Uncomment for very verbose logs
+#
+# config :logger,
+#   handle_otp_reports: true,
+#   handle_sasl_reports: true
+
 # Configure your database
 config :rabbitci_core, RabbitCICore.EctoRepo,
   adapter: Ecto.Adapters.Postgres,

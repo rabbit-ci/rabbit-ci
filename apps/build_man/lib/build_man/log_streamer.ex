@@ -6,6 +6,7 @@ defmodule BuildMan.LogStreamer do
   require Logger
   use AMQP
   use GenServer
+  use BuildMan.RabbitMQMacros
   alias BuildMan.LogProcessor
   alias BuildMan.LogOutput
 
@@ -31,8 +32,8 @@ defmodule BuildMan.LogStreamer do
   end
 
   # Server callbacks
-  def init([]) do
-    open_chan = RabbitMQ.with_conn fn conn ->
+  def rabbitmq_connect(_opts) do
+    RabbitMQ.with_conn fn conn ->
       {:ok, chan} = Channel.open(conn)
       Basic.qos(chan, prefetch_count: @log_streamer_limit)
       {:ok, %{queue: queue}} = Queue.declare(chan, @queue, durable: true)
@@ -41,14 +42,6 @@ defmodule BuildMan.LogStreamer do
 
       {:ok, _consumer_tag} = Basic.consume(chan, queue)
       {:ok, %{chan: chan, queue: queue}}
-    end
-
-    case open_chan do
-      {:ok, state = %{chan: %{pid: pid}}} ->
-        Process.monitor(pid)
-        {:ok, state}
-      {:error, :disconnected} ->
-        {:stop, :disconnected}
     end
   end
 
@@ -64,28 +57,8 @@ defmodule BuildMan.LogStreamer do
     {:noreply, state}
   end
 
-  # Channel died.
-  def handle_info({:DOWN, _ref, :process, pid, reason},
-                  state = %{chan: %{pid: chan_pid}}) when pid == chan_pid do
-    Logger.warn("RabbitMQ Channel died! #{inspect reason}")
-    shutdown(state)
-  end
-
   def handle_info({:basic_consume_ok, _}, state), do: {:noreply, state}
   def handle_info({:basic_cancel, _}, state), do: {:stop, :normal, state}
   def handle_info({:basic_cancel_ok, _}, state), do: {:noreply, state}
   def handle_info(_msg, state), do: {:noreply, state}
-
-  defp shutdown(state) do
-    Logger.debug("Log streamer going down... #{inspect state}")
-    {:stop, :normal, state}
-  end
-
-  def terminate(_reason, %{chan: chan}) do
-    try do
-      Channel.close(chan)
-    catch
-      _, _ -> :ok
-    end
-  end
 end

@@ -8,6 +8,7 @@ defmodule BuildMan.ConfigExtractionSup do
   require Logger
   use GenServer
   use AMQP
+  use BuildMan.RabbitMQMacros
 
   def start_link do
     GenServer.start_link(__MODULE__, :ok, name: __MODULE__)
@@ -18,8 +19,8 @@ defmodule BuildMan.ConfigExtractionSup do
   @queue Application.get_env(:build_man, :config_extraction_queue)
   @worker_limit Application.get_env(:build_man, :config_extraction_limit)
 
-  def init(:ok) do
-    open_chan = RabbitMQ.with_conn fn conn ->
+  def rabbitmq_connect(_opts) do
+    RabbitMQ.with_conn fn conn ->
       {:ok, chan} = Channel.open(conn)
       Basic.qos(chan, prefetch_count: @worker_limit)
       Queue.declare(chan, @queue, durable: true)
@@ -27,21 +28,14 @@ defmodule BuildMan.ConfigExtractionSup do
       Queue.bind(chan, @queue, @exchange)
 
       {:ok, _consumer_tag} = Basic.consume(chan, @queue)
-      {:ok, chan}
-    end
-
-    case open_chan do
-      {:ok, chan} ->
-        {:ok, chan}
-      {:error, :disconnected} ->
-        {:stop, :disconnected}
+      {:ok, %{chan: chan}}
     end
   end
 
   # Confirmation sent by the broker after registering this process as a consumer
-  def handle_info({:basic_consume_ok, _}, chan) do
+  def handle_info({:basic_consume_ok, _}, state) do
     Logger.info("#{__MODULE__} connected to RabbitMQ.")
-    {:noreply, chan}
+    {:noreply, state}
   end
 
   # Sent by the broker when the consumer is unexpectedly cancelled (such as
@@ -51,14 +45,11 @@ defmodule BuildMan.ConfigExtractionSup do
   # Confirmation sent by the broker to the consumer process after a Basic.cancel
   def handle_info({:basic_cancel_ok, _}, state), do: {:noreply, state}
 
-  def handle_info({:basic_deliver, payload,
-                   %{delivery_tag: tag, redelivered: redelivered}}, chan) do
+  def handle_info({:basic_deliver, payload, %{delivery_tag: tag}}, state = %{chan: chan}) do
     Task.start_link fn ->
       :erlang.process_flag(:trap_exit, true)
 
-      Task.start_link fn ->
-        consume(chan, tag, redelivered, payload)
-      end
+      Task.start_link fn -> consume(payload) end
 
       receive do
         {:EXIT, _pid, _reason} ->
@@ -66,10 +57,10 @@ defmodule BuildMan.ConfigExtractionSup do
           @processor.done
       end
     end
-    {:noreply, chan}
+    {:noreply, state}
   end
 
-  defp consume(channel, _tag, _redelivered, packed_payload) do
+  defp consume(packed_payload) do
     payload = Map.merge(%{file: ".rabbitci.json"},
                         :erlang.binary_to_term(packed_payload))
 
