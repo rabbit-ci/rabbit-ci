@@ -1,57 +1,53 @@
 defmodule RabbitMQ.Conn do
-  use GenServer
-  use AMQP
+  use Connection
   require Logger
 
   @reconnect_after_ms 5_000
 
   def start_link(opts) do
-    GenServer.start_link(__MODULE__, opts)
+    Connection.start_link(__MODULE__, opts)
   end
 
   def init(opts) do
     Process.flag(:trap_exit, true)
-    send(self, :connect)
-    {:ok, %{opts: opts, status: :disconnected, conn: nil}}
+    {:connect, :init, %{opts: opts, conn: nil}}
   end
 
-  def handle_call(:conn, _from, %{status: :connected, conn: conn} = status) do
-    {:reply, {:ok, conn}, status}
-  end
-
-  def handle_call(:conn, _from, %{status: :disconnected} = status) do
+  def handle_call(:conn, _from, %{conn: nil} = status) do
     {:reply, {:error, :disconnected}, status}
   end
 
-  def handle_info(:connect, state) do
-    case Connection.open(state.opts) do
+  def handle_call(:conn, _from, %{conn: conn} = status) do
+    {:reply, {:ok, conn}, status}
+  end
+
+  def connect(_, state) do
+    case AMQP.Connection.open(state.opts) do
       {:ok, conn} ->
         Logger.info("Connected to RabbitMQ!")
         Process.monitor(conn.pid)
-        {:noreply, %{state | conn: conn, status: :connected}}
+        {:ok, %{state | conn: conn}}
       {:error, _reason} ->
         Logger.error("Could not connect to RabbitMQ!")
-        :timer.send_after(@reconnect_after_ms, :connect)
-        {:noreply, state}
+        {:backoff, @reconnect_after_ms, state}
     end
   end
 
-  def handle_info({:DOWN, _ref, :process, _pid, _reason},
-                  %{status: :connected} = state) do
+  def handle_info({:DOWN, _ref, :process, pid, _reason},
+    %{conn: %{pid: conn_pid}} = state)
+  when pid == conn_pid do
     Logger.error "lost RabbitMQ connection. Attempting to reconnect..."
-    :timer.send_after(@reconnect_after_ms, :connect)
-    {:noreply, %{state | conn: nil, status: :disconnected}}
+    {:connect, :reconnect, %{state | conn: nil}}
   end
 
-  def terminate(_reason, %{conn: conn, status: :connected}) do
+  def terminate(_reason, %{conn: nil}), do: :ok
+  def terminate(_reason, %{conn: conn}) do
+    # Taken from:
+    # pma/phoenix_pubsub_rabbitmq/blob/master/lib/phoenix/pubsub/rabbitmq_conn.ex:54
     try do
-      Connection.close(conn)
+      AMQP.Connection.close(conn)
     catch
       _, _ -> :ok
     end
-  end
-
-  def terminate(_reason, _state) do
-    :ok
   end
 end
