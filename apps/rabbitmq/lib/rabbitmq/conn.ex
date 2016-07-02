@@ -4,7 +4,7 @@ defmodule RabbitMQ.Conn do
 
   @reconnect_after_ms 5_000
 
-  def start_link(opts) do
+  def start_link(opts \\ []) do
     Connection.start_link(__MODULE__, opts)
   end
 
