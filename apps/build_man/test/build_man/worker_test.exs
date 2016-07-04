@@ -1,5 +1,5 @@
 defmodule BuildMan.WorkerTest do
-  use RabbitCICore.ModelCase
+  use RabbitCICore.ModelCase, async: true
   alias BuildMan.Worker
   alias RabbitCICore.Factory
   import BuildMan.WorkerSupport, only: [cleanup_worker: 1]
@@ -35,21 +35,21 @@ defmodule BuildMan.WorkerTest do
   end
 
   test "Worker get_build/1" do
-    job = Factory.create(:job)
+    job = Factory.insert(:job)
     worker = Worker.create %{build_id: job.step.build.id, step_id: job.step.id, job_id: job.id}
     cleanup_worker worker
     assert Worker.get_build(worker).id == job.step.build.id
   end
 
   test "Worker get_step/1" do
-    job = Factory.create(:job)
+    job = Factory.insert(:job)
     worker = Worker.create %{build_id: job.step.build.id, step_id: job.step.id, job_id: job.id}
     cleanup_worker worker
     assert Worker.get_step(worker).id == job.step.id
   end
 
   test "Worker get_job/1" do
-    job = Factory.create(:job)
+    job = Factory.insert(:job)
     worker = Worker.create %{build_id: job.step.build.id, step_id: job.step.id, job_id: job.id}
     cleanup_worker worker
     assert Worker.get_job(worker).id == job.id
@@ -69,7 +69,7 @@ defmodule BuildMan.WorkerTest do
   end
 
   test "Default worker trigger_event/2 callbacks" do
-    job = Factory.create(:job)
+    job = Factory.insert(:job)
     worker = Worker.create %{build_id: job.step.build.id, step_id: job.step.id, job_id: job.id}
     cleanup_worker worker
 

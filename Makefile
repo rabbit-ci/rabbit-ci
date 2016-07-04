@@ -24,10 +24,10 @@ config/prod.secret.exs:
 
 # Test env auto migrates
 migrate: config/prod.secret.exs
-	MIX_ENV=dev mix ecto.create -r RabbitCICore.EctoRepo
-	MIX_ENV=dev mix ecto.migrate -r RabbitCICore.EctoRepo
-	MIX_ENV=prod mix ecto.create -r RabbitCICore.EctoRepo
-	MIX_ENV=prod mix ecto.migrate -r RabbitCICore.EctoRepo
+	MIX_ENV=dev mix ecto.create -r RabbitCICore.Repo
+	MIX_ENV=dev mix ecto.migrate -r RabbitCICore.Repo
+	MIX_ENV=prod mix ecto.create -r RabbitCICore.Repo
+	MIX_ENV=prod mix ecto.migrate -r RabbitCICore.Repo
 
 clean:
 	mix clean --deps

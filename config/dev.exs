@@ -23,7 +23,7 @@ config :logger, :console, format: "[$level] $message\n"
 #   handle_sasl_reports: true
 
 # Configure your database
-config :rabbitci_core, RabbitCICore.EctoRepo,
+config :rabbitci_core, RabbitCICore.Repo,
   adapter: Ecto.Adapters.Postgres,
   username: "postgres",
   password: "postgres",

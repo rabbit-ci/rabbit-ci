@@ -1,4 +1,4 @@
-defmodule RabbitCICore.EctoRepo.Migrations.ChangeBuildBranchIdToReference do
+defmodule RabbitCICore.Repo.Migrations.ChangeBuildBranchIdToReference do
   use Ecto.Migration
 
   def change do

@@ -1,4 +1,4 @@
-defmodule RabbitCICore.EctoRepo.Migrations.ChangeLogStepIdToReference do
+defmodule RabbitCICore.Repo.Migrations.ChangeLogStepIdToReference do
   use Ecto.Migration
 
   def change do

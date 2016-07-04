@@ -1,5 +1,5 @@
 defmodule RabbitCICore.ProjectControllerTest do
-  use RabbitCICore.ConnCase
+  use RabbitCICore.ConnCase, async: true
 
   alias RabbitCICore.Project
 

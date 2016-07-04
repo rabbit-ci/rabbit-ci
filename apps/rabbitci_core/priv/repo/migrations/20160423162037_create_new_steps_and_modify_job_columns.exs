@@ -1,4 +1,4 @@
-defmodule RabbitCICore.EctoRepo.Migrations.CreateNewStepsAndModifyJobColumns do
+defmodule RabbitCICore.Repo.Migrations.CreateNewStepsAndModifyJobColumns do
   use Ecto.Migration
 
   def change do

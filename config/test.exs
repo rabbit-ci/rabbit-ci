@@ -10,7 +10,7 @@ config :rabbitci_core, RabbitCICore.Endpoint,
 config :logger, level: :warn
 
 # Configure your database
-config :rabbitci_core, RabbitCICore.EctoRepo,
+config :rabbitci_core, RabbitCICore.Repo,
   adapter: Ecto.Adapters.Postgres,
   username: "postgres",
   password: "postgres",
@@ -26,5 +26,3 @@ config :build_man, :config_extraction_exchange, "rabbitci.config_extraction.test
 config :build_man, :config_extraction_queue, "rabbitci.config_extraction.test"
 
 config :build_man, :config_extraction_processor, BuildMan.TestExtractionProcessor
-
-config :logger, level: :warn

@@ -1,10 +1,9 @@
 defmodule BuildMan.ConfigExtractionSupTest do
-  use RabbitCICore.ModelCase
+  use RabbitCICore.ModelCase, async: false
   alias RabbitCICore.Project
   alias RabbitCICore.Branch
   alias RabbitCICore.Build
   alias RabbitCICore.Repo
-  alias Ecto.Model
 
   @pr_content """
   # example-project
@@ -48,12 +47,12 @@ defmodule BuildMan.ConfigExtractionSupTest do
       |> Repo.insert!
 
     branch =
-      Model.build(project, :branches)
+      Ecto.build_assoc(project, :branches)
       |> Branch.changeset(%{name: "branch1"})
       |> Repo.insert!
 
     build =
-      Model.build(branch, :builds)
+      Ecto.build_assoc(branch, :builds)
       |> Build.changeset(%{commit: "xyz"})
       |> Repo.insert!
 

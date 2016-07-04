@@ -1,9 +1,8 @@
 defmodule RabbitCICore.BranchControllerTest do
-  use RabbitCICore.ConnCase
+  use RabbitCICore.ConnCase, async: true
 
   alias RabbitCICore.Project
   alias RabbitCICore.Branch
-  alias Ecto.Model
 
   test "Get all branches for project", %{conn: conn} do
     project = Repo.insert! %Project{name: "project1",
@@ -25,7 +24,7 @@ defmodule RabbitCICore.BranchControllerTest do
                                     repo: "git@example.com:user/project"}
 
     branch =
-      Model.build(project, :branches)
+      Ecto.build_assoc(project, :branches)
       |> Branch.changeset(%{name: "branch1"})
       |> Repo.insert!
 

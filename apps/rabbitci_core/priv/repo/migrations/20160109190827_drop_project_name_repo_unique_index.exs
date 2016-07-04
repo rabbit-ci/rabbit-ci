@@ -1,4 +1,4 @@
-defmodule RabbitCICore.EctoRepo.Migrations.DropProjectNameRepoUniqueIndex do
+defmodule RabbitCICore.Repo.Migrations.DropProjectNameRepoUniqueIndex do
   use Ecto.Migration
 
   def change do

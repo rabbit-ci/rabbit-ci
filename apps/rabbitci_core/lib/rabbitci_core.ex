@@ -11,7 +11,7 @@ defmodule RabbitCICore do
       # Start the endpoint when the application starts
       supervisor(RabbitCICore.Endpoint, []),
       # Start the Ecto repository
-      worker(RabbitCICore.EctoRepo, []),
+      worker(RabbitCICore.Repo, []),
       # Here you could define other workers and supervisors as children
       # worker(RabbitCICore.Worker, [arg1, arg2, arg3]),
     ]

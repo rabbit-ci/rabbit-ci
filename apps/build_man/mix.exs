@@ -15,7 +15,8 @@ defmodule BuildMan.Mixfile do
      build_path: "../../_build",
      config_path: "../../config/config.exs",
      test_coverage: [tool: Coverex.Task],
-     deps: Shared.deps ++ deps]
+     aliases: aliases(),
+     deps: Shared.deps() ++ deps()]
   end
 
   # Configuration for the OTP application
@@ -41,14 +42,19 @@ defmodule BuildMan.Mixfile do
   # Type `mix help deps` for more examples and options
   defp deps do
     [{:rabbitmq, in_umbrella: true},
-     {:yamerl, github: "yakaz/yamerl"},
      {:rabbitci_core, in_umbrella: true},
      {:exec, github: "saleyn/erlexec"},
-     {:poison, "~> 1.0"},
+     {:poison, "~> 2.0"},
      {:uuid, "~> 1.1.0"}]
   end
 
   # Specifies which paths to compile per environment
   defp elixirc_paths(:test), do: ["lib", "test/support"]
   defp elixirc_paths(_),     do: ["lib"]
+
+  defp aliases do
+    ["ecto.setup": ["ecto.create", "ecto.migrate"],
+     "ecto.reset": ["ecto.drop", "ecto.setup"],
+     "test": ["ecto.create --quiet", "ecto.migrate", "test"]]
+  end
 end

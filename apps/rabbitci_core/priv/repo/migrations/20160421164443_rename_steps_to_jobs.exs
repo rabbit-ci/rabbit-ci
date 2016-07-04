@@ -1,4 +1,4 @@
-defmodule RabbitCICore.EctoRepo.Migrations.RenameStepsToJobs do
+defmodule RabbitCICore.Repo.Migrations.RenameStepsToJobs do
   use Ecto.Migration
 
   def change do

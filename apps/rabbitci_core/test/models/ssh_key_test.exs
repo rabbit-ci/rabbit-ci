@@ -1,5 +1,5 @@
 defmodule RabbitCICore.SSHKeyTest do
-  use RabbitCICore.ModelCase
+  use RabbitCICore.ModelCase, async: true
 
   alias RabbitCICore.{SSHKey, Project}
 
@@ -17,15 +17,15 @@ defmodule RabbitCICore.SSHKeyTest do
   test "changeset with invalid attributes" do
     changeset = SSHKey.changeset(%SSHKey{}, @invalid_attrs)
     refute changeset.valid?
-    assert {:private_key, "can't be blank"} in changeset.errors
-    assert {:project_id, "can't be blank"} in changeset.errors
+    assert {:private_key, {"can't be blank", []}} in changeset.errors
+    assert {:project_id, {"can't be blank", []}} in changeset.errors
   end
 
   test "changeset without project is invalid" do
     changeset = SSHKey.changeset(%SSHKey{}, @valid_attrs)
     assert {:error, changeset} = Repo.insert changeset
     refute changeset.valid?
-    assert {:project_id, "does not exist"} in changeset.errors
+    assert {:project_id, {"does not exist", []}} in changeset.errors
   end
 
   test "changeset with project is valid" do

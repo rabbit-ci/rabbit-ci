@@ -1,4 +1,4 @@
-defmodule RabbitCICore.EctoRepo.Migrations.AddBuildNumberUniqueConstraintToBuilds do
+defmodule RabbitCICore.Repo.Migrations.AddBuildNumberUniqueConstraintToBuilds do
   use Ecto.Migration
 
   def change do

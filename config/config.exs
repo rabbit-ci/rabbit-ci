@@ -2,7 +2,7 @@
 # and its dependencies with the aid of the Mix.Config module.
 use Mix.Config
 
-config :rabbitci_core, :app_namespace, RabbitCICore
+config :rabbitci_core, :namespace, RabbitCICore
 
 # Configures the endpoint
 config :rabbitci_core, RabbitCICore.Endpoint,
@@ -35,6 +35,10 @@ config :build_man, :build_exchange, "rabbitci.builds"
 config :build_man, :build_queue, "rabbitci.builds"
 config :build_man, :config_extraction_exchange, "rabbitci.config_extraction"
 config :build_man, :config_extraction_queue, "rabbitci.config_extraction"
+
+
+config :build_man, ecto_repos: [RabbitCICore.Repo]
+config :rabbitci_core, ecto_repos: [RabbitCICore.Repo]
 
 # config :rabbitmq, options: [host: "localhost"]
 

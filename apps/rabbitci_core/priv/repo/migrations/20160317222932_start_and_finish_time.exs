@@ -1,4 +1,4 @@
-defmodule RabbitCICore.EctoRepo.Migrations.StartAndFinishTime do
+defmodule RabbitCICore.Repo.Migrations.StartAndFinishTime do
   use Ecto.Migration
 
   def change do

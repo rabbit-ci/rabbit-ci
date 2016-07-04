@@ -1,4 +1,4 @@
-defmodule RabbitCICore.EctoRepo.Migrations.AddColorDataToLogs do
+defmodule RabbitCICore.Repo.Migrations.AddColorDataToLogs do
   use Ecto.Migration
 
   def change do

@@ -1,5 +1,5 @@
 defmodule BuildMan.Vagrant.VagrantfileTest do
-  use ExUnit.Case
+  use RabbitCICore.ModelCase, async: true
   alias BuildMan.Vagrant.Vagrantfile
   alias BuildMan.Worker
   alias RabbitCICore.Factory
@@ -28,7 +28,7 @@ defmodule BuildMan.Vagrant.VagrantfileTest do
   end
 
   test "Minimal Vagrantfile" do
-    job = Factory.create(:job, box: "test/box")
+    job = Factory.insert(:job, box: "test/box")
     worker = Worker.create(%{job_id: job.id, provider: "virtualbox"})
     cleanup_worker worker
 
@@ -52,7 +52,7 @@ defmodule BuildMan.Vagrant.VagrantfileTest do
   end
 
   test "Worker with single file (default permissions)" do
-    job = Factory.create(:job, box: "test/box")
+    job = Factory.insert(:job, box: "test/box")
     worker =
       Worker.create(%{job_id: job.id, provider: "virtualbox"})
       |> Worker.add_file("testing-file.txt", "This is a test")
@@ -81,7 +81,7 @@ defmodule BuildMan.Vagrant.VagrantfileTest do
   end
 
   test "Worker with single file (custom permissions)" do
-    job = Factory.create(:job, box: "test/box")
+    job = Factory.insert(:job, box: "test/box")
     worker =
       Worker.create(%{job_id: job.id, provider: "virtualbox"})
       |> Worker.add_file("testing-file.txt", "This is a test", mode: 755)

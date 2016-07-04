@@ -1,18 +1,17 @@
 defmodule RabbitCICore.BuildControllerTest do
-  use RabbitCICore.ConnCase
+  use RabbitCICore.ConnCase, async: true
 
   alias RabbitCICore.Project
   alias RabbitCICore.Branch
   alias RabbitCICore.Build
-  alias Ecto.Model
 
   # TODO: Test bad params
   def generate_records(builds: amount) do
-    project = Repo.insert!(%Project{name: "blah", repo: "lala"})
+    project = Repo.insert!(%Project{name: "blah", repo: "blah"})
     branch = Repo.insert!(%Branch{name: "branch1", project_id: project.id})
     time = Ecto.DateTime.utc()
     builds = for _ <- 1..amount do
-      Model.build(branch, :builds)
+      Ecto.build_assoc(branch, :builds)
       |> Build.changeset(%{start_time: time,
                            finish_time: time,
                            commit: "eccee02ec18a36bcb2615b8c86d401b0618738c2"})

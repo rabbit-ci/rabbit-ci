@@ -1,5 +1,5 @@
 defmodule RabbitCICore.LogTest do
-  use RabbitCICore.ModelCase
+  use RabbitCICore.ModelCase, async: true
   import RabbitCICore.Factory
 
   alias RabbitCICore.Log
@@ -16,16 +16,16 @@ defmodule RabbitCICore.LogTest do
   test "changeset with invalid attributes" do
     changeset = Log.changeset(%Log{}, @invalid_attrs)
     refute changeset.valid?
-    assert {:job_id, "can't be blank"} in changeset.errors
-    assert {:stdio, "can't be blank"} in changeset.errors
-    assert {:order, "can't be blank"} in changeset.errors
-    assert {:type, "can't be blank"} in changeset.errors
+    assert {:job_id, {"can't be blank", []}} in changeset.errors
+    assert {:stdio, {"can't be blank", []}} in changeset.errors
+    assert {:order, {"can't be blank", []}} in changeset.errors
+    assert {:type, {"can't be blank", []}} in changeset.errors
   end
 
   test "changeset with invalid type attribute" do
     changeset = Log.changeset(%Log{}, %{type: "blarg"})
     refute changeset.valid?
-    assert {:type, "is invalid"} in changeset.errors
+    assert {:type, {"is invalid", []}} in changeset.errors
   end
 
   test "changeset with valid type attribute" do
@@ -39,11 +39,11 @@ defmodule RabbitCICore.LogTest do
     changeset = Log.changeset(%Log{}, @valid_attrs)
     assert {:error, changeset} = Repo.insert changeset
     refute changeset.valid?
-    assert {:job_id, "does not exist"} in changeset.errors
+    assert {:job_id, {"does not exist", []}} in changeset.errors
   end
 
   test "changeset with job is valid" do
-    job = create(:job)
+    job = insert(:job)
     attrs = put_in(@valid_attrs.job_id, job.id)
     changeset = Log.changeset(%Log{}, attrs)
     assert {:ok, _model} = Repo.insert changeset

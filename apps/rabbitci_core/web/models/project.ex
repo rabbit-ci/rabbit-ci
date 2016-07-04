@@ -21,7 +21,7 @@ defmodule RabbitCICore.Project do
   If no params are provided, an invalid changeset is returned
   with no validation performed.
   """
-  def changeset(model, params \\ :empty) do
+  def changeset(model, params \\ %{}) do
     model
     |> cast(params, ~w(name repo), ~w(webhook_secret))
     |> validate_format(:name, ~r/^[^\/]+\/[^\/]+$/)

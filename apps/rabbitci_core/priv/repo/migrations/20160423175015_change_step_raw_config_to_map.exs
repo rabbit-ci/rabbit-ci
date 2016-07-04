@@ -1,4 +1,4 @@
-defmodule RabbitCICore.EctoRepo.Migrations.ChangeStepRawConfigToMap do
+defmodule RabbitCICore.Repo.Migrations.ChangeStepRawConfigToMap do
   use Ecto.Migration
 
   def change do

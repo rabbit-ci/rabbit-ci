@@ -12,7 +12,7 @@ defmodule BuildMan.LogOutput do
                        type: type,
                        colors: {fg, bg, style}}) do
     Repo.get!(Job, job_id, log: false)
-    |> Ecto.Model.build(:logs)
+    |> Ecto.build_assoc(:logs)
     |> Log.changeset(%{stdio: text,
                       order: order,
                       type: type,
