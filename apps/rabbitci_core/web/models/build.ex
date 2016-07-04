@@ -78,10 +78,11 @@ defmodule RabbitCICore.Build do
   end
 
   def json_from_id!(build_id) do
-    build_id
-    |> json_from_id_query
-    |> Repo.one!
-    |> BuildView.format(Endpoint, %{})
+    data =
+      build_id
+      |> json_from_id_query
+      |> Repo.one!
+    JaSerializer.format(BuildView, data, Endpoint, %{})
   end
 
   defp json_from_id_query(build_id) do

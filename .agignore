@@ -1,2 +1,4 @@
 ./frontend/bower_components/
 ./frontend/node_modules/
+./frontend/dist/
+./frontend/tmp/

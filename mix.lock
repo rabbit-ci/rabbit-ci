@@ -19,7 +19,7 @@
   "httpoison": {:hex, :httpoison, "0.9.0", "68187a2daddfabbe7ca8f7d75ef227f89f0e1507f7eecb67e4536b3c516faddb", [:mix], [{:hackney, "~> 1.6.0", [hex: :hackney, optional: false]}]},
   "idna": {:hex, :idna, "1.2.0", "ac62ee99da068f43c50dc69acf700e03a62a348360126260e87f2b54eced86b2", [:rebar3], []},
   "inflex": {:hex, :inflex, "1.5.0", "e4ff5d900280b2011b24d1ac1c4590986ee5add2ea644c9894e72213cf93ff0b", [:mix], []},
-  "ja_serializer": {:git, "https://github.com/AgilionApps/ja_serializers.git", "dde21047df7284aec18725154027abfc3b24f6f7", []},
+  "ja_serializer": {:git, "https://github.com/AgilionApps/ja_serializers.git", "e72a9f5f419c5b0a99d69c2c5e59321509e6b0f9", []},
   "jsx": {:hex, :jsx, "2.6.2"},
   "metrics": {:hex, :metrics, "1.0.1", "25f094dea2cda98213cecc3aeff09e940299d950904393b2a29d191c346a8486", [:rebar3], []},
   "mime": {:hex, :mime, "1.0.0", "b63027733bba00b1013bad14e25dc8b6629ecb817731544a88a0fd14f2a55685", [:mix], []},

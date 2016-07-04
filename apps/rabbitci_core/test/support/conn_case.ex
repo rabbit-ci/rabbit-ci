@@ -41,6 +41,11 @@ defmodule RabbitCICore.ConnCase do
       Ecto.Adapters.SQL.restart_test_transaction(RabbitCICore.EctoRepo, [])
     end
 
-    {:ok, conn: Phoenix.ConnTest.build_conn()}
+    conn =
+      Phoenix.ConnTest.build_conn()
+      |> Plug.Conn.put_req_header("accept", "application/vnd.api+json")
+      |> Plug.Conn.put_req_header("content-type", "application/vnd.api+json")
+
+    {:ok, conn: conn}
   end
 end

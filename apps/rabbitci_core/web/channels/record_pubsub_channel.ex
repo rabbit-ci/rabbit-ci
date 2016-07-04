@@ -14,7 +14,7 @@ defmodule RabbitCICore.RecordPubSubChannel do
   def handle_in("subscribe", map = %{}, socket) do
     for {k, v} <- map, k in @supported_records do
       for id <- List.wrap(v) do
-        do_subscribe(socket, k, id)
+        do_subscribe(k, id)
       end
     end
     {:reply, :ok, socket}
@@ -23,7 +23,7 @@ defmodule RabbitCICore.RecordPubSubChannel do
   def handle_in("unsubscribe", map = %{}, socket) do
     for {k, v} <- map, k in @supported_records do
       for id <- List.wrap(v) do
-        unsubscribe socket, "#{k}:#{id}"
+        Endpoint.unsubscribe("#{k}:#{id}")
       end
     end
     {:reply, :ok, socket}
@@ -47,21 +47,20 @@ defmodule RabbitCICore.RecordPubSubChannel do
   end
 
   def new_log(log) do
-    payload = LogView.format(log, Endpoint, %{})
+    payload = JaSerializer.format(LogView, log, Endpoint, %{})
     Endpoint.broadcast("logs:#{log.job_id}", "json_api_payload", payload)
   end
 
-  defp do_subscribe(socket, k = "logs", id) do
+  defp do_subscribe(k = "logs", id) do
     import Ecto.Query
-    subscribe socket, "#{k}:#{id}"
+    Endpoint.subscribe("#{k}:#{id}")
     Task.start fn ->
-      payload =
+      data =
         from(l in Log, where: l.job_id == ^id)
         |> Repo.all
-        |> LogView.format(Endpoint, %{})
-
+      payload = JaSerializer.format(LogView, data, Endpoint, %{})
       Endpoint.broadcast("logs:#{id}", "json_api_payload", payload)
     end
   end
-  defp do_subscribe(socket, k, id), do: subscribe socket, "#{k}:#{id}"
+  defp do_subscribe(k, id), do: Endpoint.subscribe("#{k}:#{id}")
 end

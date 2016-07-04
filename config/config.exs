@@ -18,8 +18,11 @@ config :logger, :console,
   format: "$time $metadata[$level] $levelpad$message\n",
   metadata: [:request_id]
 
+config :phoenix, :format_encoders,
+  "json-api": Poison
+
 config :plug, :mimes, %{
-  "application/vnd.api+json" => ["json"]
+  "application/vnd.api+json" => ["json-api"]
 }
 
 config :build_man, :worker_limit, 2

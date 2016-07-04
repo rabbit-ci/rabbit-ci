@@ -2,7 +2,8 @@ defmodule RabbitCICore.Router do
   use Phoenix.Router
 
   pipeline :api do
-    plug :accepts, ["json"]
+    plug :accepts, ["json-api"]
+    plug JaSerializer.ContentTypeNegotiation
     plug JaSerializer.Deserializer
   end
 

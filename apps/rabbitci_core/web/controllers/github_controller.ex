@@ -2,6 +2,7 @@ defmodule RabbitCICore.GitHubController do
   use RabbitCICore.Web, :controller
   alias RabbitCICore.IncomingWebhooks, as: Webhooks
   alias RabbitCICore.Project
+  alias RabbitCICore.BuildView
 
   @push_event "push"
   @pull_request_event "pull_request"
@@ -13,16 +14,14 @@ defmodule RabbitCICore.GitHubController do
 
   # Queue a build from the GitHub push payload.
   def create(conn, params) do
-    _create(conn, params, conn.assigns.event)
+    do_create(conn, params, conn.assigns.event)
   end
 
-  defp _create(conn, _params, event)
+  defp do_create(conn, _params, event)
   when event in [@push_event, @pull_request_event] do
     case Webhooks.start_build(conn.assigns.fixed_params) do
       {:ok, build} ->
-        conn
-        |> assign(:build, build)
-        |> render
+        render(conn, BuildView, :show, data: build)
       {:error, error} -> conn |> put_status(:bad_request) |> json(error)
     end
   end
