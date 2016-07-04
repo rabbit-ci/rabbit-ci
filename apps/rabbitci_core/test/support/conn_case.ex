@@ -25,7 +25,7 @@ defmodule RabbitCICore.ConnCase do
       # The default endpoint for testing
       @endpoint RabbitCICore.Endpoint
 
-      # Sorts left and right before asserting, not that args are sorted.
+      # Sorts left and right before asserting.
       defmacro assert_sort({op, meta, [left, right]}) do
         quote do
           left = Enum.sort(unquote(left))
@@ -41,6 +41,6 @@ defmodule RabbitCICore.ConnCase do
       Ecto.Adapters.SQL.restart_test_transaction(RabbitCICore.EctoRepo, [])
     end
 
-    {:ok, conn: Phoenix.ConnTest.conn()}
+    {:ok, conn: Phoenix.ConnTest.build_conn()}
   end
 end
