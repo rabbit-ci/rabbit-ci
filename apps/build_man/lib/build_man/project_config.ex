@@ -13,8 +13,7 @@ defmodule BuildMan.ProjectConfig do
   end
 
   @doc """
-  Queue builds from parsed config. See `parse_from_yaml/1` for parsing
-  the config.
+  Queue builds from parsed config.
   """
   def queue_builds(%{"steps" => steps}, build_id, pr_or_commit)
   when is_list(steps) do

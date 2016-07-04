@@ -32,7 +32,7 @@ defmodule RabbitCICore.Mixfile do
   #
   # Type `mix help deps` for examples and options
   defp deps do
-    [{:phoenix, "~> 1.2.0-rc.1"},
+    [{:phoenix, "~> 1.2.0"},
      {:phoenix_ecto, "~> 2.0"},
      {:postgrex, ">= 0.0.0"},
      {:cowboy, "~> 1.0"},
@@ -40,7 +40,7 @@ defmodule RabbitCICore.Mixfile do
      {:ecto, "~> 1.1.1"},
      {:ex_machina, "~> 0.6.0", only: :test, github: "thoughtbot/ex_machina"},
      {:ja_serializer, github: "AgilionApps/ja_serializers"},
-     {:corsica, "~> 0.4"}]
+     {:corsica, "~> 0.5"}]
   end
 
   # Specifies which paths to compile per environment
