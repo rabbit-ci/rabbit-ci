@@ -1,9 +1,7 @@
 defmodule RabbitCICore.Project do
   use RabbitCICore.Web, :model
 
-  alias RabbitCICore.Repo
   alias RabbitCICore.Branch
-  alias RabbitCICore.Build
   alias RabbitCICore.SSHKey
 
   schema "projects" do

@@ -1,6 +1,6 @@
 defmodule RabbitCICore.Job do
   use RabbitCICore.Web, :model
-  alias RabbitCICore.{Log, Build, Job, Repo, Step}
+  alias RabbitCICore.{Log, Job, Repo, Step}
 
   schema "jobs" do
     field :status, :string

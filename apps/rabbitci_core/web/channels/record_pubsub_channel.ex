@@ -5,7 +5,7 @@ defmodule RabbitCICore.RecordPubSubChannel do
   alias RabbitCICore.LogView
   alias RabbitCICore.Repo
 
-  def join("record_pubsub", payload, socket) do
+  def join("record_pubsub", _payload, socket) do
     {:ok, socket}
   end
 

@@ -5,7 +5,6 @@ defmodule RabbitCICore.LogController do
   alias RabbitCICore.Project
   alias RabbitCICore.Repo
   alias RabbitCICore.Job
-  alias RabbitCICore.Log
 
   plug :get_models
 
@@ -35,7 +34,7 @@ defmodule RabbitCICore.LogController do
     end
   end
 
-  def show(conn, params) do
+  def show(conn, _params) do
     text(conn, do_log(conn))
   end
 

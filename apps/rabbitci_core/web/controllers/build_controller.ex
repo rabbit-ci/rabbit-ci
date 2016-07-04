@@ -1,7 +1,7 @@
 defmodule RabbitCICore.BuildController do
   use RabbitCICore.Web, :controller
   import Ecto.Query
-  alias RabbitCICore.{Build, Job, Repo, Project}
+  alias RabbitCICore.{Build, Repo, Project}
   alias RabbitCICore.IncomingWebhooks, as: Webhooks
 
   # This gets all of the currently running builds.

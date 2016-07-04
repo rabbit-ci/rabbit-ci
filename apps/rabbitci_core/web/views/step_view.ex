@@ -2,7 +2,7 @@ defmodule RabbitCICore.StepView do
   use RabbitCICore.Web, :view
   use JaSerializer.PhoenixView
 
-  alias RabbitCICore.{Step, JobView, Repo}
+  alias RabbitCICore.{JobView, Repo}
 
   attributes [:name, :updated_at, :inserted_at]
   has_many :jobs, include: true, serializer: JobView
