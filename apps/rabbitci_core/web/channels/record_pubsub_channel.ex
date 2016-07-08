@@ -4,6 +4,7 @@ defmodule RabbitCICore.RecordPubSubChannel do
   alias RabbitCICore.{Build, Log}
   alias RabbitCICore.LogView
   alias RabbitCICore.Repo
+  alias Phoenix.Socket.Broadcast
 
   def join("record_pubsub", _payload, socket) do
     {:ok, socket}
@@ -31,7 +32,7 @@ defmodule RabbitCICore.RecordPubSubChannel do
 
   intercept ["json_api_payload"]
 
-  def handle_out(ev, pay, socket) do
+  def handle_info(%Broadcast{topic: _, event: "json_api_payload" = ev, payload: pay}, socket) do
     push socket, ev, pay
     {:noreply, socket}
   end

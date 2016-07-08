@@ -5,7 +5,7 @@ import { belongsTo } from 'ember-data/relationships';
 export default Model.extend({
   stdio: attr('string'),
   order: attr('number'),
-  type: attr('string'),
+  ioType: attr('string'),
   fg: attr('string'),
   bg: attr('string'),
   style: attr('string'),
