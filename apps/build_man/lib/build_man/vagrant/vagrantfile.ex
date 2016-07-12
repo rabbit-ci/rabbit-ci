@@ -52,10 +52,10 @@ defmodule BuildMan.Vagrant.Vagrantfile do
 
   def write_files!(worker) do
     {:ok, instructions} = Vagrantfile.instructions(worker)
-    File.write!(Path.join(worker.path, "Vagrantfile"), IO.inspect vagrantfile(instructions))
+    File.write!(Path.join(worker.path, "Vagrantfile"), vagrantfile(instructions))
 
     if Worker.provider(worker) == "docker" do
-      File.write!(Path.join(worker.path, "Dockerfile"), IO.inspect dockerfile(instructions))
+      File.write!(Path.join(worker.path, "Dockerfile"), dockerfile(instructions))
       File.write!(Path.join(worker.path, "rabbit-ci-B2D-Vagrantfile"), @b2d_vagrantfile_contents)
     end
   end
