@@ -7,7 +7,8 @@
     <div class="active section">{{model.name}}</div>
   </div>
 
-  <br/>{{#link-to "builds.show" model.project.name model.name "latest"}}Latest{{/link-to}}
+  <br/><br/>{{#link-to "builds.show" model.project.name model.name "latest"}}Latest{{/link-to}}
+  <p>Running builds: {{model.runningBuildsCount}}. Queued {{model.queuedBuildsCount}}</p>
 
   <table class="ui celled table">
     <thead>
