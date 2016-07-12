@@ -36,7 +36,7 @@ defmodule BuildMan.Vagrant do
   end
 
   defp log_debug(worker, str) do
-    Logger.debug("#{str} #{worker.build_id}.#{worker.job_id}")
+    Logger.info("#{str} #{worker.build_id}.#{worker.job_id}")
   end
 
   # Exit status is set when the command finished due to a non-zero exit status.
