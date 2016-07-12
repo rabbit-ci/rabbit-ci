@@ -40,6 +40,8 @@ config :build_man, :config_extraction_queue, "rabbitci.config_extraction"
 config :build_man, ecto_repos: [RabbitCICore.Repo]
 config :rabbitci_core, ecto_repos: [RabbitCICore.Repo]
 
+config :rabbitmq, options: [heartbeat: 30]
+
 # config :rabbitmq, options: [host: "localhost"]
 
 import_config "#{Mix.env}.exs"
