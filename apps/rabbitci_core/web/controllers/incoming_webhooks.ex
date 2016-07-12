@@ -4,6 +4,7 @@ defmodule RabbitCICore.IncomingWebhooks do
   alias RabbitCICore.Branch
   alias RabbitCICore.Project
   alias RabbitCICore.Repo
+  alias RabbitCICore.RecordPubSubChannel, as: PubSub
 
   @exchange Application.get_env(:build_man, :config_extraction_exchange)
 
@@ -26,6 +27,7 @@ defmodule RabbitCICore.IncomingWebhooks do
 
     case Repo.insert(changeset) do
       {:ok, build} ->
+        PubSub.new_build(build)
         add = pr && %{pr: pr} || %{commit: commit}
 
         repo = Repo.preload(branch, :project).project.repo

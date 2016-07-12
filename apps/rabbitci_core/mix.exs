@@ -38,7 +38,11 @@ defmodule RabbitCICore.Mixfile do
      {:postgrex, ">= 0.0.0"},
      {:cowboy, "~> 1.0"},
      {:rabbitmq, in_umbrella: true},
-     {:ecto, "~> 2.0"},
+     {:ecto, github: "elixir-ecto/ecto", override: true},
+     # Important fix in Ecto master branch. Remove this and replace with below
+     # code when next ecto version is released.
+     #
+     # {:ecto, "~> 2.0"},
      {:ex_machina, only: :test, github: "thoughtbot/ex_machina"},
      {:ja_serializer, github: "AgilionApps/ja_serializers"},
      {:corsica, "~> 0.5"}]

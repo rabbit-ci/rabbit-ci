@@ -1,8 +1,35 @@
 defmodule RabbitCICore.RecordPubSubChannel do
+  @moduledoc """
+  RecordPubSubChannel allows clients to subscribe to new records and record
+  updates. Records are sent as JSON-API encoded documents. To subscribe to a
+  record channel, send a message to the `subscribe` channel with a map whose
+  keys are the record's channel you want to subscribe to and the value can be a
+  single id or a list of ids to subscribe to. Unsubscribing is done exactly the
+  same through the `unsubscribe` topic. E.g.
+
+  ```
+  channel.push("subscribe", {branches: 123, builds: [456, 789]})
+  ```
+
+  Records will be sent on the `json_api_payload` topic. The payload is the
+  JSON-API encoded document.
+
+  Available channels:
+  - `branches:<branch id>`
+    - New builds.
+  - `builds:<build id>`
+    - Build updates.
+    - New Jobs
+    - New Steps
+  - `logs:<job id>`
+    - All logs for job will be sent on connect.
+    - New logs.
+  """
+
   use RabbitCICore.Web, :channel
   alias RabbitCICore.Endpoint
-  alias RabbitCICore.{Build, Log}
-  alias RabbitCICore.LogView
+  alias RabbitCICore.{Log}
+  alias RabbitCICore.{LogView, BuildView, StepView, JobView}
   alias RabbitCICore.Repo
   alias Phoenix.Socket.Broadcast
 
@@ -37,14 +64,30 @@ defmodule RabbitCICore.RecordPubSubChannel do
     {:noreply, socket}
   end
 
-  def update_build(build_id) do
-    payload = Build.json_from_id!(build_id)
-    Endpoint.broadcast("builds:#{build_id}", "json_api_payload", payload)
+  defp build_json(build) do
+    data = Repo.preload(build, [branch: :project, steps: :jobs])
+    JaSerializer.format(BuildView, data, Endpoint, %{})
   end
 
-  def new_build(branch_id, build_id) do
-    payload = Build.json_from_id!(build_id)
-    Endpoint.broadcast("branches:#{branch_id}", "json_api_payload", payload)
+  def update_build(build) do
+    payload = build_json(build)
+    Endpoint.broadcast("builds:#{build.id}", "json_api_payload", payload)
+  end
+
+  def new_build(build) do
+    payload = build_json(build)
+    Endpoint.broadcast("branches:#{build.branch_id}", "json_api_payload", payload)
+  end
+
+  def new_step(step) do
+    payload = JaSerializer.format(StepView, step, Endpoint, %{})
+    Endpoint.broadcast("builds:#{step.build_id}", "json_api_payload", payload)
+  end
+
+  def new_job(job) do
+    job = Repo.preload(job, [step: :build])
+    payload = JaSerializer.format(JobView, job, Endpoint, %{})
+    Endpoint.broadcast("builds:#{job.step.build_id}", "json_api_payload", payload)
   end
 
   def new_log(log) do

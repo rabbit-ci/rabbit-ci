@@ -1,11 +1,7 @@
 defmodule RabbitCICore.Build do
   use RabbitCICore.Web, :model
   alias RabbitCICore.Repo
-  alias RabbitCICore.Branch
-  alias RabbitCICore.Step
-  alias RabbitCICore.Build
-  alias RabbitCICore.BuildView
-  alias RabbitCICore.Endpoint
+  alias RabbitCICore.{Branch, Build, Step}
 
   def set_build_number(changes) do
     case get_field(changes, :build_number) do
@@ -77,20 +73,18 @@ defmodule RabbitCICore.Build do
     |> status
   end
 
-  def json_from_id!(build_id) do
-    data =
-      build_id
-      |> json_from_id_query
-      |> Repo.one!
-    JaSerializer.format(BuildView, data, Endpoint, %{})
+  def build_id_query(build_id) do
+    from b in Build,
+      where: b.id == ^build_id
   end
 
-  defp json_from_id_query(build_id) do
-        from b in Build,
-       join: br in assoc(b, :branch),
-       join: p in assoc(br, :project),
-      where: b.id == ^build_id,
-    preload: [branch: {br, project: p}]
+  def build_preloaded_query(query) do
+    from b in query,
+      join: br in assoc(b, :branch),
+      join: p in assoc(br, :project),
+      join: s in assoc(b, :steps),
+      join: j in assoc(s, :jobs),
+      preload: [branch: {br, project: p}, steps: {s, jobs: j}]
   end
 
   def get_repo_from_id!(build_id) do

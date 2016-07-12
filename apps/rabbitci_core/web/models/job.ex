@@ -1,6 +1,6 @@
 defmodule RabbitCICore.Job do
   use RabbitCICore.Web, :model
-  alias RabbitCICore.{Log, Job, Repo, Step}
+  alias RabbitCICore.{Log, Repo, Step}
 
   schema "jobs" do
     field :status, :string
@@ -38,14 +38,5 @@ defmodule RabbitCICore.Job do
     |> Repo.all
     |> Enum.map(&Log.html/1)
     |> Enum.join
-  end
-
-  # This is for use in BuildMan. You can use it, but you probably
-  # shouldn't as it uses job_id instead of a %Job{}.
-  def update_status!(job_id, status) do
-    Job
-    |> Repo.get!(job_id)
-    |> Job.changeset(%{status: status})
-    |> Repo.update!
   end
 end

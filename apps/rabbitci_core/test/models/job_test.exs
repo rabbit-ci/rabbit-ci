@@ -50,14 +50,6 @@ defmodule RabbitCICore.JobTest do
     assert {:ok, _model} = Repo.insert changeset
   end
 
-  test "Job.update_status!/2 should update the status of a job" do
-    for status <- ["queued", "running", "failed", "finished", "error"] do
-      job = insert(:job)
-      updated_job = Job.update_status!(job.id, status)
-      assert updated_job.status == status
-    end
-  end
-
   test "Job.log/1" do
     job = insert(:job)
 

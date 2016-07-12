@@ -3,6 +3,7 @@ defmodule BuildMan.Worker do
   alias BuildMan.Worker
   alias BuildMan.LogStreamer
   alias RabbitCICore.{Repo, Build, Job, Step}
+  alias RabbitCICore.RecordPubSubChannel, as: PubSub
 
   @moduledoc """
   The BuildMan.Worker module provides functions to interact with the
@@ -51,26 +52,42 @@ defmodule BuildMan.Worker do
   defp default_callbacks do
     %{
       running: (fn worker ->
-        Job.update_status!(worker.job_id, to_string(:running))
-        Repo.update! Job.changeset(Worker.get_job(worker), %{start_time: Ecto.DateTime.utc})
+        Worker.get_job(worker)
+        |> Job.changeset(%{start_time: Ecto.DateTime.utc, status: "running"})
+        |> Repo.update!
+        pubsub_update_build(worker)
         {:ok, worker}
       end),
       finished: (fn worker ->
-        Job.update_status!(worker.job_id, to_string(:finished))
-        Repo.update! Job.changeset(Worker.get_job(worker), %{finish_time: Ecto.DateTime.utc})
+        Worker.get_job(worker)
+        |> Job.changeset(%{finish_time: Ecto.DateTime.utc, status: "finished"})
+        |> Repo.update!
+        pubsub_update_build(worker)
         {:ok, worker}
       end),
       failed: (fn worker ->
-        Job.update_status!(worker.job_id, to_string(:failed))
-        Repo.update! Job.changeset(Worker.get_job(worker), %{finish_time: Ecto.DateTime.utc})
+        Worker.get_job(worker)
+        |> Job.changeset(%{finish_time: Ecto.DateTime.utc, status: "failed"})
+        |> Repo.update!
+        pubsub_update_build(worker)
         {:ok, worker}
       end),
       error: (fn worker ->
-        Job.update_status!(worker.job_id, to_string(:error))
-        Repo.update! Job.changeset(Worker.get_job(worker), %{finish_time: Ecto.DateTime.utc})
+        Worker.get_job(worker)
+        |> Job.changeset(%{finish_time: Ecto.DateTime.utc, status: "error"})
+        |> Repo.update!
+        pubsub_update_build(worker)
         {:ok, worker}
       end)
      }
+  end
+
+  defp pubsub_update_build(worker) do
+    worker.build_id
+    |> Build.build_id_query
+    |> Build.build_preloaded_query
+    |> Repo.one!
+    |> PubSub.update_build
   end
 
   @doc """

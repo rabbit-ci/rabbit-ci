@@ -5,6 +5,7 @@ defmodule BuildMan.ConfigExtractionSup do
   alias RabbitCICore.Build
   alias RabbitCICore.SSHKey
   alias BuildMan.ProjectConfig
+  alias RabbitCICore.RecordPubSubChannel, as: PubSub
   require Logger
   use GenServer
   use AMQP
@@ -81,6 +82,7 @@ defmodule BuildMan.ConfigExtractionSup do
         Repo.get(Build, payload.build_id)
         |> Build.changeset(%{config_extracted: "error"})
         |> Repo.update!
+        |> PubSub.update_build
         raise e
     after
       File.rm_rf!(path)
@@ -89,6 +91,7 @@ defmodule BuildMan.ConfigExtractionSup do
           build
           |> Build.changeset(%{config_extracted: "true"})
           |> Repo.update!
+          |> PubSub.update_build
         _ -> nil
       end
     end

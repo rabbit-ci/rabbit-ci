@@ -1,5 +1,6 @@
 defmodule BuildMan.ProjectConfig do
   alias RabbitCICore.Repo
+  alias RabbitCICore.RecordPubSubChannel, as: PubSub
   alias RabbitCICore.{Build, Step, Job}
 
   @moduledoc """
@@ -32,12 +33,16 @@ defmodule BuildMan.ProjectConfig do
         |> Step.changeset(step_changes)
         |> Repo.insert!
 
+      PubSub.new_step step
+
       for box <- step_config["boxes"] do
         job =
           step
           |> Ecto.build_assoc(:jobs)
           |> Job.changeset(%{status: "queued", box: box, provider: step_config["provider"]})
           |> Repo.insert!
+
+        PubSub.new_job job
 
         config = %{
           build_id: build.id,
