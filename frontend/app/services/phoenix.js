@@ -5,9 +5,32 @@ import ENV from "../config/environment";
 export default PhoenixSocket.extend({
   store: Ember.inject.service(),
   channel: null,
-  subscribedRecords: {},
+  subscribedRecords: new Map(),
 
   init: function() {
+    this.on('error', () => {
+      this.set('needResubscribe', true);
+    });
+
+    this.on('close', () => {
+      this.set('needResubscribe', true);
+    });
+
+    this.on('open', () => {
+      if (!this.get('needResubscribe')) return;
+
+      let subbed = this.get('subscribedRecords');
+      this.set('subscribedRecords', new Map());
+      let subTo = {};
+
+      for(let [_key, {key, id}] of subbed) {
+        subTo[key] = (subTo[key] || []).concat(id);
+      }
+
+      this.set('needResubscribe', false);
+      this.subscribe(subTo);
+    });
+
     const uri = ENV.SocketURI;
 
     if (uri === undefined || uri === null) {
@@ -56,14 +79,17 @@ export default PhoenixSocket.extend({
 
     Object.keys(map).forEach((key) => {
       [].concat(map[key]).forEach((id) => {
-        let newKey = key + id;
-        let subscribed = this.get('subscribedRecords');
+        let subbed = this.get('subscribedRecords');
+        let {count} = subbed.get(key + id) || {};
 
-        if (compare(subscribed[newKey]))
+        if (compare(count))
           actualChange[key] = [].concat(actualChange[key] || [], id);
 
-        subscribed[newKey] = change(subscribed[newKey]);
-        this.set('subscribedRecords', subscribed);
+        this.get('subscribedRecords').set(key + id, {
+          count: change(count),
+          key: key,
+          id: id
+        });
       });
     });
 
