@@ -4,7 +4,7 @@ module.exports = function(environment) {
   var ENV = {
     modulePrefix: 'rabbit-ci',
     environment: environment,
-    baseURL: '/',
+    rootURL: '/',
     SocketURI: 'ws://localhost:4000/socket',
     locationType: 'auto',
     EmberENV: {
@@ -39,7 +39,6 @@ module.exports = function(environment) {
 
   if (environment === 'test') {
     // Testem prefers this...
-    ENV.baseURL = '/';
     ENV.locationType = 'none';
 
     // keep test console output quieter
