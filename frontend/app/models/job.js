@@ -21,5 +21,8 @@ export default DS.Model.extend({
     case "finished": return "green";
     default: return "";
     }
-  })
+  }),
+
+  logSorting: ['order'],
+  sortedLogs: Ember.computed.sort('logs', 'logSorting')
 });

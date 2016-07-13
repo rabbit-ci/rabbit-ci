@@ -1,2 +1,8 @@
-{{!-- This is a single line because <pre> preserves newlines. --}}
-<pre class="log"><a class="line-number"></a>{{#each sortedLogs as |log|}}<span class="ansi {{log.fg}} {{log.style}} {{log.bg}}-bg">{{log.stdio}}</span>{{#if log.endsInNewline}}<a class="line-number"></a>{{/if}}{{/each}}</pre>
+<pre class="log">
+{{!-- Do not indent this <a> --}}
+<a class="line-number"></a>
+  {{~#each sortedLogs as |log|~}}
+    <span class="ansi {{log.fg}} {{log.style}} {{log.bg}}-bg">{{log.stdio}}</span>
+    {{~#if log.endsInNewline}}<a class="line-number"></a>{{/if~}}
+  {{~/each~}}
+</pre>
