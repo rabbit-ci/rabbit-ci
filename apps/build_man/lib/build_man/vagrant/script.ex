@@ -15,6 +15,9 @@ defmodule BuildMan.Vagrant.Script do
       |> env_vars_script
 
     ~s"""
+    tmpfile=$(mktemp)
+
+    cat > $tmpfile <<MAINSCRIPT
     set -v
     set -e
     #{env_vars}
@@ -22,6 +25,9 @@ defmodule BuildMan.Vagrant.Script do
     #{git_cmd}
     cd workdir
     #{step.script}
+    MAINSCRIPT
+
+    script -qefc "/bin/sh $tmpfile" /dev/null
     """
   end
 

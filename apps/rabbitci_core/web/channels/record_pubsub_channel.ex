@@ -91,8 +91,10 @@ defmodule RabbitCICore.RecordPubSubChannel do
   end
 
   def new_log(log) do
-    payload = JaSerializer.format(LogView, log, Endpoint, %{})
-    Endpoint.broadcast("logs:#{log.job_id}", "json_api_payload", payload)
+    Task.start fn ->
+      payload = JaSerializer.format(LogView, log, Endpoint, %{})
+      Endpoint.broadcast("logs:#{log.job_id}", "json_api_payload", payload)
+    end
   end
 
   defp do_subscribe(k = "logs", id) do
