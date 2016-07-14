@@ -1,8 +1,15 @@
-<pre class="log">
-{{!-- Do not indent this <a> --}}
-<a class="line-number"></a>
-  {{~#each sortedLogs as |log|~}}
-    <span class="ansi {{log.fg}} {{log.style}} {{log.bg}}-bg">{{log.stdio}}</span>
-    {{~#if log.endsInNewline}}<a class="line-number"></a>{{/if~}}
-  {{~/each~}}
-</pre>
+<div class="log">
+  {{#ember-collection
+    items=groupedLogs
+    buffer=100
+    cell-layout=(percentage-columns-layout groupedLogs.length columns 19)
+    as |logLine index|
+  }}
+    <div class="logline">
+      {{#each logLine as |log|~}}
+        <span data-line-number={{plus-one index}}
+              class="ansi {{unbound log.fg}} {{unbound log.style}} {{unbound log.bg}}-bg">{{unbound log.stdio}}</span>
+      {{~/each}}
+    </div>
+  {{/ember-collection}}
+</div>

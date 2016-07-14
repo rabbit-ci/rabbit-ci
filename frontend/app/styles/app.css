@@ -1,36 +1,29 @@
-.line-number {
-  min-width: 40px;
-  margin-left: -33px;
-  cursor: default;
-  text-decoration: none;
-  display: inline-block;
-  color: gray;
-
-  -webkit-touch-callout: none; /* iOS Safari */
-  -webkit-user-select: none;   /* Chrome/Safari/Opera */
-  -khtml-user-select: none;    /* Konqueror */
-  -moz-user-select: none;      /* Firefox */
-  -ms-user-select: none;       /* IE/Edge */
-  user-select: none;           /* non-prefixed version, currently
-                                  not supported by any browser */
-}
-
-.line-number::before {
-  content: counter(line-numbers);
-  counter-increment: line-numbers;
-  padding-right: 1em;
-}
-
-.line-number:hover {
-  color: gray;
-}
-
 .log {
   counter-reset: line-numbers;
-  padding-left: 50px;
+  margin-top: 1em;
+  position: relative;
+  height: 1000px;
   font-family: "Source Code Pro", "Courier New";
   font-size: 12px;
 }
+
+.logline {
+  padding-left: 50px;
+  height: inherit;
+}
+
+.ansi {
+  white-space: pre;
+}
+
+.ansi:first-of-type::before {
+  content: attr(data-line-number);
+  min-width: 40px;
+  margin-left: -33px;
+  color: gray;
+  display: inline-block;
+}
+
 /* Tomorrow Night ANSI Colour Scheme */
 .ansi.black { color: #3A3A3A; }
 .ansi.red { color: #DD948E; }
