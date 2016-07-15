@@ -1,14 +1,26 @@
 .log {
-  counter-reset: line-numbers;
-  margin-top: 1em;
+  padding-top: 1em;
   position: relative;
   height: 1000px;
   font-family: "Source Code Pro", "Courier New";
   font-size: 12px;
 }
 
+.ui.segment.log-container {
+  padding-top: 0;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+/* Padding in front of log */
+.log div[style*="position:absolute"] {
+  margin-top: 2em;
+}
+
 .logline {
   padding-left: 50px;
+  margin-left: 1em;
+  margin-right: 1em;
   height: inherit;
 }
 
@@ -21,6 +33,7 @@
   min-width: 40px;
   margin-left: -33px;
   color: gray;
+  font-weight: normal;
   display: inline-block;
 }
 
