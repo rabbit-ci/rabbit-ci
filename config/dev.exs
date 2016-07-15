@@ -11,6 +11,7 @@ config :rabbitci_core, RabbitCICore.Endpoint,
   debug_errors: true,
   cache_static_lookup: false,
   code_reloader: true,
+  check_origin: false,
   watchers: []
 
 # Do not include metadata nor timestamps in development logs

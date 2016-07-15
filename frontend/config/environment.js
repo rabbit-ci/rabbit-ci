@@ -21,15 +21,16 @@ module.exports = function(environment) {
   };
 
   if (environment === 'development') {
-    ENV.contentSecurityPolicy = {
-      'default-src': "'none'",
-      'script-src': "'self' 'unsafe-eval'",
-      'font-src': "'self' https://fonts.gstatic.com data:",
-      'connect-src': "'self' localhost:4000 ws://localhost:4000",
-      'img-src': "'self'",
-      'style-src': "'self' 'unsafe-inline' https://fonts.googleapis.com",
-      'media-src': "'self'"
-    };
+    ENV.contentSecurityPolicy = null;
+    // ENV.contentSecurityPolicy = {
+    //   'default-src': "'none'",
+    //   'script-src': "'self' 'unsafe-eval'",
+    //   'font-src': "'self' https://fonts.gstatic.com data:",
+    //   'connect-src': "'self' localhost:4000 ws://localhost:4000",
+    //   'img-src': "'self'",
+    //   'style-src': "'self' 'unsafe-inline' https://fonts.googleapis.com",
+    //   'media-src': "'self'"
+    // };
     // ENV.APP.LOG_RESOLVER = true;
     // ENV.APP.LOG_ACTIVE_GENERATION = true;
     // ENV.APP.LOG_TRANSITIONS = true;

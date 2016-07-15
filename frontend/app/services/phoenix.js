@@ -36,7 +36,8 @@ export default PhoenixSocket.extend({
       this.subscribe(subTo);
     });
 
-    const uri = ENV.SocketURI;
+    // const uri = ENV.SocketURI;
+    const uri = 'ws://' + document.location.hostname + ':4000/socket';
 
     if (uri === undefined || uri === null) {
       console.error("You must specify a `SocketURI` in your config/environment.js file");
