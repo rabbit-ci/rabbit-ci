@@ -42,7 +42,7 @@ defmodule RabbitCICore.RecordPubSubChannel do
   def handle_in("subscribe", map = %{}, socket) do
     for {k, v} <- map, k in @supported_records do
       for id <- List.wrap(v) do
-        do_subscribe(k, id)
+        do_subscribe(k, id, socket)
       end
     end
     {:reply, :ok, socket}
@@ -101,7 +101,7 @@ defmodule RabbitCICore.RecordPubSubChannel do
     end
   end
 
-  defp do_subscribe(k = "logs", id) do
+  defp do_subscribe(k = "logs", id, socket) do
     import Ecto.Query
     Endpoint.subscribe("#{k}:#{id}")
     Task.start fn ->
@@ -109,8 +109,8 @@ defmodule RabbitCICore.RecordPubSubChannel do
         from(l in Log, where: l.job_id == ^id)
         |> Repo.all
       payload = LogView.fast_log_serializer(data)
-      Endpoint.broadcast("logs:#{id}", "fast_log_payload", payload)
+      push socket, "fast_log_payload", payload
     end
   end
-  defp do_subscribe(k, id), do: Endpoint.subscribe("#{k}:#{id}")
+  defp do_subscribe(k, id, _), do: Endpoint.subscribe("#{k}:#{id}")
 end
