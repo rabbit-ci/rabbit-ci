@@ -19,20 +19,32 @@ export default Ember.Route.extend({
   },
 
   phoenix: Ember.inject.service(),
-  idMap: {builds: null, jobs: []},
-  // TODO: Handle new jobs being loaded.
+  idMap: {builds: null, jobs: [], logs: []},
+
   afterModel(build) {
+    Ember.addObserver(build, 'steps', this, 'jobsChanged');
+    this._subscribeModels(build);
+  },
+
+  jobsChanged() {
+    this._subscribeModels(this.get('currentModel'));
+  },
+
+  _subscribeModels(build) {
+    let oldIds = Ember.copy(this.get('idMap'));
     this.set('idMap.jobs', []);
+    this.set('idMap.logs', []);
     this.set('idMap.builds', build.get('id'));
 
     build.get('steps').forEach((step) => {
       step.get('jobs').forEach((job) => {
         this.set('idMap.jobs', this.get('idMap.jobs').concat(job.get('id')));
-        this.set('idMap.logs', this.get('idMap.jobs').concat(job.get('id')));
+        this.set('idMap.logs', this.get('idMap.jobs'));
       });
     });
 
     this.get('phoenix').subscribe(this.get('idMap'));
+    this.get('phoenix').unsubscribe(oldIds);
   },
 
   deactivate() {

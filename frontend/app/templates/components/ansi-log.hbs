@@ -6,9 +6,9 @@
     as |logLine index|
   }}
     <div class="logline">
-      {{#each logLine as |log|~}}
+      {{#each logLine key="@index" as |log|~}}
         <span data-line-number={{plus-one index}}
-              class="ansi {{unbound log.fg}} {{unbound log.style}} {{unbound log.bg}}-bg">{{unbound log.stdio}}</span>
+              class="ansi {{log.fg}} {{log.style}} {{log.bg}}-bg">{{log.stdio}}</span>
       {{~/each}}
     </div>
   {{/ember-collection}}

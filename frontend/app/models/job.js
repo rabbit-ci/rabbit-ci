@@ -1,8 +1,9 @@
 import DS from 'ember-data';
+import Ember from 'ember';
 
 export default DS.Model.extend({
   status: DS.attr('string'),
-  logs: DS.hasMany('logs'),
+  logs: DS.attr('array', { defaultValue: () => { return Ember.A([]); } }),
   box: DS.attr('string'),
   step: DS.belongsTo('step'),
   startTime: DS.attr('date'),
@@ -21,8 +22,5 @@ export default DS.Model.extend({
     case "finished": return "green";
     default: return "";
     }
-  }),
-
-  logSorting: ['order'],
-  sortedLogs: Ember.computed.sort('logs', 'logSorting')
+  })
 });

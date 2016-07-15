@@ -9,22 +9,27 @@ export default PhoenixSocket.extend({
 
   init: function() {
     this.on('error', () => {
+      Ember.Logger.debug('Socket error');
       this.set('needResubscribe', true);
     });
 
     this.on('close', () => {
+      Ember.Logger.debug('Socket close');
       this.set('needResubscribe', true);
     });
 
     this.on('open', () => {
+      Ember.Logger.debug('Socket open');
       if (!this.get('needResubscribe')) return;
 
       let subbed = this.get('subscribedRecords');
       this.set('subscribedRecords', new Map());
       let subTo = {};
 
-      for(let [_key, {key, id}] of subbed) {
-        subTo[key] = (subTo[key] || []).concat(id);
+      for(let [_key, {key, id, count}] of subbed) {
+        if (count > 0) {
+          subTo[key] = (subTo[key] || []).concat(id);
+        }
       }
 
       this.set('needResubscribe', false);
@@ -39,13 +44,35 @@ export default PhoenixSocket.extend({
       this.connect(uri, {});
       const channel = this.joinChannel("record_pubsub", {});
       channel.on("json_api_payload", (payload) => this._onPayload(payload));
+      channel.on("fast_log_payload", (payload) => this._onLogPayload(payload));
       this.set('channel', channel);
     }
   },
 
+  _onLogPayload(payload) {
+    var t2 = performance.now();
+    let data = payload.data;
+
+    if (!Array.isArray(data)) {
+      data = [data];
+    }
+
+    data.forEach((oneLog) => {
+      let job = this.get('store').peekRecord('job', oneLog.job_id);
+      let logs = job.get('logs');
+      logs.arrayContentWillChange(oneLog.order, 1, 1);
+      logs[oneLog.order] = oneLog;
+      logs.arrayContentDidChange(oneLog.order, 1, 1);
+    });
+
+    var t3 = performance.now();
+    console.log("Log update took " + (t3 - t2) + " milliseconds.");
+  },
+
   _onPayload(payload) {
-    Ember.Logger.debug('Received payload:', payload);
-    this.get('store').pushPayload(payload);
+    Ember.run(() => {
+      this.get('store').pushPayload(payload);
+    });
   },
 
   // E.g. subscribe({builds: 123})

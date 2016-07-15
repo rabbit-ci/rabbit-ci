@@ -57,9 +57,13 @@ defmodule RabbitCICore.RecordPubSubChannel do
     {:reply, :ok, socket}
   end
 
-  intercept ["json_api_payload"]
+  intercept ["json_api_payload", "fast_log_payload"]
 
   def handle_info(%Broadcast{topic: _, event: "json_api_payload" = ev, payload: pay}, socket) do
+    push socket, ev, pay
+    {:noreply, socket}
+  end
+  def handle_info(%Broadcast{topic: _, event: "fast_log_payload" = ev, payload: pay}, socket) do
     push socket, ev, pay
     {:noreply, socket}
   end
@@ -92,8 +96,8 @@ defmodule RabbitCICore.RecordPubSubChannel do
 
   def new_log(log) do
     Task.start fn ->
-      payload = JaSerializer.format(LogView, log, Endpoint, %{})
-      Endpoint.broadcast("logs:#{log.job_id}", "json_api_payload", payload)
+      payload = LogView.fast_log_serializer(log)
+      Endpoint.broadcast("logs:#{log.job_id}", "fast_log_payload", payload)
     end
   end
 
@@ -104,8 +108,8 @@ defmodule RabbitCICore.RecordPubSubChannel do
       data =
         from(l in Log, where: l.job_id == ^id)
         |> Repo.all
-      payload = JaSerializer.format(LogView, data, Endpoint, %{})
-      Endpoint.broadcast("logs:#{id}", "json_api_payload", payload)
+      payload = LogView.fast_log_serializer(data)
+      Endpoint.broadcast("logs:#{id}", "fast_log_payload", payload)
     end
   end
   defp do_subscribe(k, id), do: Endpoint.subscribe("#{k}:#{id}")
