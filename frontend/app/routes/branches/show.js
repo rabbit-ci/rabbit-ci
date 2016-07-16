@@ -1,4 +1,5 @@
 import Ember from 'ember';
+import flatten from 'rabbit-ci/utils/flatten';
 
 export default Ember.Route.extend({
   model(params) {
@@ -17,40 +18,42 @@ export default Ember.Route.extend({
   },
 
   afterModel(branch) {
-    Ember.addObserver(branch, 'builds', this, 'buildsChanged');
-    this.set('idMap.branches', branch.get('id'));
-    this.get('phoenix').subscribe(this.get('idMap'));
+    Ember.addObserver(branch, 'builds', this, '_subscribeRecords');
+    this._subscribeRecords(branch);
+
     if (branch.get('builds').isFulfilled === true) {
       branch.get('builds').reload();
     }
   },
 
   phoenix: Ember.inject.service(),
-  idMap: {branches: null, builds: [], jobs: []},
+  idMap: {},
 
-  buildsChanged() {
-    this._connectBuildsToChan(this.get('currentModel.builds'));
-  },
+  _subscribeRecords() {
+    let branch = arguments[0] || this.get('currentModel');
+    if (!branch) return;
 
-  _connectBuildsToChan(builds) {
-    let oldIds = Ember.copy(this.get('idMap'));
-    this.set('idMap.builds', []);
-    this.set('idMap.jobs', []);
+    let oldIds = Ember.copy(this.get('idMap'), true);
+    this.set('idMap', {});
 
-    builds.forEach((build) => {
-      this.set('idMap.builds', this.get('idMap.builds').concat(build.get('id')));
-      build.get('steps').forEach((step) => {
-        step.get('jobs').forEach((job) => {
-          this.set('idMap.jobs', this.get('idMap.jobs').concat(job.get('id')));
-        });
+    this.set('idMap.branches', branch.get('id'));
+    this.set('idMap.builds', branch.get('builds').mapBy('id'));
+
+    let jobIds = flatten(branch.get('builds').map((build) => {
+      return build.get('steps').map((step) => {
+        return step.get('jobs').mapBy('id');
       });
-    });
+    }));
+
+    this.set('idMap.jobs', jobIds);
 
     this.get('phoenix').subscribe(this.get('idMap'));
     this.get('phoenix').unsubscribe(oldIds);
   },
 
   deactivate() {
+    Ember.removeObserver(this.get('currentModel'), 'builds', this, '_subscribeRecords');
     this.get('phoenix').unsubscribe(this.get('idMap'));
+    this.set('idMap', {});
   }
 });

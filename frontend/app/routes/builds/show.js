@@ -1,4 +1,5 @@
 import Ember from 'ember';
+import flatten from 'rabbit-ci/utils/flatten';
 
 export default Ember.Route.extend({
   model(params) {
@@ -19,35 +20,35 @@ export default Ember.Route.extend({
   },
 
   phoenix: Ember.inject.service(),
-  idMap: {builds: null, jobs: [], logs: []},
+  idMap: {},
 
   afterModel(build) {
-    Ember.addObserver(build, 'steps', this, 'jobsChanged');
-    this._subscribeModels(build);
+    Ember.addObserver(build, 'steps', this, '_subscribeRecords');
+    this._subscribeRecords(build);
   },
 
-  jobsChanged() {
-    this._subscribeModels(this.get('currentModel'));
-  },
+  _subscribeRecords() {
+    let build = arguments[0] || this.get('currentModel');
+    if (!build) return;
 
-  _subscribeModels(build) {
-    let oldIds = Ember.copy(this.get('idMap'));
-    this.set('idMap.jobs', []);
-    this.set('idMap.logs', []);
+    let oldIds = Ember.copy(this.get('idMap'), true);
+    this.set('idMap', {});
     this.set('idMap.builds', build.get('id'));
 
-    build.get('steps').forEach((step) => {
-      step.get('jobs').forEach((job) => {
-        this.set('idMap.jobs', this.get('idMap.jobs').concat(job.get('id')));
-        this.set('idMap.logs', this.get('idMap.jobs'));
-      });
-    });
+    let jobIds = flatten(build.get('steps').map((step) => {
+      return step.get('jobs').mapBy('id');
+    }));
+
+    this.set('idMap.jobs', jobIds);
+    this.set('idMap.logs', jobIds);
 
     this.get('phoenix').subscribe(this.get('idMap'));
     this.get('phoenix').unsubscribe(oldIds);
   },
 
   deactivate() {
+    Ember.removeObserver(this.get('currentModel'), 'steps', this, '_subscribeRecords');
     this.get('phoenix').unsubscribe(this.get('idMap'));
+    this.set('idMap', {});
   }
 });

@@ -78,11 +78,10 @@ export default PhoenixSocket.extend({
 
   // E.g. subscribe({builds: 123})
   subscribe(map) {
-    Ember.Logger.debug("Subscribing to:", map);
     let actualSub = this._processPubSubMap(map,
                                            (old) => {return (old || 0) === 0;},
                                            (old) => {return (old || 0) + 1;});
-
+    if (Object.keys(actualSub).length === 0) return;
     this.get('channel').push("subscribe", actualSub)
       .receive("ok", (resp) => {
         Ember.Logger.debug("[OK] Subscribed to:", actualSub, "Response:", resp);
@@ -91,11 +90,10 @@ export default PhoenixSocket.extend({
 
   // E.g. unsubscribe({builds: 123})
   unsubscribe(map) {
-    Ember.Logger.debug("Unsubscribing from:", map);
     let actualUnsub = this._processPubSubMap(map,
                                              (old) => {return (old || 0) === 1;},
                                              (old) => {return (old || 1) - 1;});
-
+    if (Object.keys(actualUnsub).length === 0) return;
     this.get('channel').push("unsubscribe", actualUnsub)
       .receive("ok", (resp) => {
         Ember.Logger.debug("[OK] Unsubscribed from:", actualUnsub, "Response:", resp);
@@ -121,7 +119,6 @@ export default PhoenixSocket.extend({
       });
     });
 
-    Ember.Logger.debug("PubSub count:", this.get('subscribedRecords'));
     return actualChange;
   }
 });
