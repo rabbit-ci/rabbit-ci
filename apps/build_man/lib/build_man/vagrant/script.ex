@@ -15,26 +15,35 @@ defmodule BuildMan.Vagrant.Script do
       |> env_vars_script
 
     ~s"""
-    tmpfile=$(mktemp)
-
-    cat > $tmpfile <<MAINSCRIPT
-    set -v
+    set -x
     set -e
     #{env_vars}
     #{step.before_script}
     #{git_cmd}
     cd workdir
     #{step.script}
-    MAINSCRIPT
-
-    script -qefc "/bin/sh $tmpfile" /dev/null
     """
   end
 
   defp env_vars_script(vars) do
     for {key, val} <- vars, into: "" do
-      safe_val = Poison.encode!(val)
-      "export #{key}=#{safe_val}\n"
+      safe_val = bash_escape(val)
+      "export #{key}=\"#{safe_val}\"\n"
     end
+  end
+
+  defp bash_escape(string) when is_binary(string) do
+    {output, 0} =
+      System.cmd(
+        "/bin/bash",
+        ["-c", ~s(printf "%q" "$RABBITCI_ESCAPE")],
+        env: [{"RABBITCI_ESCAPE", string}]
+      )
+    output
+  end
+  defp bash_escape(not_string) do
+    not_string
+    |> to_string
+    |> bash_escape
   end
 end

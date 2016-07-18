@@ -8,11 +8,30 @@ export default Ember.Component.extend({
 
     let lines = [];
     let currentLine = [];
+    let carriageReturn = false;
+    let cursorPos = 0;
 
     this.get('logs').forEach(function(log, _index, _enumerable) {
-      currentLine.push(log);
       let stdio = log.stdio;
-      if (stdio.charAt(stdio.length - 1) === "\n") {
+      let lastChar = stdio.charAt(stdio.length - 1);
+
+      if (carriageReturn) {
+        if (stdio.replace("\r", "").replace("\n", "").length > 0) {
+          currentLine = [log];
+        } else {
+          currentLine.push(log);
+        }
+
+        carriageReturn = false;
+      } else {
+        currentLine.push(log);
+      }
+
+      if (lastChar === "\r") {
+        carriageReturn = true;
+      }
+
+      if (lastChar === "\n") {
         lines.push(currentLine);
         currentLine = [];
       }

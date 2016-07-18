@@ -92,7 +92,7 @@ defmodule BuildMan.Vagrant do
   end
 
   defp script_command("virtualbox", script), do: ["ssh", "-c", "sh", "-c", script]
-  defp script_command("docker", script), do: ["docker-run", "--", "/bin/sh", "-c", script]
+  defp script_command("docker", script), do: ["docker-run", "--tty", "--", "/bin/sh", "-c", script]
 
   defp destroy_boot2docker_machine(state, worker) do
     [worker.path, ".vagrant", "machines", "rabbit-ci-boot2docker", "virtualbox", "index_uuid"]
@@ -146,8 +146,8 @@ defmodule BuildMan.Vagrant do
     ExExec.run(
       [vagrant_cmd | args],
       [
-        {:stdout, handle_log(worker, counter, :stdout)},
-        {:stderr, handle_log(worker, counter, :stderr)},
+        :stdout,
+        :stderr,
         # Running commands in a PTY gives us colors!
         :pty,
         # We need to kill the entire Vagrant process group because Vagrant does
@@ -173,10 +173,23 @@ defmodule BuildMan.Vagrant do
     end)
   end
 
+  def handle_info({:stdout, _pid, str}, state = %{worker: worker, counter: counter}) do
+    for {{log_split, colors}, count} <- update_colors(str, counter) do
+      Worker.log(worker, log_split, :stdout, count, colors)
+    end
+    {:noreply, state}
+  end
+  def handle_info({:stderr, _pid, str}, state = %{worker: worker, counter: counter}) do
+    for {{log_split, colors}, count} <- update_colors(str, counter) do
+      Worker.log(worker, log_split, :stderr, count, colors)
+    end
+    {:noreply, state}
+  end
+
   defp handle_log(worker, counter, type) do
     fn _, _, str ->
-      for {log_split, colors} <- update_colors(str, counter) do
-        Worker.log(worker, log_split, type, increment_counter(counter), colors)
+      for {{log_split, colors}, count} <- update_colors(str, counter) do
+        Worker.log(worker, log_split, type, count, colors)
       end
     end
   end
@@ -184,7 +197,9 @@ defmodule BuildMan.Vagrant do
   defp update_colors(str, counter) do
     Agent.get_and_update counter, fn {x, colors} ->
       with logs = [{_, new_colors} | _rest] <- LogProcessor.colors_backwards(str, colors) do
-        {Enum.reverse(logs), {x, new_colors}}
+        return = for {log, index} <- Enum.with_index(Enum.reverse logs), do: {log, x + index + 1}
+        {_, new_count} = List.last(return)
+        {return, {new_count, new_colors}}
       else
         [] -> {[], {x, colors}}
       end

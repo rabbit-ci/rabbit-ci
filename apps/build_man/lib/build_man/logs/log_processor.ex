@@ -74,6 +74,18 @@ defmodule BuildMan.LogProcessor do
     do_colors(rest, {"", current_colors},
       append_formatted({current_text <> "\n", current_colors}, acc))
   end
+  defp do_colors(<<"\r\n" :: utf8, rest :: binary>>, {current_text, current_colors}, acc) do
+    do_colors(rest, {"", current_colors},
+      append_formatted({current_text <> "\n", current_colors}, acc))
+  end
+  defp do_colors(<<"\r" :: utf8, rest :: binary>>, {current_text, current_colors}, acc) do
+    do_colors(rest, {"", current_colors},
+      append_formatted({current_text <> "\r", current_colors}, acc))
+  end
+  defp do_colors(<<"\e[K" :: utf8, rest :: binary>>, {current_text, current_colors}, acc) do
+    do_colors(rest, {"", current_colors},
+      append_formatted({current_text <> "\n", current_colors}, acc))
+  end
   defp do_colors("", current, acc) do
     append_formatted(current, acc)
   end
