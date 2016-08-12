@@ -2,9 +2,10 @@ defmodule BuildMan.RabbitMQMacros do
   @callback rabbitmq_connect(opts :: any) :: %{chan: %AMQP.Channel{}}
 
   defmacro __using__(_opts) do
-    quote do
+    quote location: :keep do
       require Logger
       alias AMQP.Channel
+      @behaviour GenServer
       @behaviour BuildMan.RabbitMQMacros
 
       def init(opts) do
