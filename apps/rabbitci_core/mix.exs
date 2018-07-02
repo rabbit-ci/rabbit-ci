@@ -17,7 +17,7 @@ defmodule RabbitCICore.Mixfile do
      config_path: "../../config/config.exs",
      test_coverage: [tool: Coverex.Task],
      aliases: aliases(),
-     deps: Shared.deps ++ deps]
+     deps: Shared.deps() ++ deps()]
   end
 
   # Configuration for the OTP application

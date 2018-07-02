@@ -14,7 +14,7 @@ defmodule Rabbitmq.Mixfile do
      build_path: "../../_build",
      config_path: "../../config/config.exs",
      test_coverage: [tool: Coverex.Task],
-     deps: Shared.deps ++ deps]
+     deps: Shared.deps() ++ deps()]
   end
 
   # Configuration for the OTP application
