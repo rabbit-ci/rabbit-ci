@@ -14,18 +14,20 @@ defmodule RabbitCICore.BuildController do
   def running_builds(conn, _params) do
     builds =
       Repo.all from(b in Build,
-                    join: s in assoc(b, :jobs),
-                    # We want to get all of the jobs for all of the builds that
-                    # have jobs which have statuses that are either "queued" or
-                    # "running". Instead of doing two queries, we load all of
-                    # the jobs (for preloading) here. The other join on jobs
-                    # is used to filter the builds that we will be loading.
-                    join: sa in assoc(b, :jobs),
-                    join: br in assoc(b, :branch),
-                    join: p in assoc(br, :project),
-                    where: s.status in ["queued", "running"]
-                    or b.config_extracted == "false",
-                    preload: [jobs: sa, branch: {br, project: p}])
+        join: j in assoc(b, :steps),
+        join: s in assoc(j, :jobs),
+        # We want to get all of the jobs for all of the builds that
+        # have jobs which have statuses that are either "queued" or
+        # "running". Instead of doing two queries, we load all of
+        # the jobs (for preloading) here. The other join on jobs
+        # is used to filter the builds that we will be loading.
+        join: ja in assoc(b, :steps),
+        join: sa in assoc(ja, :jobs),
+        join: br in assoc(b, :branch),
+        join: p in assoc(br, :project),
+        where: s.status in ["queued", "running"]
+        or b.config_extracted == "false",
+        preload: [steps: {ja, jobs: sa}, branch: {br, project: p}])
 
     conn
     |> render("index.json", data: builds)
